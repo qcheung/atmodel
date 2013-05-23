@@ -28,18 +28,18 @@ class atmodel(wx.Frame):
         'TOP_LEFT'
         top_left_fgs = wx.FlexGridSizer(7, 2, 6, 6)
         parameters = ['Specify Parameters', 'Spectral Resolution:', 
-                      'Mirror Diameter/m:', 'Mirror Temperature/K:',
+                      'Mirror Diameter(m):', 'Mirror Temperature(K):',
                       'Choose a Site:', 'Choose a source:', 'Choose backgrounds', 
-                      'Specify starting frequency/cm^-1', 'Specify ending frequency/cm^-1' ]
+                      'Specify starting frequency(cm^-1)', 'Specify ending frequency(cm^-1)','Signal to noise ratio' ]
         sites = ['South Pole', 'DomeA', 'DomeC', 'WhiteMo','Santa Barbara',
                   'Chili', 'Sofia', 'Balloon 30', 'Balloon 40', 'Space', 'Custom..']
         sources = ['SED', 'ARP220', 'NGC 958', 'Custom..']
-        backgrounds = ['CIB', 'OH', 'CMB', 'Galaxy', 'ZODI', 
+        backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galaxtic Emission', 'Thermal Mirror Emission', 'Atmospheric Radiance', 
                        'Atmospheric Radiance', 'Atmospheric Transmision', 
-                       'Thermal Mirror Emission']
+                       'Zodiacal Emission']
 
-        parameter_labels = [wx.StaticText(panel, label = parameters[i]) for i in range(9)]
-        self.parameter_inputs = [wx.TextCtrl(panel) for i in range(5)]
+        parameter_labels = [wx.StaticText(panel, label = parameters[i]) for i in range(10)]
+        self.parameter_inputs = [wx.TextCtrl(panel) for i in range(6)]
         parameter_site_combo = wx.ComboBox(panel, choices = sites, style = wx.CB_READONLY) 
         parameter_source_combo = wx.ComboBox(panel, choices = sources, style = wx.CB_READONLY)
 
@@ -52,7 +52,8 @@ class atmodel(wx.Frame):
                               (parameter_labels[4], 0, wx.EXPAND), (parameter_site_combo, 0, wx.EXPAND),
                               (parameter_labels[5], 0, wx.EXPAND), (parameter_source_combo, 0, wx.EXPAND),
                               (parameter_labels[7], 0, wx.EXPAND), (self.parameter_inputs[3], 0, wx.EXPAND),
-                              (parameter_labels[8], 0, wx.EXPAND), (self.parameter_inputs[4], 0, wx.EXPAND)])
+                              (parameter_labels[8], 0, wx.EXPAND), (self.parameter_inputs[4], 0, wx.EXPAND),
+                              (parameter_labels[9], 0, wx.EXPAND), (self.parameter_inputs[5], 0, wx.EXPAND)])
         
         top_left.Add(top_left_fgs, flag = wx.EXPAND)
 
@@ -141,7 +142,8 @@ class atmodel(wx.Frame):
         temp = xr.read_from_col(8)
         
         #Calculation
-        bling=cal.bling_Galactic_Emission(freq, temp, resol)
+
+        bling = cal.bling_Galactic_Emission(freq, temp, resol)
         
         #writing
         xw.write_col('freq/THz', freq)
