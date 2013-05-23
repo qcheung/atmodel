@@ -39,9 +39,7 @@ def bling_Galactic_Emission(freq, temp, resol):
     for i in range(len(freq)):
         v0 = freq[i]
         t0 = temp[i]
-        freq_begin = v0 - v0/resol
-        freq_end = v0 + v0/resol
-        result = const.h * const.k * v0 * t0 * (freq_end - freq_begin)
+        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
     return result
 
 def trancate(data, start, end):
@@ -57,4 +55,4 @@ def trancate(data, start, end):
             result.append(x)
     return np.transpose(result)
 
-#print bling_by_temperature([1,2,3,4,5],[1,2,3,4,5],100)
+#print bling_Galactic_Emission([1,2,3,4,5],[100,200,300,400,500],100)
