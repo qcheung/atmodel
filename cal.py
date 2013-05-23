@@ -33,6 +33,8 @@ def bling_by_temperature(freq, temp, resol):
         integral = const.h * const.k * temp_freq * temp_temp
         result.append(integrate.simps(integral, temp_freq)**(0.5))
     return result
+    
+def bling_Galactic_Emission(freq, temp, resol)
 
 def trancate(data, start, end):
     '''
