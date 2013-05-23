@@ -11,19 +11,26 @@ def ta(freq, intensity):
 def bling(freq, intensity, resol):
     result = []
     for v0 in freq:
-        int_begin = v0 - v0/resol
-        int_end = v0 + v0/resol
-        f = np.array(trancate(freq, int_begin, int_end))
-        t = ta(freq, intensity)
-        integral = const.h * const.k
-        result.append(integrate.simps(integral, freq))
+        freq_begin = v0 - v0/resol
+        freq_end = v0 + v0/resol
+        data = [freq,intensity]
+        data = trancate(data, freq_begin, freq_end)
+        f = data[0]
+        i = data[1]
+        t = ta(f,i)
+        integral = const.h * const.k * f * i * t
+        result.append(integrate.simps(integral, i)**(0.5))
     return result
 
-def trancate(arr, start, end):
+def trancate(data, start, end):
+    '''
+    Used to trancate an array based on frequency
+    ''' 
+    data = np.transpose(data)
     result = []
-    for x in arr:
-        if x > end:
+    for x in data:
+        if x[0] > end:
             break
-        if x >= start:
+        if x[0] >= start:
             result.append(x)
-    return result
+    return np.transpose(result)
