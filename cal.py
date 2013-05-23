@@ -35,6 +35,15 @@ def bling_by_temperature(freq, temp, resol):
     return result
     
 def bling_Galactic_Emission(freq, temp, resol)
+    result = []
+    data = [freq,temp]
+    for v0 in freq:
+        freq_begin = v0 - v0/resol
+        freq_end = v0 + v0/resol
+        temp_freq = temp_data[0]
+        temp_temp = temp_data[1]
+        result = const.h * const.k * temp_freq * temp_temp * (freq_end - freq_begin)
+    return result
 
 def trancate(data, start, end):
     '''
