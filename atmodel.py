@@ -1,12 +1,7 @@
-'''
-Created on May 16, 2013
-
-@author: dave
-'''
-
 import wx
 from excel import ExcelWriter,ExcelReader
 import plotter
+import cal
  
 class atmodel(wx.Frame):
     output_input = 0
@@ -129,21 +124,34 @@ class atmodel(wx.Frame):
         file_dialog.Destroy()        
         
     def onGenerate(self, e):
+        #initialization
         xw = ExcelWriter(self.path)
         xr = ExcelReader("/home/dave/test.xlsx")
+        
+        #get values
         freq_start = float(self.parameter_inputs[3].GetValue())
         freq_end = float(self.parameter_inputs[4].GetValue())
+        resol = float(self.parameter_inputs[0].GetValue())
+        
+        #set frequency range
         xr.set_freq_range(freq_start, freq_end)
-        x = xr.read_from_col(2)
-        y = xr.read_from_col(8)
-        xw.write_col('freq/THz', x)
-        xw.write_col('Temp/K', y)
+        
+        #read frequency and temperature
+        freq = xr.read_from_col(2)
+        temp = xr.read_from_col(8)
+        
+        #Calculation
+        bling = cal.bling_by_temperature(freq, temp, resol)
+        
+        #writing
+        xw.write_col('freq/THz', freq)
+        xw.write_col('Bling', bling)
         xw.save()
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
         message_dialog.SetTitle("Successful!")
         if message_dialog.ShowModal() == wx.ID_OK:
             message_dialog.Destroy()
-        plotter.loglogplot(x, y)
+        plotter.loglogplot(freq, bling)
     def onCancel(self, e):
         self.Destroy()
     '''

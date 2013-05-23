@@ -39,7 +39,6 @@ class ExcelWriter:
         for x in column_content:
             self.sheet.write(row, self.column_to_fill, x)
             row += 1
-            print x
         self.column_to_fill += 1
     def save(self):
         self.book.save(self.path)
