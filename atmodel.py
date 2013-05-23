@@ -34,9 +34,9 @@ class atmodel(wx.Frame):
         sites = ['South Pole', 'DomeA', 'DomeC', 'WhiteMo','Santa Barbara',
                   'Chili', 'Sofia', 'Balloon 30', 'Balloon 40', 'Space', 'Custom..']
         sources = ['SED', 'ARP220', 'NGC 958', 'Custom..']
-        backgrounds = ['CIB', 'OH', 'CMB', 'Galaxy', 'ZODI', 
+        backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galaxtic Emission', 'Thermal Mirror Emission', 'Atmospheric Radiance', 
                        'Atmospheric Radiance', 'Atmospheric Transmision', 
-                       'Thermal Mirror Emission']
+                       'Zodiacal Emission']
 
         parameter_labels = [wx.StaticText(panel, label = parameters[i]) for i in range(9)]
         self.parameter_inputs = [wx.TextCtrl(panel) for i in range(5)]
