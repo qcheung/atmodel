@@ -141,7 +141,7 @@ class atmodel(wx.Frame):
         temp = xr.read_from_col(8)
         
         #Calculation
-        bling = cal.bling_by_temperature(freq, temp, resol)
+        bling = cal.bling_Galactic_Emission(freq, temp, resol)
         
         #writing
         xw.write_col('freq/THz', freq)
