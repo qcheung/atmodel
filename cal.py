@@ -46,4 +46,5 @@ def trancate(data, start, end):
         if x[0] >= start:
             result.append(x)
     return np.transpose(result)
-#print bling_by_temperature([1,2,3,4,5],[1,2,3,4,5],1)
+
+print bling_by_temperature([1,2,3,4,5],[1,2,3,4,5],100)
