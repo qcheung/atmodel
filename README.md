@@ -39,7 +39,7 @@ Packages used:
 
 Wxpython: for UI
 
-numpy/simpy: for calculation
+numpy/scipy: for calculation
 
 xlrd/xlwt: for excel accessing. see python-excel
 
