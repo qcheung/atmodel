@@ -9,27 +9,27 @@ There are a large amount of excel files that make the analysis very cubersome to
 
 The program contains following files:
 
-1.atmodel.py
+atmodel.py
 
 It controls the User Interface and main program loop
 
-2. excel.py
+excel.py
 
 It contains two classes to help excel reading and writing: ExcelReader and ExcelWriter.
 
-3. plotter.py
+plotter.py
 
 It's a collection of functions related to plotting graphs of data
 
-4. cal.py
+cal.py
 
 It contains functions for detailed calculations
 
-5. exceptions.py
+exceptions.py
 
 It deals with exceptions in the program. Currently remains undeveloped
 
-6. const.py
+const.py
 
 It contains all constant definitions. 
 
