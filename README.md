@@ -38,8 +38,11 @@ It contains all constant definitions.
 Packages used:
 
 Wxpython: for UI
+
 numpy/simpy: for calculation
+
 xlrd/xlwt: for excel accessing. see python-excel
+
 matplotlib: for plotting
 
 In order to run the program please make sure these packages are properly installed.
