@@ -33,15 +33,61 @@ def bling_by_temperature(freq, temp, resol):
         integral = const.h * const.k * temp_freq * temp_temp
         result.append(integrate.simps(integral, temp_freq)**(0.5))
     return result
+
+#bling_Cosmology_Infrared_Backgrond   
+def bling_CIB(freq, temp, resol):
+    result1 = []
+    for i in range(len(freq)):
+        v0 = freq[i]
+        t0 = temp[i]
+        result.append(const.h * const.k * v0*t0 * 2 * v0 / resol)
+    return result1
     
-def bling_Galactic_Emission(freq, temp, resol):
-    result = []
+#bling_Cosmology_Microwave_Backgrond
+def bling_CMB(freq, resol):
+    result2 = []
+    for i in range(len(freq)):
+        v0 = freq[i]
+        I = 2 * const.h * v0**3 / (const.c**2 * (exp((const.h * v0) / (const.k * const.T))-1))
+        t0 = I * c**2 / (const.k * v0**2)
+        result.append(const.h * const.k * v0*t0 * 2 * v0 / resol)
+    return result2
+    
+#bling_Galactic_Emission       
+def bling_GE(freq, temp, resol):
+    result3 = []
     for i in range(len(freq)):
         v0 = freq[i]
         t0 = temp[i]
         result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
-    return result
+    return result3
+  
+#bling_Thermal Mirror Emission
+def bling_TME(freq, temp, resol):
+    result4 = []
+    for i in range(len(freq)):
+        v0 = freq[i]
+        I = 2 * const.h * v0**3 / (const.c**2 * (exp((const.h * v0) / (const.k * const.T))-1))
+        epsilon = (16 * pi * v0 * const.epsilon / const.delta)**(0.5)
+        t0 = epsilon * I * c**2 / (const.k * v0**2)
+        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
+    return result4
+    
+#bing_Atmospheric_Radiance
 
+
+#bling_Zodiacal_Emission
+def bling_ZE(freq, temp, resol):
+    result5 = []
+    for i in range(len(freq)):
+        v0 = freq[i]
+        t0 = temp[i]
+        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
+    return result5
+
+#bling_TOT
+   
+    
 def trancate(data, start, end):
     '''
     Used to trancate an array based on frequency
