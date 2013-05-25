@@ -68,7 +68,7 @@ def bling_TME(freq, temp, resol):
     for i in range(len(freq)):
         v0 = freq[i]
         I = 2 * const.h * v0**3 / (const.c**2 * (exp((const.h * v0) / (const.k * const.T))-1))
-        epsilon = (16 * pi * v0 * const.epsilon / const.delta)**(0.5)
+        epsilon = (16 * pi * v0 * const.epsilon / const.sigma)**(0.5)
         t0 = epsilon * I * c**2 / (const.k * v0**2)
         result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
     return result4
