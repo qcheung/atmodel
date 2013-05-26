@@ -21,6 +21,7 @@ def bling(freq, intensity, resol):
         integral = const.h * const.k * f * i * t
         result.append(integrate.simps(integral, i)**(0.5))
     return result
+    
 def bling_by_temperature(freq, temp, resol):
     result = []
     data = [freq,temp]
@@ -36,35 +37,36 @@ def bling_by_temperature(freq, temp, resol):
 
 #bling_Cosmology_Infrared_Backgrond   
 def bling_CIB(freq, temp, resol):
-    result1 = []
+    result = []
     for i in range(len(freq)):
         v0 = freq[i]
         t0 = temp[i]
         result.append(const.h * const.k * v0*t0 * 2 * v0 / resol)
-    return result1
+    return result
     
 #bling_Cosmology_Microwave_Backgrond
 def bling_CMB(freq, resol):
-    result2 = []
+    result = []
     for i in range(len(freq)):
         v0 = freq[i]
         I = 2 * const.h * v0**3 / (const.c**2 * (exp((const.h * v0) / (const.k * const.T))-1))
         t0 = I * c**2 / (const.k * v0**2)
         result.append(const.h * const.k * v0*t0 * 2 * v0 / resol)
-    return result2
+        
+    return result
     
 #bling_Galactic_Emission       
 def bling_GE(freq, temp, resol):
-    result3 = []
+    result = []
     for i in range(len(freq)):
         v0 = freq[i]
         t0 = temp[i]
         result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
-    return result3
+    return result
   
 #bling_Thermal Mirror Emission
 def bling_TME(freq, temp, resol):
-    result4 = []
+    result = []
     for i in range(len(freq)):
         v0 = freq[i]
         I = 2 * const.h * v0**3 / (const.c**2 * (exp((const.h * v0) / (const.k * const.T))-1))
