@@ -140,6 +140,9 @@ class atmodel(wx.Frame):
         freq_start = float(self.parameter_inputs[3].GetValue())
         freq_end = float(self.parameter_inputs[4].GetValue())
         resol = float(self.parameter_inputs[0].GetValue())
+        d = float(self.parameter_inputs[1].GetValue())
+        T = float(self.parameter_inputs[2].GetValue())
+        ratio = float(self.parameter_inputs[5].GetValue())
         
         #set frequency range
         xr.set_freq_range(freq_start, freq_end)
