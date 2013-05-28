@@ -63,7 +63,7 @@ class atmodel(wx.Frame):
         for i in range(len(backgrounds)):
             top_right.Add(self.background_checkboxs[i], flag = wx.BOTTOM, border = 3)
         #bind eventhandler
-        self.background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_CIB)
+        self.background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_Galatic_Emission)
         
         
         'BOTTOM'
@@ -118,10 +118,12 @@ class atmodel(wx.Frame):
         content.Add(bottom, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
         panel.SetSizer(content)
         
-    def onBg_CIB(self, e):
+    def onBg_Galatic_Emission(self, e):
         source = e.GetEventObject()
+        parent = source.GetParent()
         if source.IsChecked():
-            print 'sorry dude'
+            parent.InsertItem(3,wx.StaticText(self.panel, label = "test"))
+        
             
     def onBg_CMB(self, e):
         source = e.GetEventObject()
@@ -150,7 +152,6 @@ class atmodel(wx.Frame):
         t = float(self.parameter_inputs[2].GetValue())
         ratio = float(self.parameter_inputs[5].GetValue())
         
-        bling = calculate_bling()
         #set frequency range
         xr.set_freq_range(freq_start, freq_end)
         
