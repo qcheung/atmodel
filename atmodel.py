@@ -93,42 +93,46 @@ class atmodel(wx.Frame):
         top_right.Add(self.zodiacal_direction_combo, flag = wx.LEFT, border = 20)
         
 
-        'BOTTOM_LEFT'
+	#Bottom_left 
+	#Bottom_left -> Controls
         generate_label = wx.StaticText(panel, label = 'Generates:')
-        generate_label.SetFont(font)
-        bottom_left.Add(generate_label, flag = wx.BOTTOM, border = 10)
+        generate_label.SetFont(font) #Title
 
         generates = ['Total Noise', 'Total Signal', 'Limiting Flux', 'Integration time'] 
         generate_checkboxs = [wx.CheckBox(panel, label = generates[i]) for i in range(len(generates))]
+
+	#Bottom_left -> Fill up contents
+        bottom_left.Add(generate_label, flag = wx.BOTTOM, border = 10)
         for i in range(len(generates)):
             bottom_left.Add(generate_checkboxs[i], flag = wx.BOTTOM, border = 3)
 
-        'BOTTOM_RIGHT'
+        #Bottom_right
+	#Bottom_right -> Output -> Controls
         output_sizer = wx.BoxSizer(wx.HORIZONTAL)
         output_label = wx.StaticText(panel, label = 'Output to:')
         self.output_input = wx.TextCtrl(panel, size = (200,30))
         output_button = wx.Button(panel, size = (80,30), label = 'Browse')
-        output_button.Bind(wx.EVT_BUTTON, self.onBrowse)
-
+	
+	#Bottom_right -> Output -> Fill up contents
         bottom_right.Add(output_label, flag = wx.TOP, border = 20)
         output_sizer.Add(self.output_input, flag = wx.EXPAND)
         output_sizer.Add(output_button)
-        
         bottom_right.Add(output_sizer, flag = wx.BOTTOM, border = 8)
 
+	#Bottom_right -> Buttons
         generate_button = wx.Button(panel, label = 'Generate')
-        generate_button.Bind(wx.EVT_BUTTON, self.onGenerate)
-        
         cancel_button = wx.Button(panel, label = 'Cancel')
+        
+	#Bottom_right -> Buttons -> Fill up
+ 	bottom_right.Add(generate_button, flag = wx.EXPAND | wx.BOTTOM, border = 3)
+        bottom_right.Add(cancel_button, flag = wx.EXPAND)
+	
+	#Bottom_right -> Function Bindings
+        output_button.Bind(wx.EVT_BUTTON, self.onBrowse)
+        generate_button.Bind(wx.EVT_BUTTON, self.onGenerate)
         cancel_button.Bind(wx.EVT_BUTTON, self.onCancel)
         
-        bottom_right.Add(generate_button, flag = wx.EXPAND | wx.BOTTOM, border = 3)
-        '''
-        bottom_right.Add(plot_button, flag = wx.EXPAND)
-        '''
-        bottom_right.Add(cancel_button, flag = wx.EXPAND)
-        
-        'Finishing'
+	#Fill up contents
         top.Add(top_left, flag = wx.RIGHT | wx.BOTTOM, border = 25)
         top.Add(self.top_right, flag = wx.TOP | wx.BOTTOM, border = 25)
         bottom.Add(bottom_left, flag = wx.RIGHT, border = 35)
@@ -137,19 +141,7 @@ class atmodel(wx.Frame):
         content.Add(bottom, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
         panel.SetSizer(content)
         
-        self.panel = panel
-        
-    def onBg_Galatic_Emission(self, e):
-        source = e.GetEventObject()
-        
-        if source.IsChecked():
-            test = wx.StaticText(self.panel, label = "test")
-            self.top_right.Insert(0, test, flag = wx.EXPAND)
-            self.top_right.Layout()
-        else:
-            test.Destroy()
-            self.top_right.Layout()
-            
+           
     def onBrowse(self, e):
         file_dialog = wx.FileDialog(self, style = wx.FD_SAVE)
         if file_dialog.ShowModal() == wx.ID_OK:
@@ -236,17 +228,18 @@ class atmodel(wx.Frame):
         #plotter.loglogplot(freq, bling)
     def onCancel(self, e):
         self.Destroy()
-    '''
-    def onPlot(self, e):
-        xr = ExcelReader("/home/dave/test.xlsx")
-        freq_start = float(self.parameter_inputs[3].GetValue())
-        freq_end = float(self.parameter_inputs[4].GetValue())
-        xr.set_freq_range(freq_start, freq_end)
-        x = xr.read_from_col(2)
-        y = xr.read_from_col(8)
         
+    def onBg_Galatic_Emission(self, e):
+        source = e.GetEventObject()
         
-    '''
+        if source.IsChecked():
+            test = wx.StaticText(self.panel, label = "test")
+            self.top_right.Insert(0, test, flag = wx.EXPAND)
+            self.top_right.Layout()
+        else:
+            test.Destroy()
+            self.top_right.Layout()
+     
 
 if __name__ == '__main__':
   
