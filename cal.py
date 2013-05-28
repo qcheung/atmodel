@@ -64,32 +64,32 @@ def bling_ZE(freq, temp, resol):
     return result
 
 #Total_Signal
-def TS(freq, rad, tao, d):
+def TS(freq, inte, tao, d):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
-        i0 = rad[i]
+        i0 = inte[i]
         p0 = np.pi * (d / 2)**2 * tao * i0 * 2 * v0 / resol
         result.append(p0)
     return result
 
 #Limiting_Flux
-def LF(freq, rad, tao, d, resol):
+def LF(freq, inte, tao, d, resol):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
-        i0 = rad[i]
-        p0 = TS(freq, rad, tao, d)
+        i0 = inte[i]
+        p0 = TS(freq, inte, tao, d)
         result.append((p0 *resol) / (2 * np.pi * (d / 2)**2 * v0))
     return result
 
 #Integration_Time
-def IT(freq, bling, ratio, rad, tao, d):
+def IT(freq, bling, ratio, inte, tao, d):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
         n0 = bling[i]
-        p0 = TS(freq, rad, tao, d)
+        p0 = TS(freq, inte, tao, d)
         result.append((n0 * ratio / p0)**2)
     return result
 
