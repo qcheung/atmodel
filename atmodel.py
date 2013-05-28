@@ -211,7 +211,7 @@ class atmodel(wx.Frame):
               ar = ExcelReader("/home/dave/sites/WhiteMountain-175g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
             ar.set_freq_range(freq_start, freq_end)
             freq = ar.read_from_col(2)
-            rad = ar.read_from_col(8)
+            rad = ar.read_from_col(5)
             bling += cal.bling_AR(freq, rad, resol)
         if self.background_checkboxs[5].IsChecked():
             ze = ExcelReader("/home/dave/test.xlsx")
