@@ -59,11 +59,11 @@ class atmodel(wx.Frame):
 
         'TOP_RIGHT'
         top_right.Add(parameter_labels[6], flag = wx.BOTTOM, border = 6)
-        background_checkboxs =[wx.CheckBox(panel,label = backgrounds[i]) for i in range(len(backgrounds))]
+        self.background_checkboxs =[wx.CheckBox(panel,label = backgrounds[i]) for i in range(len(backgrounds))]
         for i in range(len(backgrounds)):
-            top_right.Add(background_checkboxs[i], flag = wx.BOTTOM, border = 3)
+            top_right.Add(self.background_checkboxs[i], flag = wx.BOTTOM, border = 3)
         #bind eventhandler
-        background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_CIB)
+        self.background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_CIB)
         
         
         'BOTTOM'
@@ -122,9 +122,10 @@ class atmodel(wx.Frame):
         source = e.GetEventObject()
         if source.IsChecked():
             print 'sorry dude'
+            
     def onBg_CMB(self, e):
         source = e.GetEventObject()
-        if source.IsChecked():
+       
             
     def onBrowse(self, e):
         file_dialog = wx.FileDialog(self, style = wx.FD_SAVE)
@@ -149,12 +150,18 @@ class atmodel(wx.Frame):
         t = float(self.parameter_inputs[2].GetValue())
         ratio = float(self.parameter_inputs[5].GetValue())
         
+        bling = calculate_bling()
         #set frequency range
         xr.set_freq_range(freq_start, freq_end)
         
         #read frequency and temperature
         freq = xr.read_from_col(2)
         temp = xr.read_from_col(8)
+        
+        bling = 0
+        if self.background_checkboxs[0].IsChecked():
+            bling += cal.bling_CIB(freq, temp)
+        
         
         #Calculation
 
@@ -186,6 +193,7 @@ class atmodel(wx.Frame):
         
         
     '''
+
 if __name__ == '__main__':
   
     app = wx.App()
