@@ -70,7 +70,7 @@ def bling_TME(freq, temp, resol):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
-        I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * const.T))-1))
+        I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * const.t))-1))
         epsilon = (16 * np.pi * v0 * const.epsilon / const.sigma)**(0.5)
         t0 = epsilon * I * const.c**2 / (const.k * v0**2)
         result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
@@ -90,6 +90,14 @@ def bling_ZE(freq, temp, resol):
 
 #bling_TOT
    
+#Signal_Intensity
+def SI(freq, 
+#Total_Signal
+
+#Limiting_Flux
+
+#Integration_Time
+
     
 def trancate(data, start, end):
     '''
