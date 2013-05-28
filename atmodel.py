@@ -166,9 +166,9 @@ class atmodel(wx.Frame):
         if self.background_checkboxs[2].IsChecked():
             bling += cal.bling_GE(freq, resol)
         if self.background_checkboxs[3].IsChecked():   
-            bling += cal.bling_TME(freq, resol)
+            bling += cal.bling_TME(freq, temp, resol, sigma, t)
         if self.background_checkboxs[4].IsChecked():   
-            bling += cal.bling_AR(freq, resol)
+            bling += cal.bling_AR(freq, rad, resol)
         if self.background_checkboxs[5].IsChecked():   
             bling += cal.bling_ZE(freq, resol)
             
