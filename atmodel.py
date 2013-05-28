@@ -72,11 +72,11 @@ class atmodel(wx.Frame):
         self.top_right.Add(self.background_checkboxs[0], flag = wx.BOTTOM, border = 3)
         self.top_right.Add(self.background_checkboxs[1], flag = wx.BOTTOM, border = 3)
         self.top_right.Add(self.background_checkboxs[2], flag = wx.BOTTOM, border = 3)
-        self.top_right.Add(galactic_direction_combo, flag = wx.BOTTOM, border = 3)
-        self.top_right.Add(self.background_checkboxs[3], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(galactic_direction_combo, flag = wx.LEFT, border = 20)
+        self.top_right.Add(self.background_checkboxs[3], flag = wx.BOTTOM | wx.TOP, border = 3)
         self.top_right.Add(self.background_checkboxs[4], flag = wx.BOTTOM, border = 3)
         self.top_right.Add(self.background_checkboxs[5], flag = wx.BOTTOM, border = 3)
-        self.top_right.Add(zodiacal_direction_combo, flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(zodiacal_direction_combo, flag = wx.LEFT, border = 20)
         
         'BOTTOM'
         bottom = wx.BoxSizer(wx.HORIZONTAL)
