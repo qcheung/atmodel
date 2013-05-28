@@ -31,8 +31,9 @@ class atmodel(wx.Frame):
                       'Mirror Diameter(m):', 'Mirror Temperature(K):',
                       'Choose a Site:', 'Choose a source:', 'Choose backgrounds', 
                       'Specify starting frequency(cm^-1)', 'Specify ending frequency(cm^-1)','Signal to noise ratio' ]
-        sites = ['South Pole', 'DomeA', 'DomeC', 'WhiteMo','Santa Barbara',
-                  'Chili', 'Sofia', 'Balloon 30', 'Balloon 40', 'Space', 'Custom..']
+        sites = ['Balloon 30', 'Balloon 40', 'CCAT-0732g','CCAT-0978g','DomeA-01g','DomeA-014g','DomeC-015g',
+        'DomeC-024g','MaunaKea-1g','MaunaKea-15g','SantaBarbara-01g','SantaBarbara-30g','SOFIA','SouthPole-023g',
+        'SouthPole-032g','WhiteMountain-115g','WhiteMountain-175g','Space', 'Custom..']
         sources = ['SED', 'ARP220', 'NGC 958', 'Custom..']
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission', 
                        'Atmospheric Radiance', 
