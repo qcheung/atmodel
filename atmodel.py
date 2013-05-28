@@ -63,9 +63,10 @@ class atmodel(wx.Frame):
         galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45','g_long = 0, g_lat = +90','g_long = 0, g_lat = -90',
         'g_long = 180, g_lat = 90']
         zodiacal_directions = ['g_long = 0, g_lat = 90','g_long = 0, g_lat = 45','g_long = 0, g_lat = 0']
-        
+        thermal_mirror_materials = ['Be', 'Al', 'Au', 'Ag']
         galactic_direction_combo = wx.ComboBox(panel, choices = galactic_directions, style = wx.CB_READONLY) 
         zodiacal_direction_combo = wx.ComboBox(panel, choices = zodiacal_directions, style = wx.CB_READONLY)
+        thermal_mirror_material_combo = wx.ComboBox(panel, choices = thermal_mirror_materials, style = wx.CB_READONLY)
         
         self.top_right.Add(parameter_labels[6], flag = wx.BOTTOM, border = 6)
         self.background_checkboxs =[wx.CheckBox(panel,label = backgrounds[i]) for i in range(len(backgrounds))]
@@ -75,6 +76,10 @@ class atmodel(wx.Frame):
         self.top_right.Add(galactic_direction_combo, flag = wx.LEFT, border = 20)
         self.top_right.Add(self.background_checkboxs[3], flag = wx.BOTTOM | wx.TOP, border = 3)
         self.top_right.Add(self.background_checkboxs[4], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(thermal_mirror_material_combo, flag = wx.LEFT, border = 20)
+        self.top_right.Add(self.background_checkboxs[3], flag = wx.BOTTOM | wx.TOP, border = 3)
+        self.top_right.Add(self.background_checkboxs[4], flag = wx.BOTTOM, border = 3)
+        
         self.top_right.Add(self.background_checkboxs[5], flag = wx.BOTTOM, border = 3)
         self.top_right.Add(zodiacal_direction_combo, flag = wx.LEFT, border = 20)
         
