@@ -177,11 +177,47 @@ class atmodel(wx.Frame):
             tme = ExcelReader("/home/dave/Thermal_Mirror_Emission.xlsx")
             tme.set_freq_range(freq_start, freq_end)
             freq = tme.read_from_col(2)
-            temp = .read_from_col(8)
+            temp = tme.read_from_col(8)
+            sigma = const.sigma[i]
             bling += cal.bling_TME(freq, temp, resol, sigma, t)
-        if self.background_checkboxs[4].IsChecked():   
+        if self.background_checkboxs[4].IsChecked(): 
+            if 
+              ar = ExcelReader("/home/dave/sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/40KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/CCAT-0732g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/CCAT-0978g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/DomeA-01g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/DomeA-014g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/DomeC-015g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/DomeC-024g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/MaunaKea-1g-Radiance-1976Model-45Deg-0-2000cm.xlsx")  
+            if
+              ar = ExcelReader("/home/dave/sites/MaunaKea-15g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/SouthPole-023g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/SouthPole-032g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/WhiteMountain-115g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/WhiteMountain-175g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            ar.set_freq_range(freq_start, freq_end)
+            freq = ar.read_from_col(2)
+            rad = ar.read_from_col(8)
             bling += cal.bling_AR(freq, rad, resol)
-        if self.background_checkboxs[5].IsChecked():   
+        if self.background_checkboxs[5].IsChecked():
+            ze = ExcelReader("/home/dave/test.xlsx")
+            ze.set_freq_range(freq_start, freq_end)
+            freq = ze.read_from_col(2)
+            temp = ze.read_from_col(8)
             bling += cal.bling_ZE(freq, temp, resol)
         bling_TOT = bling**(0.5)
             
