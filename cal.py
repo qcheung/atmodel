@@ -34,12 +34,12 @@ def bling_GE(freq, temp, resol):
     return result
   
 #bling_Thermal Mirror Emission
-def bling_TME(freq, temp, resol):
+def bling_TME(freq, temp, resol,sigma):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
-        I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * const.t))-1))
-        epsilon = (16 * np.pi * v0 * const.epsilon / const.sigma)**(0.5)
+        I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * const.T))-1))
+        epsilon = (16 * np.pi * v0 * const.epsilon / sigma)**(0.5)
         t0 = epsilon * I * const.c**2 / (const.k * v0**2)
         result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
     return result
@@ -64,7 +64,7 @@ def bling_ZE(freq, temp, resol):
     return result
 
 #Total_Signal
-def TS(freq, rad, tao, d):
+def TS(freq, rad, tao, d, resol):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
@@ -108,11 +108,6 @@ def trancate(data, start, end):
             result.append(x)
     print np.transpose(result)
     return np.transpose(result)
-
-#testing 
-x = range(100)
-y = bling_by_temperature(x,range(100),5)
-plotter.loglogplot(x, y)
 
 def ta(freq, intensity):
     f = np.array(freq)

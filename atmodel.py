@@ -62,8 +62,8 @@ class atmodel(wx.Frame):
         background_checkboxs =[wx.CheckBox(panel,label = backgrounds[i]) for i in range(len(backgrounds))]
         for i in range(len(backgrounds)):
             top_right.Add(background_checkboxs[i], flag = wx.BOTTOM, border = 3)
-        
         #bind eventhandler
+        background_checkboxs[0].Bind(wx.EVT_CHECKBOX, )
         
         
         'BOTTOM'
