@@ -177,7 +177,6 @@ class atmodel(wx.Frame):
         if self.background_checkboxs[1].IsChecked():
             cmb = ExcelReader("/home/dave/Cosmology_Microwave_Background.xlsx")
             cmb.set_freq_range(freq_start, freq_end)
-            freq = cmb.read_from_col(1)
             bling += cal.bling_CMB(freq, resol)
             
         if self.background_checkboxs[2].IsChecked():
@@ -185,47 +184,20 @@ class atmodel(wx.Frame):
             ge = ExcelReader("/home/dave/Galactic_Emission.xlsx")
             ge.set_freq_range(freq_start, freq_end)
             freq = ge.read_from_col(1)
-            temp = ge.read_from_col(8)
+            if index == 0:
+              temp = ge.read_from_col(8)
+            else if index == 4:
+              temp = ge.read_from_col(13)
             bling += cal.bling_GE(freq, temp, resol)
             
         if self.background_checkboxs[3].IsChecked():
             index = self.thermal_mirror_material_combo.GetCurrentSelection()
-            tme = ExcelReader("/home/dave/Thermal_Mirror_Emission.xlsx")
-            tme.set_freq_range(freq_start, freq_end)
-            freq = tme.read_from_col(1)
             sigma = const.sigma[index]
             bling += cal.bling_TME(freq, resol, sigma, t)
             '''
         if self.background_checkboxs[4].IsChecked(): 
             index = self.site.GetCurrentSelection()
-            if 
-              ar = ExcelReader("/home/dave/sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/40KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/CCAT-0732g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/CCAT-0978g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/DomeA-01g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/DomeA-014g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/DomeC-015g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/DomeC-024g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/MaunaKea-1g-Radiance-1976Model-45Deg-0-2000cm.xlsx")  
-            if
-              ar = ExcelReader("/home/dave/sites/MaunaKea-15g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/SouthPole-023g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/SouthPole-032g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/WhiteMountain-115g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
-            if
-              ar = ExcelReader("/home/dave/sites/WhiteMountain-175g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            ar = ExcelReader(file_sites[index])
             ar.set_freq_range(freq_start, freq_end)
             freq = ar.read_from_col(1)
             rad = ar.read_from_col(4)
@@ -233,7 +205,7 @@ class atmodel(wx.Frame):
             
         if self.background_checkboxs[5].IsChecked():
             index = self.zodiacal_direction_combo.GetCurrentSelection()
-            ze = ExcelReader("/home/dave/sites/Zodiacal_Emission.xlsx")
+            ze = ExcelReader("file_zodiacal[index]")
             ze.set_freq_range(freq_start, freq_end)
             freq = ze.read_from_col(1)
             temp = ze.read_from_col(8)
