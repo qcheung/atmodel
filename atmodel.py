@@ -227,18 +227,6 @@ class atmodel(wx.Frame):
     def onCancel(self, e):
         self.Destroy()
         
-    def onBg_Galatic_Emission(self, e):
-        source = e.GetEventObject()
-        
-        if source.IsChecked():
-            test = wx.StaticText(self.panel, label = "test")
-            self.top_right.Insert(0, test, flag = wx.EXPAND)
-            self.top_right.Layout()
-        else:
-            test.Destroy()
-            self.top_right.Layout()
-     
-
 if __name__ == '__main__':
   
     app = wx.App()
