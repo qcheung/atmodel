@@ -63,7 +63,7 @@ class atmodel(wx.Frame):
         for i in range(len(backgrounds)):
             top_right.Add(background_checkboxs[i], flag = wx.BOTTOM, border = 3)
         #bind eventhandler
-        background_checkboxs[0].Bind(wx.EVT_CHECKBOX, )
+        background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_CIB)
         
         
         'BOTTOM'
@@ -118,9 +118,14 @@ class atmodel(wx.Frame):
         content.Add(bottom, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
         panel.SetSizer(content)
         
-    def onBackgroundCheck(self, e):
-        print e.GetId()
-    
+    def onBg_CIB(self, e):
+        source = e.GetEventObject()
+        if source.IsChecked():
+            print 'sorry dude'
+    def onBg_CMB(self, e):
+        source = e.GetEventObject()
+        if source.IsChecked():
+            
     def onBrowse(self, e):
         file_dialog = wx.FileDialog(self, style = wx.FD_SAVE)
         if file_dialog.ShowModal() == wx.ID_OK:
