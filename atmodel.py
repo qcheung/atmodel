@@ -153,16 +153,17 @@ class atmodel(wx.Frame):
     def onGenerate(self, e):
         #initialization
         
-        #get values
-        freq_start = float(self.parameter_inputs[3].GetValue())
-        freq_end = float(self.parameter_inputs[4].GetValue())
-        resol = float(self.parameter_inputs[0].GetValue())
-        d = float(self.parameter_inputs[1].GetValue())
-        t = float(self.parameter_inputs[2].GetValue())
-        ratio = float(self.parameter_inputs[5].GetValue())
+	#initialization -> Parse inputs
+        resol = float(self.parameter_inputs[0].GetValue()) 	#resolution
+        d = float(self.parameter_inputs[1].GetValue())		#mirror diameters
+        t = float(self.parameter_inputs[2].GetValue()) 		#mirror temperature
+        freq_start = float(self.parameter_inputs[3].GetValue())	#starting frequency
+        freq_end = float(self.parameter_inputs[4].GetValue())	#ending frequency
+        ratio = float(self.parameter_inputs[5].GetValue())	#signal to noise ratio
         
-    
+	#Calculate bling
         bling = 0
+
         if self.background_checkboxs[0].IsChecked():
             cib = ExcelReader("/home/dave/Cosmology_Infrared_Background.xlsx")
             cib.set_freq_range(freq_start, freq_end)
@@ -190,7 +191,7 @@ class atmodel(wx.Frame):
             index = self.thermal_mirror_material_combo.GetCurrentSelection()
             sigma = const.sigma[index]
             bling += cal.bling_TME(freq, resol, sigma, t)
-            '''
+
         if self.background_checkboxs[4].IsChecked(): 
             index = self.site.GetCurrentSelection()
             ar = ExcelReader(file_sites[index])
@@ -206,17 +207,13 @@ class atmodel(wx.Frame):
             freq = ze.read_from_col(1)
             temp = ze.read_from_col(8)
             bling += cal.bling_ZE(freq, temp, resol)
-        bling_TOT = bling**(0.5)
-            '''
-            
-        #Calculation
 
-        #bling = cal.(freq, temp, resol)
-        
+        bling_TOT = bling**(0.5)
+            
         #writing
-        #xw.write_col('freq/THz', freq)
-        #xw.write_col('Bling', bling)
-        #xw.save()
+        xw.write_col('freq/THz', freq)
+        xw.write_col('Bling', bling_TOT)
+        xw.save()
         
         #message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
@@ -225,7 +222,8 @@ class atmodel(wx.Frame):
             message_dialog.Destroy()
         
         #plot
-        #plotter.loglogplot(freq, bling)
+        plotter.loglogplot(freq, bling_TOT)
+
     def onCancel(self, e):
         self.Destroy()
         
