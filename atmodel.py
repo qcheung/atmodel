@@ -60,10 +60,23 @@ class atmodel(wx.Frame):
         top_left.Add(top_left_fgs, flag = wx.EXPAND)
 
         'TOP_RIGHT'
+        galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45','g_long = 0, g_lat = +90','g_long = 0, g_lat = -90',
+        'g_long = 180, g_lat = 90']
+        zodiacal_directions = ['g_long = 0, g_lat = 90','g_long = 0, g_lat = 45','g_long = 0, g_lat = 0']
+        
+        galactic_direction_combo = wx.ComboBox(panel, choices = galactic_directions, style = wx.CB_READONLY) 
+        zodiacal_direction_combo = wx.ComboBox(panel, choices = zodiacal_directions, style = wx.CB_READONLY)
+        
         self.top_right.Add(parameter_labels[6], flag = wx.BOTTOM, border = 6)
         self.background_checkboxs =[wx.CheckBox(panel,label = backgrounds[i]) for i in range(len(backgrounds))]
-        for i in range(len(backgrounds)):
-            self.top_right.Add(self.background_checkboxs[i], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(self.background_checkboxs[0], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(self.background_checkboxs[1], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(self.background_checkboxs[2], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(galactic_direction_combo, flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(self.background_checkboxs[3], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(self.background_checkboxs[4], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(self.background_checkboxs[5], flag = wx.BOTTOM, border = 3)
+        self.top_right.Add(zodiacal_direction_combo, flag = wx.BOTTOM, border = 3)
         
         'BOTTOM'
         bottom = wx.BoxSizer(wx.HORIZONTAL)
