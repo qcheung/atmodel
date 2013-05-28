@@ -34,7 +34,7 @@ def bling_GE(freq, temp, resol):
     return result
   
 #bling_Thermal Mirror Emission
-def bling_TME(freq, resol, sigma, t):
+def bling_TME(freq, temp, resol, sigma, t):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]

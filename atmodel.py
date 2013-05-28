@@ -65,7 +65,7 @@ class atmodel(wx.Frame):
         for i in range(len(backgrounds)):
             self.top_right.Add(self.background_checkboxs[i], flag = wx.BOTTOM, border = 3)
         #bind eventhandler
-        self.background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_CIB)
+        #self.background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_CIB)
         
         
         'BOTTOM'
@@ -175,8 +175,9 @@ class atmodel(wx.Frame):
             tme = ExcelReader("/home/dave/Thermal_Mirror_Emission.xlsx")
             tme.set_freq_range(freq_start, freq_end)
             freq = tme.read_from_col(1)
-            sigma = const.sigma[i]
-            bling += cal.bling_TME(freq, resol, sigma, t)
+            #sigma = const.sigma[i]
+            #bling += cal.bling_TME(freq, resol, sigma, t)
+            '''
         if self.background_checkboxs[4].IsChecked(): 
             if 
               ar = ExcelReader("/home/dave/sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
@@ -217,7 +218,7 @@ class atmodel(wx.Frame):
             temp = ze.read_from_col(8)
             bling += cal.bling_ZE(freq, temp, resol)
         bling_TOT = bling**(0.5)
-            
+            '''
             
         #Calculation
 
