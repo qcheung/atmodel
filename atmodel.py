@@ -1,7 +1,7 @@
 import wx
 from excel import ExcelWriter,ExcelReader
 import plotter
-#import cal
+import cal
  
 class atmodel(wx.Frame):
     output_input = 0
