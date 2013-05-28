@@ -2,6 +2,7 @@ import wx
 from excel import ExcelWriter,ExcelReader
 import plotter
 import cal
+import const
  
 class atmodel(wx.Frame):
     output_input = 0
@@ -31,8 +32,9 @@ class atmodel(wx.Frame):
                       'Mirror Diameter(m):', 'Mirror Temperature(K):',
                       'Choose a Site:', 'Choose a source:', 'Choose backgrounds', 
                       'Specify starting frequency(cm^-1)', 'Specify ending frequency(cm^-1)','Signal to noise ratio' ]
-        sites = ['South Pole', 'DomeA', 'DomeC', 'WhiteMo','Santa Barbara',
-                  'Chili', 'Sofia', 'Balloon 30', 'Balloon 40', 'Space', 'Custom..']
+        sites = ['Balloon 30', 'Balloon 40', 'CCAT-0732g','CCAT-0978g','DomeA-01g','DomeA-014g','DomeC-015g',
+        'DomeC-024g','MaunaKea-1g','MaunaKea-15g','SantaBarbara-01g','SantaBarbara-30g','SOFIA','SouthPole-023g',
+        'SouthPole-032g','WhiteMountain-115g','WhiteMountain-175g','Space', 'Custom..']
         sources = ['SED', 'ARP220', 'NGC 958', 'Custom..']
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission', 
                        'Atmospheric Radiance', 
@@ -63,7 +65,7 @@ class atmodel(wx.Frame):
         for i in range(len(backgrounds)):
             self.top_right.Add(self.background_checkboxs[i], flag = wx.BOTTOM, border = 3)
         #bind eventhandler
-        self.background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_Galatic_Emission)
+        self.background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_CIB)
         
         
         'BOTTOM'
@@ -142,9 +144,6 @@ class atmodel(wx.Frame):
     def onGenerate(self, e):
         #initialization
         
-        #xw = ExcelWriter(self.path)
-        xr = ExcelReader("/home/dave/test.xlsx")
-        
         #get values
         freq_start = float(self.parameter_inputs[3].GetValue())
         freq_end = float(self.parameter_inputs[4].GetValue())
@@ -153,25 +152,69 @@ class atmodel(wx.Frame):
         t = float(self.parameter_inputs[2].GetValue())
         ratio = float(self.parameter_inputs[5].GetValue())
         
-        #set frequency range
-        xr.set_freq_range(freq_start, freq_end)
-        
-        #read frequency and temperature
-        freq = xr.read_from_col(2)
-        temp = xr.read_from_col(8)
-        
+    
         bling = 0
         if self.background_checkboxs[0].IsChecked():
+            cib = ExcelReader("/home/dave/Cosmology_Infrared_Background.xlsx")
+            cib.set_freq_range(freq_start, freq_end)
+            freq = cib.read_from_col(1)
+            temp = cib.read_from_col(8)
             bling += cal.bling_CIB(freq, temp, resol)
         if self.background_checkboxs[1].IsChecked():
+            cmb = ExcelReader("/home/dave/Cosmology_Microwave_Background.xlsx")
+            cmb.set_freq_range(freq_start, freq_end)
+            freq = cmb.read_from_col(1)
             bling += cal.bling_CMB(freq, resol)
         if self.background_checkboxs[2].IsChecked():
+            ge = ExcelReader("/home/dave/Galactic_Emission.xlsx")
+            ge.set_freq_range(freq_start, freq_end)
+            freq = ge.read_from_col(1)
+            temp = ge.read_from_col(8)
             bling += cal.bling_GE(freq, temp, resol)
-        if self.background_checkboxs[3].IsChecked():   
-            bling += cal.bling_TME(freq, temp, resol, sigma, t)
-        if self.background_checkboxs[4].IsChecked():   
+        if self.background_checkboxs[3].IsChecked():
+            tme = ExcelReader("/home/dave/Thermal_Mirror_Emission.xlsx")
+            tme.set_freq_range(freq_start, freq_end)
+            freq = tme.read_from_col(1)
+            sigma = const.sigma[i]
+            bling += cal.bling_TME(freq, resol, sigma, t)
+        if self.background_checkboxs[4].IsChecked(): 
+            if 
+              ar = ExcelReader("/home/dave/sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/40KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/CCAT-0732g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/CCAT-0978g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/DomeA-01g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/DomeA-014g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/DomeC-015g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/DomeC-024g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/MaunaKea-1g-Radiance-1976Model-45Deg-0-2000cm.xlsx")  
+            if
+              ar = ExcelReader("/home/dave/sites/MaunaKea-15g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/SouthPole-023g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/SouthPole-032g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/WhiteMountain-115g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            if
+              ar = ExcelReader("/home/dave/sites/WhiteMountain-175g-Radiance-1976Model-45Deg-0-2000cm.xlsx")
+            ar.set_freq_range(freq_start, freq_end)
+            freq = ar.read_from_col(1)
+            rad = ar.read_from_col(4)
             bling += cal.bling_AR(freq, rad, resol)
-        if self.background_checkboxs[5].IsChecked():   
+        if self.background_checkboxs[5].IsChecked():
+            ze = ExcelReader("/home/dave/sites/Zodiacal_Emission.xlsx")
+            ze.set_freq_range(freq_start, freq_end)
+            freq = ze.read_from_col(1)
+            temp = ze.read_from_col(8)
             bling += cal.bling_ZE(freq, temp, resol)
         bling_TOT = bling**(0.5)
             

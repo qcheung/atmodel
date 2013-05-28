@@ -17,6 +17,7 @@ sigma_Be=2.500*10**7 # omega**(-1)*m**(-1)
 sigma_Al=3.538*10**7 # omega**(-1)*m**(-1)
 sigma_Au=4.060*10**7 # omega**(-1)*m**(-1)
 sigma_Ag=6.287*10**7 # omega**(-1)*m**(-1)
+sigma = [sigma_Be, sigma_Al, sigma_Au, sigma_Ag]
 epsilon=8.854187817620*10**(-12) #F/m
 
 
