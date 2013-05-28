@@ -177,9 +177,8 @@ class atmodel(wx.Frame):
             tme = ExcelReader("/home/dave/Thermal_Mirror_Emission.xlsx")
             tme.set_freq_range(freq_start, freq_end)
             freq = tme.read_from_col(1)
-            temp = tme.read_from_col(8)
             sigma = const.sigma[i]
-            bling += cal.bling_TME(freq, temp, resol, sigma, t)
+            bling += cal.bling_TME(freq, resol, sigma, t)
         if self.background_checkboxs[4].IsChecked(): 
             if 
               ar = ExcelReader("/home/dave/sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
