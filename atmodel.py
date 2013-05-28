@@ -171,6 +171,7 @@ class atmodel(wx.Frame):
             bling += cal.bling_AR(freq, rad, resol)
         if self.background_checkboxs[5].IsChecked():   
             bling += cal.bling_ZE(freq, temp, resol)
+        bling_TOT = bling**(0.5)
             
             
         #Calculation
