@@ -7,7 +7,7 @@ import const
 class atmodel(wx.Frame):
     output_input = 0
     def __init__(self, parent , title):
-        super(atmodel, self).__init__(parent, title=title, size = (650, 500))
+        super(atmodel, self).__init__(parent, title=title, size = (700, 500))
             
         self.InitUI()
         self.Centre()
