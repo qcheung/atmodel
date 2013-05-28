@@ -34,7 +34,7 @@ class atmodel(wx.Frame):
         sites = ['South Pole', 'DomeA', 'DomeC', 'WhiteMo','Santa Barbara',
                   'Chili', 'Sofia', 'Balloon 30', 'Balloon 40', 'Space', 'Custom..']
         sources = ['SED', 'ARP220', 'NGC 958', 'Custom..']
-        backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galaxtic Emission', 'Thermal Mirror Emission', 
+        backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission', 
                        'Atmospheric Radiance', 
                        'Zodiacal Emission']
 
@@ -161,9 +161,20 @@ class atmodel(wx.Frame):
         
         bling = 0
         if self.background_checkboxs[0].IsChecked():
-            bling += cal.bling_CIB(freq, temp)
-        
-        
+            bling += cal.bling_CIB(freq, temp, resol)
+        if self.background_checkboxs[1].IsChecked():
+            bling += cal.bling_CMB(freq, resol)
+        if self.background_checkboxs[2].IsChecked():
+            bling += cal.bling_GE(freq, temp, resol)
+        if self.background_checkboxs[3].IsChecked():   
+            bling += cal.bling_TME(freq, temp, resol, sigma, t)
+        if self.background_checkboxs[4].IsChecked():   
+            bling += cal.bling_AR(freq, rad, resol)
+        if self.background_checkboxs[5].IsChecked():   
+            bling += cal.bling_ZE(freq, temp, resol)
+        bling_TOT = bling**(0.5)
+            
+            
         #Calculation
 
         #bling = cal.(freq, temp, resol)
