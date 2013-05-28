@@ -64,9 +64,10 @@ class atmodel(wx.Frame):
         'g_long = 180, g_lat = 90']
         zodiacal_directions = ['g_long = 0, g_lat = 90','g_long = 0, g_lat = 45','g_long = 0, g_lat = 0']
         thermal_mirror_materials = ['Be', 'Al', 'Au', 'Ag']
-        galactic_direction_combo = wx.ComboBox(panel, choices = galactic_directions, style = wx.CB_READONLY) 
-        zodiacal_direction_combo = wx.ComboBox(panel, choices = zodiacal_directions, style = wx.CB_READONLY)
-        thermal_mirror_material_combo = wx.ComboBox(panel, choices = thermal_mirror_materials, style = wx.CB_READONLY)
+        
+        self.galactic_direction_combo = wx.ComboBox(panel, choices = galactic_directions, style = wx.CB_READONLY) 
+        self.zodiacal_direction_combo = wx.ComboBox(panel, choices = zodiacal_directions, style = wx.CB_READONLY)
+        self.thermal_mirror_material_combo = wx.ComboBox(panel, choices = thermal_mirror_materials, style = wx.CB_READONLY)
         
         self.top_right.Add(parameter_labels[6], flag = wx.BOTTOM, border = 6)
         self.background_checkboxs =[wx.CheckBox(panel,label = backgrounds[i]) for i in range(len(backgrounds))]
@@ -172,25 +173,31 @@ class atmodel(wx.Frame):
             freq = cib.read_from_col(1)
             temp = cib.read_from_col(8)
             bling += cal.bling_CIB(freq, temp, resol)
+            
         if self.background_checkboxs[1].IsChecked():
             cmb = ExcelReader("/home/dave/Cosmology_Microwave_Background.xlsx")
             cmb.set_freq_range(freq_start, freq_end)
             freq = cmb.read_from_col(1)
             bling += cal.bling_CMB(freq, resol)
+            
         if self.background_checkboxs[2].IsChecked():
+            index = self.galactic_direction_combo.GetCurrentSelection()
             ge = ExcelReader("/home/dave/Galactic_Emission.xlsx")
             ge.set_freq_range(freq_start, freq_end)
             freq = ge.read_from_col(1)
             temp = ge.read_from_col(8)
             bling += cal.bling_GE(freq, temp, resol)
+            
         if self.background_checkboxs[3].IsChecked():
+            index = self.thermal_mirror_material_combo.GetCurrentSelection()
             tme = ExcelReader("/home/dave/Thermal_Mirror_Emission.xlsx")
             tme.set_freq_range(freq_start, freq_end)
             freq = tme.read_from_col(1)
-            #sigma = const.sigma[i]
-            #bling += cal.bling_TME(freq, resol, sigma, t)
+            sigma = const.sigma[index]
+            bling += cal.bling_TME(freq, resol, sigma, t)
             '''
         if self.background_checkboxs[4].IsChecked(): 
+            index = self.site.GetCurrentSelection()
             if 
               ar = ExcelReader("/home/dave/sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx")
             if
@@ -223,7 +230,9 @@ class atmodel(wx.Frame):
             freq = ar.read_from_col(1)
             rad = ar.read_from_col(4)
             bling += cal.bling_AR(freq, rad, resol)
+            
         if self.background_checkboxs[5].IsChecked():
+            index = self.zodiacal_direction_combo.GetCurrentSelection()
             ze = ExcelReader("/home/dave/sites/Zodiacal_Emission.xlsx")
             ze.set_freq_range(freq_start, freq_end)
             freq = ze.read_from_col(1)
