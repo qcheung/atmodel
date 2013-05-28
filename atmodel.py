@@ -23,7 +23,7 @@ class atmodel(wx.Frame):
         'TOP'
         top = wx.BoxSizer(wx.HORIZONTAL)
         top_left = wx.BoxSizer(wx.VERTICAL)
-        top_right = wx.BoxSizer(wx.VERTICAL)
+        self.top_right = wx.BoxSizer(wx.VERTICAL)
         
         'TOP_LEFT'
         top_left_fgs = wx.FlexGridSizer(7, 2, 6, 6)
@@ -58,10 +58,10 @@ class atmodel(wx.Frame):
         top_left.Add(top_left_fgs, flag = wx.EXPAND)
 
         'TOP_RIGHT'
-        top_right.Add(parameter_labels[6], flag = wx.BOTTOM, border = 6)
+        self.top_right.Add(parameter_labels[6], flag = wx.BOTTOM, border = 6)
         self.background_checkboxs =[wx.CheckBox(panel,label = backgrounds[i]) for i in range(len(backgrounds))]
         for i in range(len(backgrounds)):
-            top_right.Add(self.background_checkboxs[i], flag = wx.BOTTOM, border = 3)
+            self.top_right.Add(self.background_checkboxs[i], flag = wx.BOTTOM, border = 3)
         #bind eventhandler
         self.background_checkboxs[0].Bind(wx.EVT_CHECKBOX, self.onBg_Galatic_Emission)
         
@@ -111,23 +111,25 @@ class atmodel(wx.Frame):
         
         'Finishing'
         top.Add(top_left, flag = wx.RIGHT | wx.BOTTOM, border = 25)
-        top.Add(top_right, flag = wx.TOP | wx.BOTTOM, border = 25)
+        top.Add(self.top_right, flag = wx.TOP | wx.BOTTOM, border = 25)
         bottom.Add(bottom_left, flag = wx.RIGHT, border = 35)
         bottom.Add(bottom_right, flag = wx.LEFT, border = 35)
         content.Add(top, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
         content.Add(bottom, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
         panel.SetSizer(content)
         
+        self.panel = panel
+        
     def onBg_Galatic_Emission(self, e):
         source = e.GetEventObject()
-        parent = source.GetParent()
-        if source.IsChecked():
-            parent.InsertItem(3,wx.StaticText(self.panel, label = "test"))
         
-            
-    def onBg_CMB(self, e):
-        source = e.GetEventObject()
-       
+        if source.IsChecked():
+            test = wx.StaticText(self.panel, label = "test")
+            self.top_right.Insert(0, test, flag = wx.EXPAND)
+            self.top_right.Layout()
+        else:
+            test.Destroy()
+            self.top_right.Layout()
             
     def onBrowse(self, e):
         file_dialog = wx.FileDialog(self, style = wx.FD_SAVE)
@@ -135,7 +137,6 @@ class atmodel(wx.Frame):
             self.path = file_dialog.GetPath()
             self.output_input.Clear()
             self.output_input.WriteText(self.path)  
-            
         file_dialog.Destroy()        
         
     def onGenerate(self, e):
