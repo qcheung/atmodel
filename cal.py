@@ -1,6 +1,7 @@
 import const
 import numpy as np
 import scipy.integrate as integrate
+import plotter
 
 def ta(freq, intensity):
     f = np.array(freq)
@@ -26,13 +27,13 @@ def bling_by_temperature(freq, temp, resol):
     result = []
     data = [freq,temp]
     for v0 in freq:
-        freq_begin = v0 - v0/resol
-        freq_end = v0 + v0/resol
+        freq_begin = v0 - v0/float(resol)
+        freq_end = v0 + v0/float(resol)
         temp_data = trancate(data, freq_begin, freq_end)
         temp_freq = temp_data[0]
         temp_temp = temp_data[1]
         integral = const.h * const.k * temp_freq * temp_temp
-        result.append(integrate.simps(integral, temp_freq)**(0.5))
+        result.append(integrate.trapz(integral, temp_freq)**(0.5))
     return result
 
 #bling_Cosmology_Infrared_Backgrond   
@@ -49,8 +50,8 @@ def bling_CMB(freq, resol):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
-        I = 2 * const.h * v0**3 / (const.c**2 * (exp((const.h * v0) / (const.k * const.T))-1))
-        t0 = I * c**2 / (const.k * v0**2)
+        I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * const.T))-1))
+        t0 = I * const.c**2 / (const.k * v0**2)
         result.append(const.h * const.k * v0*t0 * 2 * v0 / resol)
         
     return result
@@ -69,23 +70,23 @@ def bling_TME(freq, temp, resol):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
-        I = 2 * const.h * v0**3 / (const.c**2 * (exp((const.h * v0) / (const.k * const.T))-1))
-        epsilon = (16 * pi * v0 * const.epsilon / const.sigma)**(0.5)
-        t0 = epsilon * I * c**2 / (const.k * v0**2)
+        I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * const.T))-1))
+        epsilon = (16 * np.pi * v0 * const.epsilon / const.sigma)**(0.5)
+        t0 = epsilon * I * const.c**2 / (const.k * v0**2)
         result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
-    return result4
+    return result
     
 #bing_Atmospheric_Radiance
 
 
 #bling_Zodiacal_Emission
 def bling_ZE(freq, temp, resol):
-    result5 = []
+    result = []
     for i in range(len(freq)):
         v0 = freq[i]
         t0 = temp[i]
         result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
-    return result5
+    return result
 
 #bling_TOT
    
@@ -101,6 +102,9 @@ def trancate(data, start, end):
             break
         if x[0] >= start:
             result.append(x)
+    print np.transpose(result)
     return np.transpose(result)
-
-#print bling_Galactic_Emission([1,2,3,4,5],[100,200,300,400,500],100)
+#testing 
+x = range(100)
+y = bling_by_temperature(x,range(100),5)
+plotter.loglogplot(x, y)

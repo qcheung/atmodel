@@ -126,7 +126,8 @@ class atmodel(wx.Frame):
         
     def onGenerate(self, e):
         #initialization
-        xw = ExcelWriter(self.path)
+        
+        #xw = ExcelWriter(self.path)
         xr = ExcelReader("/home/dave/test.xlsx")
         
         #get values
@@ -143,12 +144,12 @@ class atmodel(wx.Frame):
         
         #Calculation
 
-        bling = cal.bling_Galactic_Emission(freq, temp, resol)
+        bling = cal.(freq, temp, resol)
         
         #writing
-        xw.write_col('freq/THz', freq)
-        xw.write_col('Bling', bling)
-        xw.save()
+        #xw.write_col('freq/THz', freq)
+        #xw.write_col('Bling', bling)
+        #xw.save()
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
         message_dialog.SetTitle("Successful!")
         if message_dialog.ShowModal() == wx.ID_OK:
