@@ -1,7 +1,7 @@
 import wx
 from excel import ExcelWriter,ExcelReader
 import plotter
-import cal
+#import cal
  
 class atmodel(wx.Frame):
     output_input = 0
@@ -63,6 +63,9 @@ class atmodel(wx.Frame):
         for i in range(len(backgrounds)):
             top_right.Add(background_checkboxs[i], flag = wx.BOTTOM, border = 3)
         
+        #bind eventhandler
+        
+        
         'BOTTOM'
         bottom = wx.BoxSizer(wx.HORIZONTAL)
         bottom_left = wx.BoxSizer(wx.VERTICAL)
@@ -115,6 +118,9 @@ class atmodel(wx.Frame):
         content.Add(bottom, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
         panel.SetSizer(content)
         
+    def onBackgroundCheck(self, e):
+        print e.GetId()
+    
     def onBrowse(self, e):
         file_dialog = wx.FileDialog(self, style = wx.FD_SAVE)
         if file_dialog.ShowModal() == wx.ID_OK:
@@ -144,17 +150,21 @@ class atmodel(wx.Frame):
         
         #Calculation
 
-        bling = cal.(freq, temp, resol)
+        #bling = cal.(freq, temp, resol)
         
         #writing
         #xw.write_col('freq/THz', freq)
         #xw.write_col('Bling', bling)
         #xw.save()
+        
+        #message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
         message_dialog.SetTitle("Successful!")
         if message_dialog.ShowModal() == wx.ID_OK:
             message_dialog.Destroy()
-        plotter.loglogplot(freq, bling)
+        
+        #plot
+        #plotter.loglogplot(freq, bling)
     def onCancel(self, e):
         self.Destroy()
     '''
