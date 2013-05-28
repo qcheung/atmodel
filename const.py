@@ -10,6 +10,7 @@ Created on May 22, 2013
 h = 6.63*10**(-34) # J*s
 k = 1.38*10**(-23) # J/K
 c = 3*10**8 # m/s
+T = 2.73 # k
 
 #material constants for Thermal Mirror Emission
 sigma_Be=2.500*10**7 # omega**(-1)*m**(-1)
