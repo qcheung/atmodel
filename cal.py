@@ -3,6 +3,14 @@ import numpy as np
 import scipy.integrate as integrate
 import plotter
 
+#generate frequency list
+def generate_freq(start = 0.05, stop = 2005, step=0.1):
+    i = start
+    result = []
+    while i < stop:
+	result.append(i)	
+	i += step
+    return result
 
 #bling_Cosmology_Infrared_Backgrond   
 def bling_CIB(freq, temp, resol):
