@@ -94,46 +94,46 @@ class atmodel(wx.Frame):
         top_right.Add(self.zodiacal_direction_combo, flag = wx.LEFT, border = 20)
         
 
-	#Bottom_left 
-	#Bottom_left -> Controls
+        #Bottom_left 
+        #Bottom_left -> Controls
         generate_label = wx.StaticText(panel, label = 'Generates:')
         generate_label.SetFont(font) #Title
 
         generates = ['Total Noise', 'Total Signal', 'Limiting Flux', 'Integration time'] 
         generate_checkboxs = [wx.CheckBox(panel, label = generates[i]) for i in range(len(generates))]
 
-	#Bottom_left -> Fill up contents
+        #Bottom_left -> Fill up contents
         bottom_left.Add(generate_label, flag = wx.BOTTOM, border = 10)
         for i in range(len(generates)):
             bottom_left.Add(generate_checkboxs[i], flag = wx.BOTTOM, border = 3)
 
         #Bottom_right
-	#Bottom_right -> Output -> Controls
+        #Bottom_right -> Output -> Controls
         output_sizer = wx.BoxSizer(wx.HORIZONTAL)
         output_label = wx.StaticText(panel, label = 'Output to:')
         self.output_input = wx.TextCtrl(panel, size = (200,30))
         output_button = wx.Button(panel, size = (80,30), label = 'Browse')
 	
-	#Bottom_right -> Output -> Fill up contents
+        #Bottom_right -> Output -> Fill up contents
         bottom_right.Add(output_label, flag = wx.TOP, border = 20)
         output_sizer.Add(self.output_input, flag = wx.EXPAND)
         output_sizer.Add(output_button)
         bottom_right.Add(output_sizer, flag = wx.BOTTOM, border = 8)
 
-	#Bottom_right -> Buttons
+        #Bottom_right -> Buttons
         generate_button = wx.Button(panel, label = 'Generate')
         cancel_button = wx.Button(panel, label = 'Cancel')
         
-	#Bottom_right -> Buttons -> Fill up
- 	bottom_right.Add(generate_button, flag = wx.EXPAND | wx.BOTTOM, border = 3)
+        #Bottom_right -> Buttons -> Fill up
+        bottom_right.Add(generate_button, flag = wx.EXPAND | wx.BOTTOM, border = 3)
         bottom_right.Add(cancel_button, flag = wx.EXPAND)
 	
-	#Bottom_right -> Function Bindings
+        #Bottom_right -> Function Bindings
         output_button.Bind(wx.EVT_BUTTON, self.onBrowse)
         generate_button.Bind(wx.EVT_BUTTON, self.onGenerate)
         cancel_button.Bind(wx.EVT_BUTTON, self.onCancel)
         
-	#Fill up contents
+        #Fill up contents
         top.Add(top_left, flag = wx.RIGHT | wx.BOTTOM, border = 25)
         top.Add(top_right, flag = wx.TOP | wx.BOTTOM, border = 25)
         bottom.Add(bottom_left, flag = wx.RIGHT, border = 35)
@@ -222,7 +222,7 @@ class atmodel(wx.Frame):
         #writing
         xw = ExcelWriter(path)
         xw.write_col('freq/Hz', freq)
-        freq_THz = freq*(10)**(-12)
+        freq_THz = np.array(freq)*(10)**(-12)
         xw.write_col('freq/THz', freq_THz)
         xw.write_col('Bling', bling_TOT)
         xw.save()
