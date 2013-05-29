@@ -43,6 +43,8 @@ freq_hz = 3*10**10/freq_cm
 xw.write_col("freq/Hz", freq_hz)
 freq_thz = freq_hz*10**(-12)
 xw.write_col("freq/THz", freq_thz)
-xw.write_col("Intensity", SED(freq_thz))
+f = SED(freq_thz)
+xw.write_col("Intensity", f)
 xw.save()
 
+plotter.loglogplot(freq_thz, f)
