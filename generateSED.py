@@ -6,11 +6,11 @@ import plotter
 
 #constant_NGC_958
 a_radio = -0.200
-Td = 26.9
+Td = 26.9 #k
 beta = 1.28
 a_high = -2.04
-v_radio = 0.14 #THz
-v_midIR = 3.2 #THz
+v_radio = 0.14*10**12 #Hz
+v_midIR = 3.2*10**12 #Hz
 
 '''
 #contant_Mrk_231
@@ -18,8 +18,8 @@ a_radio = -0.365
 Td = 50.4
 beta = 1.21
 a_high = -1.56
-v_radio = 0.24 #THz
-v_midIR = 4.8 #THz
+v_radio = 0.24*10**12 #Hz
+v_midIR =  4.8*10**12 #Hz
 '''
 
 #generate SED
