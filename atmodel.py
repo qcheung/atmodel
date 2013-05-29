@@ -3,6 +3,7 @@ from excel import ExcelWriter,ExcelReader
 import plotter
 import cal
 import const
+import numpy as np
  
 class atmodel(wx.Frame):
     def __init__(self, parent , title):
@@ -134,7 +135,7 @@ class atmodel(wx.Frame):
         
 	#Fill up contents
         top.Add(top_left, flag = wx.RIGHT | wx.BOTTOM, border = 25)
-        top.Add(self.top_right, flag = wx.TOP | wx.BOTTOM, border = 25)
+        top.Add(top_right, flag = wx.TOP | wx.BOTTOM, border = 25)
         bottom.Add(bottom_left, flag = wx.RIGHT, border = 35)
         bottom.Add(bottom_right, flag = wx.LEFT, border = 35)
         content.Add(top, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
@@ -153,29 +154,32 @@ class atmodel(wx.Frame):
     def onGenerate(self, e):
         #initialization
         
-	#initialization -> Parse inputs
+        #initialization -> Parse inputs
         resol = float(self.parameter_inputs[0].GetValue()) 	#resolution
         d = float(self.parameter_inputs[1].GetValue())		#mirror diameters
         t = float(self.parameter_inputs[2].GetValue()) 		#mirror temperature
         freq_start = float(self.parameter_inputs[3].GetValue())	#starting frequency
         freq_end = float(self.parameter_inputs[4].GetValue())	#ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())	#signal to noise ratio
-        
-	#Calculate bling
-        bling = 0
+        path = self.output_input.GetValue()
+        #Calculate bling   
+        bling = list()
 
+        #CIB
         if self.background_checkboxs[0].IsChecked():
             cib = ExcelReader("/home/dave/Cosmology_Infrared_Background.xlsx")
             cib.set_freq_range(freq_start, freq_end)
             freq = cib.read_from_col(1)
             temp = cib.read_from_col(8)
-            bling += cal.bling_CIB(freq, temp, resol)
-            
+            bling.append(cal.bling_CIB(freq, temp, resol))
+        
+        #CMB
         if self.background_checkboxs[1].IsChecked():
             cmb = ExcelReader("/home/dave/Cosmology_Microwave_Background.xlsx")
             cmb.set_freq_range(freq_start, freq_end)
-            bling += cal.bling_CMB(freq, resol)
-            
+            bling.append(cal.bling_CMB(freq, resol))
+        
+        #Galactic Emission    
         if self.background_checkboxs[2].IsChecked():
             index = self.galactic_direction_combo.GetCurrentSelection()
             ge = ExcelReader("/home/dave/Galactic_Emission.xlsx")
@@ -185,21 +189,23 @@ class atmodel(wx.Frame):
                 temp = ge.read_from_col(8)
             if index == 4:
                 temp = ge.read_from_col(13)
-            bling += cal.bling_GE(freq, temp, resol)
-            
+            bling.append(cal.bling_GE(freq, temp, resol))
+        
+        #Thermal Mirror Emission    
         if self.background_checkboxs[3].IsChecked():
             index = self.thermal_mirror_material_combo.GetCurrentSelection()
             sigma = const.sigma[index]
             bling += cal.bling_TME(freq, resol, sigma, t)
-
+        
+        '''
         if self.background_checkboxs[4].IsChecked(): 
             index = self.site.GetCurrentSelection()
-            ar = ExcelReader(file_sites[index])
+            ar = ExcelReader(const.file_sites[index])
             ar.set_freq_range(freq_start, freq_end)
             freq = ar.read_from_col(1)
             rad = ar.read_from_col(4)
             bling += cal.bling_AR(freq, rad, resol)
-            
+        
         if self.background_checkboxs[5].IsChecked():
             index = self.zodiacal_direction_combo.GetCurrentSelection()
             ze = ExcelReader("file_zodiacal[index]")
@@ -207,11 +213,17 @@ class atmodel(wx.Frame):
             freq = ze.read_from_col(1)
             temp = ze.read_from_col(8)
             bling += cal.bling_ZE(freq, temp, resol)
-
-        bling_TOT = bling**(0.5)
-            
+        '''
+        bling_element = bling.pop()
+        for i in range(len(bling)):
+            bling_element += bling.pop()
+        bling_TOT = np.array(bling_element)**(0.5)
+        
         #writing
-        xw.write_col('freq/THz', freq)
+        xw = ExcelWriter(path)
+        xw.write_col('freq/Hz', freq)
+        freq_THz = freq*(10)**(-12)
+        xw.write_col('freq/THz', freq_THz)
         xw.write_col('Bling', bling_TOT)
         xw.save()
         
@@ -222,7 +234,7 @@ class atmodel(wx.Frame):
             message_dialog.Destroy()
         
         #plot
-        plotter.loglogplot(freq, bling_TOT)
+        plotter.loglogplot(freq_THz, bling_TOT)
 
     def onCancel(self, e):
         self.Destroy()
