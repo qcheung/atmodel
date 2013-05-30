@@ -81,7 +81,6 @@ class atmodel(wx.Frame):
         self.galactic_direction_combo = wx.ComboBox(panel, choices = galactic_directions, style = wx.CB_READONLY) 
         self.zodiacal_direction_combo = wx.ComboBox(panel, choices = zodiacal_directions, style = wx.CB_READONLY)
         self.thermal_mirror_material_combo = wx.ComboBox(panel, choices = thermal_mirror_materials, style = wx.CB_READONLY)
-        self.source_combo = wx.ComboBox(panel, choices = sources, style = wx.CB_READONLY)
         
         #Top_right -> fill up contents
         top_right.Add(parameter_labels[6], flag = wx.BOTTOM, border = 6)
@@ -235,7 +234,10 @@ class atmodel(wx.Frame):
         #xw.save()
         
         #Source Intensity
-        if self.source_combo
+        si = ExcelReader(file_refs.source_refs[source])
+        si.set_freq_range(freq_start, freq_end)
+        freq = si.read_from_col(1)
+        inte = si.read_from_col(4)
         
         #message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
