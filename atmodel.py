@@ -153,7 +153,6 @@ class atmodel(wx.Frame):
         
     def onGenerate(self, e):
         #initialization
-        
         #initialization -> Parse inputs
         resol = float(self.parameter_inputs[0].GetValue()) 	#resolution
         d = float(self.parameter_inputs[1].GetValue())		#mirror diameters

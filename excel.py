@@ -5,6 +5,7 @@ Created on May 17, 2013
 '''
 from xlrd import open_workbook
 from xlwt import Workbook
+import os
 class ExcelReader:
     def __init__(self, file_location):
         self.book = open_workbook(file_location, on_demand = True)
@@ -43,8 +44,10 @@ class ExcelWriter:
     def save(self):
         self.book.save(self.path)
         
-        
-        
+xr = ExcelReader("data/Sources/Arp220_z=1.xlsx") 
+xr.set_freq_range(0.05, 5)
+result = xr.read_from_col(0)
+print result             
         
         
         
