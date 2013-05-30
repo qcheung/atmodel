@@ -42,6 +42,18 @@ atm_tran_refs = {'13_7Km SOFIA': "data/Backgrounds/Atmospheric Tranimission_site
                 'WhiteMountain-175g':"data/Backgrounds/Atmospheric Tranimission_sites/WhiteMountain-175g-Transmission-1976Model-45Deg-0-2000cm.xlsx"
                 }
 
+CIB_ref = "data/Backgrounds/CIB/Cosmic_Infrared_Background.xlsx"
+CMB_ref = "data/Backgrounds/CMB/CMB.xlsx"
+Galatic_Emission_refs = ["data/Backgrounds/Galactic Emission/Galactic Emission_glat=0 glong=0.xlsx",
+                        "data/Backgrounds/Galactic Emission/Galactic Emission_glat=45 glong=0.xlsx",
+                        "data/Backgrounds/Galactic Emission/Galactic Emission_glat=-90 glong=0.xlsx",
+                        "data/Backgrounds/Galactic Emission/Galactic Emission_glat=90 glong=0.xlsx",
+                        "data/Backgrounds/Galactic Emission/Galactic Emission_glat=90 glong=180.xlsx"]
+TME_ref = "data/Backgrounds/Thermal Mirror Emission/Thermal Mirror Emission.xlsx"
+
+ZODI_refs = ["data/Backgrounds/Zodiacal Emission/Zodi_Glong_0 Glat_0.xlsx",
+             "data/Backgrounds/Zodiacal Emission/Zodi_Glong_0 Glat_45.xlsx",
+             "data/Backgrounds/Zodiacal Emission/Zodi_Glong_180 Glat_90.xlsx"]
 '''
 ./data/Backgrounds/Galactic Emission:
 Galactic Emission_glat=0 glong=0.xlsx

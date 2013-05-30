@@ -73,7 +73,7 @@ class atmodel(wx.Frame):
         #Top_right
         galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45','g_long = 0, g_lat = +90','g_long = 0, g_lat = -90',
                                'g_long = 180, g_lat = 90']
-        zodiacal_directions = ['g_long = 0, g_lat = 90','g_long = 0, g_lat = 45','g_long = 0, g_lat = 0']
+        zodiacal_directions = ['g_long = 0, g_lat = 0','g_long = 0, g_lat = 45','g_long = 180, g_lat = 90']
         thermal_mirror_materials = ['Be', 'Al', 'Au', 'Ag']
         
         #Top_right -> controls
@@ -159,7 +159,7 @@ class atmodel(wx.Frame):
         #initialization -> Parse inputs
         resol = float(self.parameter_inputs[0].GetValue()) 	#resolution
         d = float(self.parameter_inputs[1].GetValue())		#mirror diameters
-        t = float(self.parameter_inputs[2].GetValue()) 		#mirror temperature
+        mirror_temp = float(self.parameter_inputs[2].GetValue()) 		#mirror temperature
         freq_start = float(self.parameter_inputs[3].GetValue())	#starting frequency
         freq_end = float(self.parameter_inputs[4].GetValue())	#ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())	#signal to noise ratio
@@ -168,39 +168,44 @@ class atmodel(wx.Frame):
         
         #Calculate bling   
         bling = 0
-
+        
         #CIB
         if self.background_checkboxs[0].IsChecked():
-            cib = ExcelReader("/home/dave/Cosmology_Infrared_Background.xlsx")
+            cib_excel = file_refs.CIB_ref
+            cib = ExcelReader(cib_excel)
             cib.set_freq_range(freq_start, freq_end)
             freq = cib.read_from_col(1)
-            temp = cib.read_from_col(8)
+            temp = cib.read_from_col(4)
             bling += cal.bling_CIB(freq, temp, resol)
+            
         
         #CMB
         if self.background_checkboxs[1].IsChecked():
-            cmb = ExcelReader("/home/dave/Cosmology_Microwave_Background.xlsx")
+            cmb_excel = file_refs.CMB_ref
+            cmb = ExcelReader(cmb_excel)
             cmb.set_freq_range(freq_start, freq_end)
+            freq = cmb.read_from_col(1)
             bling += cal.bling_CMB(freq, resol)
         
         #Galactic Emission    
         if self.background_checkboxs[2].IsChecked():
             index = self.galactic_direction_combo.GetCurrentSelection()
-            ge = ExcelReader("/home/dave/Galactic_Emission.xlsx")
+            ge = ExcelReader(file_refs.Galatic_Emission_refs[index])
             ge.set_freq_range(freq_start, freq_end)
             freq = ge.read_from_col(1)
-            if index == 0:
-                temp = ge.read_from_col(8)
-            if index == 4:
-                temp = ge.read_from_col(13)
+            temp = ge.read_from_col(8)
             bling += cal.bling_GE(freq, temp, resol)
-        '''
+            
+        
         #Thermal Mirror Emission    
         if self.background_checkboxs[3].IsChecked():
             index = self.thermal_mirror_material_combo.GetCurrentSelection()
+            tme = ExcelReader(file_refs.TME_ref)
+            tme.set_freq_range(freq_start, freq_end)
+            freq = tme.read_from_col(1)
             sigma = const.sigma[index]
-            bling.append(cal.bling_TME(freq, resol, sigma, t))
-        '''
+            bling += cal.bling_TME(freq, resol, sigma, mirror_temp)
+        
         #Atmospheric Radiance
         if self.background_checkboxs[4].IsChecked(): 
             ar = ExcelReader(file_refs.atm_rad_refs[site])
@@ -209,16 +214,14 @@ class atmodel(wx.Frame):
             rad = ar.read_from_col(4)
             bling += cal.bling_AR(freq, rad, resol)
         
-        #zodiac
-        '''
+        #Zodiacal Emission
         if self.background_checkboxs[5].IsChecked():
             index = self.zodiacal_direction_combo.GetCurrentSelection()
-            ze = ExcelReader("file_zodiacal[index]")
+            ze = ExcelReader(file_refs.ZODI_refs[index])
             ze.set_freq_range(freq_start, freq_end)
             freq = ze.read_from_col(1)
-            temp = ze.read_from_col(8)
+            temp = ze.read_from_col(4)
             bling += cal.bling_ZE(freq, temp, resol)
-        '''
         
         bling_TOT = bling ** 0.5
         #writing
