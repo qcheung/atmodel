@@ -101,12 +101,12 @@ class atmodel(wx.Frame):
         generate_label.SetFont(font) #Title
 
         generates = ['Total Noise', 'Total Signal', 'Limiting Flux', 'Integration time'] 
-        generate_checkboxs = [wx.CheckBox(panel, label = generates[i]) for i in range(len(generates))]
+        self.generate_checkboxs = [wx.CheckBox(panel, label = generates[i]) for i in range(len(generates))]
 
         #Bottom_left -> Fill up contents
         bottom_left.Add(generate_label, flag = wx.BOTTOM, border = 10)
         for i in range(len(generates)):
-            bottom_left.Add(generate_checkboxs[i], flag = wx.BOTTOM, border = 3)
+            bottom_left.Add(self.generate_checkboxs[i], flag = wx.BOTTOM, border = 3)
 
         #Bottom_right
         #Bottom_right -> Output -> Controls
@@ -252,15 +252,23 @@ class atmodel(wx.Frame):
         #xw.write_col('freq/THz', freq_THz)
         #xw.write_col('Bling', bling_TOT)
         #xw.save()
-
-        #message box alert
+        '''
+        message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
         message_dialog.SetTitle("Successful!")
         if message_dialog.ShowModal() == wx.ID_OK:
             message_dialog.Destroy()
-        
+        '''
         #plot
-        plotter.loglogplot(freq_THz, limiting_flux)
+        if self.generate_checkboxs[0].IsChecked():
+            plotter.loglogplot(freq_THz, bling_TOT)
+        if self.generate_checkboxs[1].IsChecked():
+            plotter.loglogplot(freq_THz, ts)
+        if self.generate_checkboxs[2].IsChecked():
+            plotter.loglogplot(freq_THz, limiting_flux)
+        if self.generate_checkboxs[3].IsChecked():
+            plotter.loglogplot(freq_THz, integration_time)
+        
 
     def onCancel(self, e):
         self.Destroy()
