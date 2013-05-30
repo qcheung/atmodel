@@ -225,13 +225,6 @@ class atmodel(wx.Frame):
             bling += cal.bling_ZE(freq, temp, resol)
         
         bling_TOT = bling ** 0.5
-        #writing
-        #xw = ExcelWriter(path)
-        #xw.write_col('freq/Hz', freq)
-        freq_THz = np.array(freq)*10**(-12)
-        #xw.write_col('freq/THz', freq_THz)
-        #xw.write_col('Bling', bling_TOT)
-        #xw.save()
         
         #Source Intensity
         si = ExcelReader(file_refs.source_refs[source])
@@ -239,6 +232,14 @@ class atmodel(wx.Frame):
         freq = si.read_from_col(1)
         inte = si.read_from_col(5)
         
+        #writing
+        #xw = ExcelWriter(path)
+        #xw.write_col('freq/Hz', freq)
+        freq_THz = np.array(freq)*10**(-12)
+        #xw.write_col('freq/THz', freq_THz)
+        #xw.write_col('Bling', bling_TOT)
+        #xw.save()
+
         #message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
         message_dialog.SetTitle("Successful!")
