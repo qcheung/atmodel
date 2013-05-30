@@ -163,7 +163,7 @@ class atmodel(wx.Frame):
         freq_start = float(self.parameter_inputs[3].GetValue())	#starting frequency
         freq_end = float(self.parameter_inputs[4].GetValue())	#ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())	#signal to noise ratio
-        #path = self.output_input.GetValue()
+        path = self.output_input.GetValue()
         site = self.parameter_site_combo.GetValue()
         source = self.parameter_source_combo.GetValue()
         
@@ -255,16 +255,16 @@ class atmodel(wx.Frame):
          
         #plot
         if self.generate_checkboxs[0].IsChecked():
-            xw.write_col('Total Noise_Bling()', bling_TOT)
+            xw.write_col('Total Noise_BLING(W Hz^(-1/2))', bling_TOT)
             plotter.loglogplot(freq_THz, bling_TOT)
         if self.generate_checkboxs[1].IsChecked():
-            xw.write_col('Total signal()', ts)
+            xw.write_col('Total signal(W/m^2/sr/Hz)', ts)
             plotter.loglogplot(freq_THz, ts)
         if self.generate_checkboxs[2].IsChecked():
-            xw.write_col('Limiting Flux()', limiting_flux)
+            xw.write_col('Limiting Flux(W/m^2/Hz)', limiting_flux)
             plotter.loglogplot(freq_THz, limiting_flux)
         if self.generate_checkboxs[3].IsChecked():
-            xw.write_col('Integration Time()', integration_time)
+            xw.write_col('Integration Time(s)', integration_time)
             plotter.loglogplot(freq_THz, integration_time)
         xw.save()
         
