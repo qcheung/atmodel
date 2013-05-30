@@ -54,6 +54,13 @@ TME_ref = "data/Backgrounds/Thermal Mirror Emission/Thermal Mirror Emission.xlsx
 ZODI_refs = ["data/Backgrounds/Zodiacal Emission/Zodi_Glong_0 Glat_0.xlsx",
              "data/Backgrounds/Zodiacal Emission/Zodi_Glong_0 Glat_45.xlsx",
              "data/Backgrounds/Zodiacal Emission/Zodi_Glong_180 Glat_90.xlsx"]
+             
+source_refs = {'NGC958_z=1': "data/Sources/NGC958_z=1.xlsx",
+               'ARP220_z=1': "data/Sources/ARP220_z=1.xlsx",
+               'MRK231_z=1': "data/Sources/MRK231_z=1.xlsx"
+               }
+                
+                
 '''
 ./data/Backgrounds/Galactic Emission:
 Galactic Emission_glat=0 glong=0.xlsx
