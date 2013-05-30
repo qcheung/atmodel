@@ -219,14 +219,12 @@ class atmodel(wx.Frame):
             temp = ze.read_from_col(8)
             bling += cal.bling_ZE(freq, temp, resol)
         '''
-        #later move this to cal.py
-        print "length of bling is "+ str(len(bling))
-        print "length of freq is " + len(freq)
         
+        bling_TOT = bling ** 0.5
         #writing
         #xw = ExcelWriter(path)
         #xw.write_col('freq/Hz', freq)
-        #freq_THz = np.array(freq)*(10)**(-12)
+        freq_THz = np.array(freq)*10**(-12)
         #xw.write_col('freq/THz', freq_THz)
         #xw.write_col('Bling', bling_TOT)
         #xw.save()
@@ -238,7 +236,7 @@ class atmodel(wx.Frame):
             message_dialog.Destroy()
         
         #plot
-        #plotter.loglogplot(freq_THz, bling_TOT)
+        plotter.loglogplot(freq_THz, bling_TOT)
 
     def onCancel(self, e):
         self.Destroy()
