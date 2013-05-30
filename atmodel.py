@@ -45,7 +45,7 @@ class atmodel(wx.Frame):
         sites = ['30KmBalloon', '40KmBalloon', 'CCAT-0732g','CCAT-0978g','DomeA-01g','DomeA-014g','DomeC-015g',
                  'DomeC-024g','MaunaKea-1g','MaunaKea-15g','SantaBarbara-01g','SantaBarbara-30g','SOFIA','SouthPole-023g',
                  'SouthPole-032g','WhiteMountain-115g','WhiteMountain-175g','Space', 'Custom..']
-        sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK_z=1', 'Custom..']
+        sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom..']
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission', 
                        'Atmospheric Radiance', 'Zodiacal Emission']
         
