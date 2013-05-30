@@ -236,10 +236,10 @@ class atmodel(wx.Frame):
         at = ExcelReader(file_refs.atm_tran_refs[site])
         at.set_freq_range(freq_start, freq_end)
         tau = at.read_from_col(4)
-        total_signal = cal.TS(freq, inte, tau, d, resol)
+        ts = cal.TS(freq, inte, tau, d, resol)
         
         #Limiting Flux
-        limiting_flux = cal.LF(freq, inte, tau, d, resol)
+        limiting_flux = cal.LF(freq, inte, tau, d, resol, ts)
         
         #Integration Time
         integration_time = cal.IT(freq, bling_TOT, ratio, inte, tau, d)
