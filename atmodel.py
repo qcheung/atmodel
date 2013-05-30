@@ -45,7 +45,7 @@ class atmodel(wx.Frame):
         sites = ['30KmBalloon', '40KmBalloon', 'CCAT-0732g','CCAT-0978g','DomeA-01g','DomeA-014g','DomeC-015g',
                  'DomeC-024g','MaunaKea-1g','MaunaKea-15g','SantaBarbara-01g','SantaBarbara-30g','SOFIA','SouthPole-023g',
                  'SouthPole-032g','WhiteMountain-115g','WhiteMountain-175g','Space', 'Custom..']
-        sources = ['SED', 'ARP220', 'NGC 958', 'Custom..']
+        sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK_z=1', 'Custom..']
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission', 
                        'Atmospheric Radiance', 'Zodiacal Emission']
         
@@ -81,6 +81,7 @@ class atmodel(wx.Frame):
         self.galactic_direction_combo = wx.ComboBox(panel, choices = galactic_directions, style = wx.CB_READONLY) 
         self.zodiacal_direction_combo = wx.ComboBox(panel, choices = zodiacal_directions, style = wx.CB_READONLY)
         self.thermal_mirror_material_combo = wx.ComboBox(panel, choices = thermal_mirror_materials, style = wx.CB_READONLY)
+        self.source_combo = wx.ComboBox(panel, choices = sources, style = wx.CB_READONLY)
         
         #Top_right -> fill up contents
         top_right.Add(parameter_labels[6], flag = wx.BOTTOM, border = 6)
@@ -165,6 +166,7 @@ class atmodel(wx.Frame):
         ratio = float(self.parameter_inputs[5].GetValue())	#signal to noise ratio
         #path = self.output_input.GetValue()
         site = self.parameter_site_combo.GetValue()
+        source = self.parameter_source_combo.GetValue()
         
         #Calculate bling   
         bling = 0
@@ -231,6 +233,9 @@ class atmodel(wx.Frame):
         #xw.write_col('freq/THz', freq_THz)
         #xw.write_col('Bling', bling_TOT)
         #xw.save()
+        
+        #Source Intensity
+        if self.source_combo
         
         #message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
