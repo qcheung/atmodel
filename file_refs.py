@@ -7,7 +7,6 @@ Galactic Emission
 Zodiacal Emission
 
 '''
-from excel import ExcelReader
 atm_rad_refs = {'30KmBalloon': "data/Backgrounds/Atmospheric Radiance_sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx",
                 '40KmBalloon': "data/Backgrounds/Atmospheric Radiance_sites/40KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx",
                 'CCAT-0732g': "data/Backgrounds/Atmospheric Radiance_sites/CCAT-0732g-Radiance-1976Model-45Deg-0-2000cm.xlsx",
@@ -23,9 +22,7 @@ atm_rad_refs = {'30KmBalloon': "data/Backgrounds/Atmospheric Radiance_sites/30Km
                 'WhiteMountain-115g': "data/Backgrounds/Atmospheric Radiance_sites/WhiteMountain-115g-Radiance-1976Model-45Deg-0-2000cm.xlsx",
                 'WhiteMountain-175g': "data/Backgrounds/Atmospheric Radiance_sites/WhiteMountain-175g-Radiance-1976Model-45Deg-0-2000cm.xlsx"
                 }
-test = atm_rad_refs['30KmBalloon']
 
-from excel import ExcelReader
 atm_tran_refs = {'13_7Km SOFIA': "data/Backgrounds/Atmospheric Tranimission_sites/13_7Km SOFIA-Transmission-1976Model-45Deg-0-2000cm.xlsx",
                  '30KmBalloon': "data/Backgrounds/Atmospheric Tranimission_sites/30KmBalloon-Transmission-1976Model-45Deg-0-2000cm.xlsx",
                  '40KmBalloon': "data/Backgrounds/Atmospheric Tranimission_sites/40KmBalloon-Transmission-1976Model-45Deg-0-2000cm.xlsx",

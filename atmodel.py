@@ -52,8 +52,8 @@ class atmodel(wx.Frame):
         #Top_left -> Controls
         parameter_labels = [wx.StaticText(panel, label = parameters[i]) for i in range(10)]
         self.parameter_inputs = [wx.TextCtrl(panel) for i in range(6)]
-        parameter_site_combo = wx.ComboBox(panel, choices = sites, style = wx.CB_READONLY) 
-        parameter_source_combo = wx.ComboBox(panel, choices = sources, style = wx.CB_READONLY)
+        self.parameter_site_combo = wx.ComboBox(panel, choices = sites, style = wx.CB_READONLY) 
+        self.parameter_source_combo = wx.ComboBox(panel, choices = sources, style = wx.CB_READONLY)
         
         #Top_left -> fill up contains 
         parameter_labels[0].SetFont(font)   #set a title font
@@ -62,8 +62,8 @@ class atmodel(wx.Frame):
         top_left_fgs.AddMany([(parameter_labels[1], 0, wx.EXPAND), (self.parameter_inputs[0], 0, wx.EXPAND),
                               (parameter_labels[2], 0, wx.EXPAND), (self.parameter_inputs[1], 0, wx.EXPAND),
                               (parameter_labels[3], 0, wx.EXPAND), (self.parameter_inputs[2], 0, wx.EXPAND),
-                              (parameter_labels[4], 0, wx.EXPAND), (parameter_site_combo, 0, wx.EXPAND),
-                              (parameter_labels[5], 0, wx.EXPAND), (parameter_source_combo, 0, wx.EXPAND),
+                              (parameter_labels[4], 0, wx.EXPAND), (self.parameter_site_combo, 0, wx.EXPAND),
+                              (parameter_labels[5], 0, wx.EXPAND), (self.parameter_source_combo, 0, wx.EXPAND),
                               (parameter_labels[7], 0, wx.EXPAND), (self.parameter_inputs[3], 0, wx.EXPAND),
                               (parameter_labels[8], 0, wx.EXPAND), (self.parameter_inputs[4], 0, wx.EXPAND),
                               (parameter_labels[9], 0, wx.EXPAND), (self.parameter_inputs[5], 0, wx.EXPAND)])
@@ -153,7 +153,9 @@ class atmodel(wx.Frame):
         file_dialog.Destroy()        
         
     def onGenerate(self, e):
+        
         #initialization
+        
         #initialization -> Parse inputs
         resol = float(self.parameter_inputs[0].GetValue()) 	#resolution
         d = float(self.parameter_inputs[1].GetValue())		#mirror diameters
@@ -161,9 +163,11 @@ class atmodel(wx.Frame):
         freq_start = float(self.parameter_inputs[3].GetValue())	#starting frequency
         freq_end = float(self.parameter_inputs[4].GetValue())	#ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())	#signal to noise ratio
-        path = self.output_input.GetValue()
+        #path = self.output_input.GetValue()
+        site = self.parameter_site_combo.GetValue()
+        
         #Calculate bling   
-        bling = list()
+        bling = 0
 
         #CIB
         if self.background_checkboxs[0].IsChecked():
@@ -171,13 +175,13 @@ class atmodel(wx.Frame):
             cib.set_freq_range(freq_start, freq_end)
             freq = cib.read_from_col(1)
             temp = cib.read_from_col(8)
-            bling.append(cal.bling_CIB(freq, temp, resol))
+            bling += cal.bling_CIB(freq, temp, resol)
         
         #CMB
         if self.background_checkboxs[1].IsChecked():
             cmb = ExcelReader("/home/dave/Cosmology_Microwave_Background.xlsx")
             cmb.set_freq_range(freq_start, freq_end)
-            bling.append(cal.bling_CMB(freq, resol))
+            bling += cal.bling_CMB(freq, resol)
         
         #Galactic Emission    
         if self.background_checkboxs[2].IsChecked():
@@ -189,18 +193,17 @@ class atmodel(wx.Frame):
                 temp = ge.read_from_col(8)
             if index == 4:
                 temp = ge.read_from_col(13)
-            bling.append(cal.bling_GE(freq, temp, resol))
-        
+            bling += cal.bling_GE(freq, temp, resol)
+        '''
         #Thermal Mirror Emission    
         if self.background_checkboxs[3].IsChecked():
             index = self.thermal_mirror_material_combo.GetCurrentSelection()
             sigma = const.sigma[index]
             bling.append(cal.bling_TME(freq, resol, sigma, t))
-        
+        '''
         #Atmospheric Radiance
         if self.background_checkboxs[4].IsChecked(): 
-            choice = self.site.GetValue()
-            ar = ExcelReader(file_refs.atm_rad_refs[choice])
+            ar = ExcelReader(file_refs.atm_rad_refs[site])
             ar.set_freq_range(freq_start, freq_end)
             freq = ar.read_from_col(1)
             rad = ar.read_from_col(4)
@@ -217,15 +220,13 @@ class atmodel(wx.Frame):
             bling += cal.bling_ZE(freq, temp, resol)
         '''
         #later move this to cal.py
-        bling_element = bling.pop()
-        for i in range(len(bling)):
-            bling_element += bling.pop()
-        bling_TOT = np.array(bling_element)**(0.5)
+        print "length of bling is "+ str(len(bling))
+        print "length of freq is " + len(freq)
         
         #writing
         #xw = ExcelWriter(path)
         #xw.write_col('freq/Hz', freq)
-        freq_THz = np.array(freq)*(10)**(-12)
+        #freq_THz = np.array(freq)*(10)**(-12)
         #xw.write_col('freq/THz', freq_THz)
         #xw.write_col('Bling', bling_TOT)
         #xw.save()
@@ -237,7 +238,7 @@ class atmodel(wx.Frame):
             message_dialog.Destroy()
         
         #plot
-        plotter.loglogplot(freq_THz, bling_TOT)
+        #plotter.loglogplot(freq_THz, bling_TOT)
 
     def onCancel(self, e):
         self.Destroy()

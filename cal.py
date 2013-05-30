@@ -8,8 +8,8 @@ def generate_freq(start = 0.05, stop = 2005, step=0.1):
     i = start
     result = []
     while i < stop:
-	result.append(i)	
-	i += step
+        result.append(i)	
+        i += step
     return result
 
 #bling_Cosmology_Infrared_Backgrond   
@@ -18,7 +18,7 @@ def bling_CIB(freq, temp, resol):
     for i in range(len(freq)):
         v0 = freq[i]
         t0 = temp[i]
-        result.append(const.h * const.k * v0*t0 * 2 * v0 / resol)
+        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
     return result
     
 #bling_Cosmology_Microwave_Backgrond
@@ -60,7 +60,7 @@ def bling_AR(freq, rad, resol):
         i0 = rad[i]
         t0 = i0 * const.c**2 / (const.k * v0**2)
         result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
-    return result    
+    return np.array(result)
 
 #bling_Zodiacal_Emission
 def bling_ZE(freq, temp, resol):
