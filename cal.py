@@ -77,7 +77,8 @@ def TS(freq, inte, tao, d, resol):
     for i in range(len(freq)):
         v0 = freq[i]
         i0 = inte[i]
-        p0 = np.pi * (d / 2)**2 * tao * i0 * 2 * v0 / resol
+        tao0 = tao[i]
+        p0 = np.pi * (d / 2)**2 * tao0 * i0 * 2 * v0 / resol
         result.append(p0)
     return result
 
@@ -87,6 +88,7 @@ def LF(freq, inte, tao, d, resol):
     for i in range(len(freq)):
         v0 = freq[i]
         i0 = inte[i]
+        tao0 = tao[i]
         p0 = TS(freq, inte, tao, d)
         result.append((p0 *resol) / (2 * np.pi * (d / 2)**2 * v0))
     return result
@@ -97,6 +99,7 @@ def IT(freq, bling, ratio, inte, tao, d):
     for i in range(len(freq)):
         v0 = freq[i]
         n0 = bling[i]
+        tao0 = tao[i]
         p0 = TS(freq, inte, tao, d)
         result.append((n0 * ratio / p0)**2)
     return result
