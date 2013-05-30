@@ -71,35 +71,35 @@ def bling_ZE(freq, temp, resol):
     return np.array(result)
 
 #Total_Signal
-def TS(freq, inte, tao, d, resol):
+def TS(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
         i0 = inte[i]
-        tao0 = tao[i]
-        p0 = np.pi * (d / 2)**2 * tao0 * i0 * 2 * v0 / resol
+        tau0 = tau[i]
+        p0 = np.pi * (d / 2)**2 * tau0 * i0 * 2 * v0 / resol
         result.append(p0)
     return np.array(result)
 
 #Limiting_Flux
-def LF(freq, inte, tao, d, resol):
+def LF(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
         i0 = inte[i]
-        tao0 = tao[i]
-        p0 = TS(freq, inte, tao, d)
+        tau0 = tau[i]
+        p0 = TS(freq, inte, tau, d)
         result.append((p0 *resol) / (2 * np.pi * (d / 2)**2 * v0))
     return np.array(result)
 
 #Integration_Time
-def IT(freq, bling, ratio, inte, tao, d):
+def IT(freq, bling, ratio, inte, tau, d):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
         n0 = bling[i]
-        tao0 = tao[i]
-        p0 = TS(freq, inte, tao, d)
+        tau0 = tau[i]
+        p0 = TS(freq, inte, tau, d)
         result.append((n0 * ratio / p0)**2)
     return np.array(result)
 
