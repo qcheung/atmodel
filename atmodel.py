@@ -4,6 +4,7 @@ import plotter
 import cal
 import const
 import numpy as np
+import file_refs
  
 class atmodel(wx.Frame):
     def __init__(self, parent , title):
@@ -194,17 +195,19 @@ class atmodel(wx.Frame):
         if self.background_checkboxs[3].IsChecked():
             index = self.thermal_mirror_material_combo.GetCurrentSelection()
             sigma = const.sigma[index]
-            bling += cal.bling_TME(freq, resol, sigma, t)
+            bling.append(cal.bling_TME(freq, resol, sigma, t))
         
-        '''
+        #Atmospheric Radiance
         if self.background_checkboxs[4].IsChecked(): 
-            index = self.site.GetCurrentSelection()
-            ar = ExcelReader(const.file_sites[index])
+            choice = self.site.GetValue()
+            ar = ExcelReader(file_refs.atm_rad_refs[choice])
             ar.set_freq_range(freq_start, freq_end)
             freq = ar.read_from_col(1)
             rad = ar.read_from_col(4)
             bling += cal.bling_AR(freq, rad, resol)
         
+        #zodiac
+        '''
         if self.background_checkboxs[5].IsChecked():
             index = self.zodiacal_direction_combo.GetCurrentSelection()
             ze = ExcelReader("file_zodiacal[index]")
@@ -213,18 +216,19 @@ class atmodel(wx.Frame):
             temp = ze.read_from_col(8)
             bling += cal.bling_ZE(freq, temp, resol)
         '''
+        #later move this to cal.py
         bling_element = bling.pop()
         for i in range(len(bling)):
             bling_element += bling.pop()
         bling_TOT = np.array(bling_element)**(0.5)
         
         #writing
-        xw = ExcelWriter(path)
-        xw.write_col('freq/Hz', freq)
+        #xw = ExcelWriter(path)
+        #xw.write_col('freq/Hz', freq)
         freq_THz = np.array(freq)*(10)**(-12)
-        xw.write_col('freq/THz', freq_THz)
-        xw.write_col('Bling', bling_TOT)
-        xw.save()
+        #xw.write_col('freq/THz', freq_THz)
+        #xw.write_col('Bling', bling_TOT)
+        #xw.save()
         
         #message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
