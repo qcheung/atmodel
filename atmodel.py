@@ -260,7 +260,7 @@ class atmodel(wx.Frame):
             message_dialog.Destroy()
         
         #plot
-        plotter.loglogplot(freq_THz, total_signal)
+        plotter.loglogplot(freq_THz, limition_flux)
 
     def onCancel(self, e):
         self.Destroy()
