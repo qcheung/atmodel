@@ -239,7 +239,7 @@ class atmodel(wx.Frame):
         ts = cal.TS(freq, inte, tau, d, resol)
         
         #Limiting Flux
-        limiting_flux = cal.LF(freq, inte, tau, d, resol, ts)
+        limiting_flux = cal.LF(freq, d, resol, ts)
         
         #Integration Time
         integration_time = cal.IT(freq, bling_TOT, ratio, ts)
