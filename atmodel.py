@@ -237,7 +237,7 @@ class atmodel(wx.Frame):
         si = ExcelReader(file_refs.source_refs[source])
         si.set_freq_range(freq_start, freq_end)
         freq = si.read_from_col(1)
-        inte = si.read_from_col(4)
+        inte = si.read_from_col(5)
         
         #message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
