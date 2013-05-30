@@ -82,13 +82,13 @@ def TS(freq, inte, tau, d, resol):
     return np.array(result)
 
 #Limiting_Flux
-def LF(freq, inte, tau, d, resol):
+def LF(freq, inte, tau, d, resol, ts):
     result = []
     for i in range(len(freq)):
         v0 = freq[i]
         i0 = inte[i]
         tau0 = tau[i]
-        p0 = TS(freq, inte, tau, d, resol)
+        p0 = ts[i]
         result.append((p0 *resol) / (2 * np.pi * (d / 2)**2 * v0))
     return np.array(result)
 
