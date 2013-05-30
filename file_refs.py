@@ -45,7 +45,7 @@ atm_tran_refs = {'13_7Km SOFIA': "data/Backgrounds/Atmospheric Tranimission_site
                 'WhiteMountain-175g':"data/Backgrounds/Atmospheric Tranimission_sites/WhiteMountain-175g-Transmission-1976Model-45Deg-0-2000cm.xlsx"
                 }
 
-
+'''
 ./data/Backgrounds/Galactic Emission:
 Galactic Emission_glat=0 glong=0.xlsx
 Galactic Emission_glat=90 glong=180.xlsx
