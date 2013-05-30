@@ -88,7 +88,7 @@ def LF(freq, inte, tau, d, resol):
         v0 = freq[i]
         i0 = inte[i]
         tau0 = tau[i]
-        p0 = TS(freq, inte, tau, d)
+        p0 = TS(freq, inte, tau, d, resol)
         result.append((p0 *resol) / (2 * np.pi * (d / 2)**2 * v0))
     return np.array(result)
 
@@ -99,7 +99,7 @@ def IT(freq, bling, ratio, inte, tau, d):
         v0 = freq[i]
         n0 = bling[i]
         tau0 = tau[i]
-        p0 = TS(freq, inte, tau, d)
+        p0 = TS(freq, inte, tau, d, resol)
         result.append((n0 * ratio / p0)**2)
     return np.array(result)
 
