@@ -246,11 +246,16 @@ class atmodel(wx.Frame):
         
         
         #writing
-        #xw = ExcelWriter(path)
-        #xw.write_col('freq/Hz', freq)
+        xw = ExcelWriter(path)
+        xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
+        xw.write_col('freq(Hz)', freq)
         freq_THz = np.array(freq)*10**(-12)
-        #xw.write_col('freq/THz', freq_THz)
-        #xw.write_col('Bling', bling_TOT)
+        xw.write_col('freq(THz)', freq_THz)
+        xw.write_col('wavelength(um)', (3 * 10**8) / freq * 10**6)
+        if self.generate_checkboxs[0].IsChecked():
+          xw.write_col('Bling', bling_TOT)
+        if self.generate_checkboxs[1].IsChecked():
+         
         #xw.save()
         '''
         message box alert
@@ -261,12 +266,16 @@ class atmodel(wx.Frame):
         '''
         #plot
         if self.generate_checkboxs[0].IsChecked():
+            xw.write_col('Total Noise_Bling()', bling_TOT)
             plotter.loglogplot(freq_THz, bling_TOT)
         if self.generate_checkboxs[1].IsChecked():
+            xw.write_col('Total signal()', ts)
             plotter.loglogplot(freq_THz, ts)
         if self.generate_checkboxs[2].IsChecked():
+            xw.write_col('Limiting Flux()', limiting_flux)
             plotter.loglogplot(freq_THz, limiting_flux)
         if self.generate_checkboxs[3].IsChecked():
+            xw.write_col('Integration Time()', integration_time)
             plotter.loglogplot(freq_THz, integration_time)
         
 
