@@ -252,18 +252,7 @@ class atmodel(wx.Frame):
         freq_THz = np.array(freq)*10**(-12)
         xw.write_col('freq(THz)', freq_THz)
         xw.write_col('wavelength(um)', (3 * 10**8) / freq * 10**6)
-        if self.generate_checkboxs[0].IsChecked():
-          xw.write_col('Bling', bling_TOT)
-        if self.generate_checkboxs[1].IsChecked():
          
-        #xw.save()
-        '''
-        message box alert
-        message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
-        message_dialog.SetTitle("Successful!")
-        if message_dialog.ShowModal() == wx.ID_OK:
-            message_dialog.Destroy()
-        '''
         #plot
         if self.generate_checkboxs[0].IsChecked():
             xw.write_col('Total Noise_Bling()', bling_TOT)
@@ -277,7 +266,16 @@ class atmodel(wx.Frame):
         if self.generate_checkboxs[3].IsChecked():
             xw.write_col('Integration Time()', integration_time)
             plotter.loglogplot(freq_THz, integration_time)
+        xw.save()
         
+        
+        '''
+        message box alert
+        message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
+        message_dialog.SetTitle("Successful!")
+        if message_dialog.ShowModal() == wx.ID_OK:
+            message_dialog.Destroy()
+        '''
 
     def onCancel(self, e):
         self.Destroy()
