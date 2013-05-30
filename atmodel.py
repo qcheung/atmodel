@@ -232,6 +232,12 @@ class atmodel(wx.Frame):
         freq = si.read_from_col(1)
         inte = si.read_from_col(5)
         
+        #Source_Total Signal
+        at = ExcelReader(file_refs.atm_tran_refs[site])
+        at.set_freq_range(freq_start, freq_end)
+        tau = at.read_from_col(4)
+        total_signal = cal.TS(freq, inte, tau, d, resol)
+        
         #writing
         #xw = ExcelWriter(path)
         #xw.write_col('freq/Hz', freq)
@@ -247,7 +253,7 @@ class atmodel(wx.Frame):
             message_dialog.Destroy()
         
         #plot
-        plotter.loglogplot(freq_THz, inte)
+        plotter.loglogplot(freq_THz, total_signal)
 
     def onCancel(self, e):
         self.Destroy()
