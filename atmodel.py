@@ -42,8 +42,8 @@ class atmodel(wx.Frame):
                       'Mirror Diameter(m):', 'Mirror Temperature(K):',
                       'Choose a Site:', 'Choose a source:', 'Choose backgrounds', 
                       'Specify starting frequency(cm^-1)', 'Specify ending frequency(cm^-1)','Signal to noise ratio' ]
-        sites = ['30KmBalloon', '40KmBalloon', 'CCAT-0732g','CCAT-0978g','DomeA-01g','DomeA-014g','DomeC-015g',
-                 'DomeC-024g','MaunaKea-1g','MaunaKea-15g','SantaBarbara-01g','SantaBarbara-30g','SOFIA','SouthPole-023g',
+        sites = ['13_7Km SOFIA','30KmBalloon', '40KmBalloon', 'CCAT-0732g','CCAT-0978g','DomeA-01g','DomeA-014g','DomeC-015g',
+                 'DomeC-024g','MaunaKea-1g','MaunaKea-15g','SantaBarbara-01g','SantaBarbara-30g','SouthPole-023g',
                  'SouthPole-032g','WhiteMountain-115g','WhiteMountain-175g','Space', 'Custom..']
         sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom..']
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission', 
@@ -257,16 +257,16 @@ class atmodel(wx.Frame):
         #plot
         if self.generate_checkboxs[0].IsChecked():
             xw.write_col('Total Noise_BLING(W Hz^(-1/2))', bling_TOT)
-            #plotter.loglogplot(freq_THz, bling_TOT)
+            plotter.loglogplot(freq_THz, bling_TOT)
         if self.generate_checkboxs[1].IsChecked():
             xw.write_col('Total signal(W/m^2/sr/Hz)', ts)
-            #plotter.loglogplot(freq_THz, ts)
+            plotter.loglogplot(freq_THz, ts)
         if self.generate_checkboxs[2].IsChecked():
-            xw.write_col('Limiting Flux(W/m^2/Hz)', limiting_flux)
-            #plotter.loglogplot(freq_THz, limiting_flux)
+            xw.write_col('Limiting Flux(W)', limiting_flux)
+            plotter.loglogplot(freq_THz, limiting_flux)
         if self.generate_checkboxs[3].IsChecked():
             xw.write_col('Integration Time(s)', integration_time)
-            #plotter.loglogplot(freq_THz, integration_time)
+            plotter.loglogplot(freq_THz, integration_time)
         xw.save()
         
         

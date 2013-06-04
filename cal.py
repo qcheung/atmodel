@@ -71,15 +71,6 @@ def bling_ZE(freq, temp, resol):
     return np.array(result)
 
 #Total_Signal
-def TS(freq, inte, tau, d, resol):
-    result = []
-    for i in range(len(freq)):
-        v0 = freq[i]
-        i0 = inte[i]
-        tau0 = tau[i]
-        p0 = np.pi * (d / 2)**2 * tau0 * i0 * 2 * v0 / resol
-        result.append(p0)
-    return np.array(result)
 
 #Limiting_Flux
 def LF(freq, d, resol, ts):
@@ -113,19 +104,39 @@ def trancate(data, start, end):
     print np.transpose(result)
     return np.transpose(result)
 
-def integral_tot_signal(freq, inte, tau, d, resol):
+def TS(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
         v = freq[i]
-        i_start = int( i - v / ((2 * resol * 0.1))
-        i_end = int(i + v / ((2 * resol * 0.1))
-        if i_start < 0
-          i_start = 0
+        #i_start = int((v - v/2/resol -0.05)/0.1 )
+        i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
+        #i_end = int((v + v/2/resol -0.05)/0.1 )
+        i_end = int(i + v / (3*10**10)/ ((2 * resol * 0.1)))
+        
+        if i_start <= 0:
+            i_start = 0
+        if i_end > len(freq):
+            i_end = len(freq)
+
         p0 = 0
-        for j in range(i_start, i_end+1):
-          v0 = freq[j]
-          i0 = inte[j]
-          tau0 = tau[j]
-          p0 = p0 + np.pi * (d / 2)**2 * tau0 * i0
+        for j in range(i_start, i_end):
+            v0 = freq[j]
+            i0 = inte[j]
+            tau0 = tau[j]
+            p0 = p0 + np.pi * (float(d) / 2)**2 * tau0 * i0 * 0.1*10**10*3
         result.append(p0)
     return np.array(result)
+'''
+def TS(freq, inte, tau, d, resol):
+    result = []
+    for i in range(len(freq)):
+        v0 = freq[i]
+        i0 = inte[i]
+        tau0 = tau[i]
+        p0 = np.pi * (d / 2)**2 * tau0 * i0 * 2 * v0 / resol
+        result.append(p0)
+    return np.array(result)
+'''
+
+#result = TS([0.05+0.1*i for i in range(50,100)], [10 for i in range(50)],[1 for i in range(50)],1,3)
+#plotter.loglogplot([0.05+0.1*i for i in range(50,100)],result)

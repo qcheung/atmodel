@@ -7,7 +7,8 @@ Galactic Emission
 Zodiacal Emission
 
 '''
-atm_rad_refs = {'30KmBalloon': "data/Backgrounds/Atmospheric Radiance_sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx",
+atm_rad_refs = {'13_7Km SOFIA': "data/Backgrounds/Atmospheric Radiance_sites/13_7Km SOFIA-Radiance-1976Model-45Deg-0-2000cm.xlsx",
+                '30KmBalloon': "data/Backgrounds/Atmospheric Radiance_sites/30KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx",
                 '40KmBalloon': "data/Backgrounds/Atmospheric Radiance_sites/40KmBalloon-Radiance-1976Model-45Deg-0-2000cm.xlsx",
                 'CCAT-0732g': "data/Backgrounds/Atmospheric Radiance_sites/CCAT-0732g-Radiance-1976Model-45Deg-0-2000cm.xlsx",
                 'CCAT-0978g': "data/Backgrounds/Atmospheric Radiance_sites/CCAT-0978g-Radiance-1976Model-45Deg-0-2000cm.xlsx",
