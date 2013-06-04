@@ -246,6 +246,7 @@ class atmodel(wx.Frame):
         
         
         #writing
+        freq = np.array(freq)
         xw = ExcelWriter(path)
         xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
         xw.write_col('freq(Hz)', freq)
