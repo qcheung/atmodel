@@ -113,3 +113,19 @@ def trancate(data, start, end):
     print np.transpose(result)
     return np.transpose(result)
 
+def integral_tot_signal(freq, inte, tau, d, resol):
+    result = []
+    for i in range(len(freq)):
+        v = freq[i]
+        i_start = int( i - v / ((2 * resol * 0.1))
+        i_end = int(i + v / ((2 * resol * 0.1))
+        if i_start < 0
+          i_start = 0
+        p0 = 0
+        for j in range(i_start, i_end+1):
+          v0 = freq[j]
+          i0 = inte[j]
+          tau0 = tau[j]
+          p0 = p0 + np.pi * (d / 2)**2 * tau0 * i0
+        result.append(p0)
+    return np.array(result)
