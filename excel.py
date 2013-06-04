@@ -60,6 +60,9 @@ class ExcelXWriter:
             self.sheet.write(row, self.column_to_fill, x)
             row += 1
         self.column_to_fill += 1
+    # write_note(self, note):
     def save(self):
         self.book.close()
-        
+#xw = ExcelXWriter("test.xlsx")
+#xw.write_col("freq", [1,2,3,4,5])
+
