@@ -1,5 +1,5 @@
 import wx
-from excel import ExcelWriter,ExcelReader
+from excel import ExcelXWriter,ExcelReader
 import plotter
 import cal
 import const
@@ -247,7 +247,7 @@ class atmodel(wx.Frame):
         
         #writing
         freq = np.array(freq)
-        xw = ExcelWriter(path)
+        xw = ExcelXWriter(path)
         xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
         xw.write_col('freq(Hz)', freq)
         freq_THz = freq*10**(-12)
@@ -257,16 +257,16 @@ class atmodel(wx.Frame):
         #plot
         if self.generate_checkboxs[0].IsChecked():
             xw.write_col('Total Noise_BLING(W Hz^(-1/2))', bling_TOT)
-            plotter.loglogplot(freq_THz, bling_TOT)
+            #plotter.loglogplot(freq_THz, bling_TOT)
         if self.generate_checkboxs[1].IsChecked():
             xw.write_col('Total signal(W/m^2/sr/Hz)', ts)
-            plotter.loglogplot(freq_THz, ts)
+            #plotter.loglogplot(freq_THz, ts)
         if self.generate_checkboxs[2].IsChecked():
             xw.write_col('Limiting Flux(W/m^2/Hz)', limiting_flux)
-            plotter.loglogplot(freq_THz, limiting_flux)
+            #plotter.loglogplot(freq_THz, limiting_flux)
         if self.generate_checkboxs[3].IsChecked():
             xw.write_col('Integration Time(s)', integration_time)
-            plotter.loglogplot(freq_THz, integration_time)
+            #plotter.loglogplot(freq_THz, integration_time)
         xw.save()
         
         

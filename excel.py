@@ -1,11 +1,10 @@
-'''
-Created on May 17, 2013
 
-@author: dave
-'''
 from xlrd import open_workbook
 from xlwt import Workbook
+from xlsxwriter.workbook import Workbook
 import os
+
+#to read excel files
 class ExcelReader:
     def __init__(self, file_location):
         self.book = open_workbook(file_location, on_demand = True)
@@ -26,6 +25,7 @@ class ExcelReader:
         self.row_start = int((freq_start - self.freq_offset)/self.freq_step_size) + self.row_offset
         self.row_end = int((freq_end - self.freq_offset) / self.freq_step_size)+ 1 + self.row_offset
 
+#to generate XLS excel format
 class ExcelWriter:
     def __init__(self, path):
         self.path = path
@@ -43,11 +43,23 @@ class ExcelWriter:
         self.column_to_fill += 1
     def save(self):
         self.book.save(self.path)
+
+#to generate XLSX format excel format
+class ExcelXWriter:
+    def __init__(self, path):
+        self.path = path
+        self.book = Workbook(path)
+        self.sheet = self.book.add_worksheet()
+        self.column_to_fill = 0
         
-'''xr = ExcelReader("data/Sources/Arp220_z=1.xlsx") 
-xr.set_freq_range(0.05, 5)
-result = xr.read_from_col(0)
-print result      
-        '''
-        
+    def write_col(self, column_name, column_content):
+        row = 0
+        self.sheet.write(row, self.column_to_fill, column_name)
+        row += 1
+        for x in column_content:
+            self.sheet.write(row, self.column_to_fill, x)
+            row += 1
+        self.column_to_fill += 1
+    def save(self):
+        self.book.close()
         
