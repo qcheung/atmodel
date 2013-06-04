@@ -250,7 +250,7 @@ class atmodel(wx.Frame):
         xw = ExcelWriter(path)
         xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
         xw.write_col('freq(Hz)', freq)
-        freq_THz = np.array(freq)*10**(-12)
+        freq_THz = freq*10**(-12)
         xw.write_col('freq(THz)', freq_THz)
         xw.write_col('wavelength(um)', (3 * 10**8) / freq * 10**6)
          
@@ -270,13 +270,12 @@ class atmodel(wx.Frame):
         xw.save()
         
         
-        '''
-        message box alert
+       
+        #message box alert
         message_dialog = wx.MessageDialog(self, message='Successfully Generated!')
         message_dialog.SetTitle("Successful!")
         if message_dialog.ShowModal() == wx.ID_OK:
             message_dialog.Destroy()
-        '''
 
     def onCancel(self, e):
         self.Destroy()
