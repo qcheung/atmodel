@@ -12,8 +12,10 @@ def generate_freq(start = 0.05, stop = 2005, step=0.1):
         i += step
     return result
 
-#bling_Cosmology_Infrared_Backgrond   
-def bling_CIB(freq, temp, resol):
+#bling_Cosmology_Infrared_Backgrond  
+#bling_Galactic_Emission 
+#bling_Zodiacal_Emission
+def bling_sub(freq, temp, resol):
     result = []
     for i in range(len(freq)):
         v = freq[i]
@@ -27,58 +29,72 @@ def bling_CIB(freq, temp, resol):
         for j in range(i_start, i_end):
             v0 = freq[j]
             t0 = temp[j]
-            p0 = p0 + np.pi * (float(d) / 2)**2 * tau0 * i0 * 0.1*10**10*3
-        result.append(const.h * const.k * v0 * t0 * 
+            p0 = p0 + const.h * const.k * v0 * t0 * 0.1*10**10*3
+        result.append(p0)
     return np.array(result)
     
 #bling_Cosmology_Microwave_Backgrond
 def bling_CMB(freq, resol):
     result = []
     for i in range(len(freq)):
-        v0 = freq[i]
-        I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * const.T))-1))
-        t0 = I * const.c**2 / (const.k * v0**2)
-        result.append(const.h * const.k * v0*t0 * 2 * v0 / resol)
-    return np.array(result)
-    
-#bling_Galactic_Emission       
-def bling_GE(freq, temp, resol):
-    result = []
-    for i in range(len(freq)):
-        v0 = freq[i]
-        t0 = temp[i]
-        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
+        v = freq[i]
+        i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
+        i_end = int(i + v / (3*10**10)/ ((2 * resol * 0.1)))
+        if i_start <= 0:
+            i_start = 0
+        if i_end > len(freq):
+            i_end = len(freq)
+        p0 = 0
+        for j in range(i_start, i_end):
+            v0 = freq[j]
+            I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * const.T))-1))
+            t0 = I * const.c**2 / (const.k * v0**2)
+            p0 = p0 + const.h * const.k * v0 * t0 * 0.1*10**10*3
+        result.append(p0)
     return np.array(result)
   
 #bling_Thermal Mirror Emission
 def bling_TME(freq, resol, sigma, mirror_temp):
     result = []
     for i in range(len(freq)):
-        v0 = freq[i]
-        I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * mirror_temp))-1))
-        epsilon = (16 * np.pi * v0 * const.epsilon / sigma)**(0.5)
-        t0 = epsilon * I * const.c**2 / (const.k * v0**2)
-        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
+        v = freq[i]
+        i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
+        i_end = int(i + v / (3*10**10)/ ((2 * resol * 0.1)))
+        if i_start <= 0:
+            i_start = 0
+        if i_end > len(freq):
+            i_end = len(freq)
+        p0 = 0
+        for j in range(i_start, i_end):
+            v0 = freq[j]
+            I = 2 * const.h * v0**3 / (const.c**2 * (np.exp((const.h * v0) / (const.k * mirror_temp))-1))
+            epsilon = (16 * np.pi * v0 * const.epsilon / sigma)**(0.5)
+            t0 = epsilon * I * const.c**2 / (const.k * v0**2)
+            p0 = p0 + const.h * const.k * v0 * t0 * 0.1*10**10*3
+        result.append(p0)
     return np.array(result)
     
 #bing_Atmospheric_Radiance
 def bling_AR(freq, rad, resol):
     result = []
-    for i in range(len(freq)):
-        v0 = freq[i]
-        i0 = rad[i]
-        t0 = i0 * const.c**2 / (const.k * v0**2)
-        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
+for i in range(len(freq)):
+        v = freq[i]
+        i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
+        i_end = int(i + v / (3*10**10)/ ((2 * resol * 0.1)))
+        if i_start <= 0:
+            i_start = 0
+        if i_end > len(freq):
+            i_end = len(freq)
+        p0 = 0
+        for j in range(i_start, i_end):
+            v0 = freq[j]
+            i0 = rad[j]
+            t0 = i0 * const.c**2 / (const.k * v0**2)
+            p0 = p0 + const.h * const.k * v0 * t0 * 0.1*10**10*3
+        result.append(p0)
     return np.array(result)
 
 #bling_Zodiacal_Emission
-def bling_ZE(freq, temp, resol):
-    result = []
-    for i in range(len(freq)):
-        v0 = freq[i]
-        t0 = temp[i]
-        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
-    return np.array(result)
 
 #Total_Signal
 
@@ -114,6 +130,7 @@ def trancate(data, start, end):
     print np.transpose(result)
     return np.transpose(result)
 
+#Total_Signal
 def TS(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
