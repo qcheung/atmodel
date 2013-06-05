@@ -177,7 +177,7 @@ class atmodel(wx.Frame):
             cib.set_freq_range(freq_start, freq_end)
             freq = cib.read_from_col(1)
             temp = cib.read_from_col(4)
-            bling += cal.bling_CIB(freq, temp, resol)
+            bling += cal.bling_sub(freq, temp, resol)
             
         
         #CMB
@@ -195,7 +195,7 @@ class atmodel(wx.Frame):
             ge.set_freq_range(freq_start, freq_end)
             freq = ge.read_from_col(1)
             temp = ge.read_from_col(8)
-            bling += cal.bling_GE(freq, temp, resol)
+            bling += cal.bling_sub(freq, temp, resol)
             
         
         #Thermal Mirror Emission    
@@ -222,7 +222,7 @@ class atmodel(wx.Frame):
             ze.set_freq_range(freq_start, freq_end)
             freq = ze.read_from_col(1)
             temp = ze.read_from_col(4)
-            bling += cal.bling_ZE(freq, temp, resol)
+            bling += cal.bling_sub(freq, temp, resol)
         
         bling_TOT = bling ** 0.5
         
