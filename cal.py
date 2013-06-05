@@ -16,9 +16,19 @@ def generate_freq(start = 0.05, stop = 2005, step=0.1):
 def bling_CIB(freq, temp, resol):
     result = []
     for i in range(len(freq)):
-        v0 = freq[i]
-        t0 = temp[i]
-        result.append(const.h * const.k * v0 * t0 * 2 * v0 / resol)
+        v = freq[i]
+        i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
+        i_end = int(i + v / (3*10**10)/ ((2 * resol * 0.1)))
+        if i_start <= 0:
+            i_start = 0
+        if i_end > len(freq):
+            i_end = len(freq)
+        p0 = 0
+        for j in range(i_start, i_end):
+            v0 = freq[j]
+            t0 = temp[j]
+            p0 = p0 + np.pi * (float(d) / 2)**2 * tau0 * i0 * 0.1*10**10*3
+        result.append(const.h * const.k * v0 * t0 * 
     return np.array(result)
     
 #bling_Cosmology_Microwave_Backgrond
