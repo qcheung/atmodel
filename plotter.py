@@ -9,4 +9,4 @@ def loglogplot(x, y):
     plt.ylabel("log()")
     plt.show()
 
-loglogplot([1,2,3,4,5,6],[10,20,30,40,60,80])
+#loglogplot([1,2,3,4,5,6],[10,20,30,40,60,80])

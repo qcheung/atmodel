@@ -40,12 +40,12 @@ class atmodel(wx.Frame):
         #Top_left -> parameters
         parameters = ['Specify Parameters', 'Spectral Resolution:', 
                       'Mirror Diameter(m):', 'Mirror Temperature(K):',
-                      'Choose a Site:', 'Choose a source:', 'Choose backgrounds', 
+                      'Choose a Site:', 'Choose a source:', 'Choose backgrounds:', 
                       'Specify starting frequency(cm^-1)', 'Specify ending frequency(cm^-1)','Signal to noise ratio' ]
         sites = ['13_7Km SOFIA','30KmBalloon', '40KmBalloon', 'CCAT-0732g','CCAT-0978g','DomeA-01g','DomeA-014g','DomeC-015g',
                  'DomeC-024g','MaunaKea-1g','MaunaKea-15g','SantaBarbara-01g','SantaBarbara-30g','SouthPole-023g',
-                 'SouthPole-032g','WhiteMountain-115g','WhiteMountain-175g','Space', 'Custom..']
-        sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom..']
+                 'SouthPole-032g','WhiteMountain-115g','WhiteMountain-175g','Space', 'Custom']
+        sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom']
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission', 
                        'Atmospheric Radiance', 'Zodiacal Emission']
         
@@ -69,6 +69,9 @@ class atmodel(wx.Frame):
                               (parameter_labels[9], 0, wx.EXPAND), (self.parameter_inputs[5], 0, wx.EXPAND)])
                                 #each row represents a row in interface
         top_left.Add(top_left_fgs, flag = wx.EXPAND)
+
+	#Top_left -> Bind eventhandler
+	self.parameter_site_combo.Bind(wx.EVT_COMBOBOX, self.onCustom)
 
         #Top_right
         galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45','g_long = 0, g_lat = +90','g_long = 0, g_lat = -90',
@@ -142,8 +145,35 @@ class atmodel(wx.Frame):
         content.Add(top, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
         content.Add(bottom, flag = wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border = 10)
         panel.SetSizer(content)
-        
-           
+
+    def onCustom(self, e):
+	self.site_dialog = wx.Frame(self,title="Custom Site Files:", size = (300, 150) ) 
+	site_dialog_fgs = wx.FlexGridSizer(2, 3, 6, 6) #declare FlexibleGridSizer
+	self.site_dialog_labels = [wx.StaticText(self.site_dialog, label = "Specify radiance file:"), wx.StaticText(self.site_dialog, label = "specify transimission file:"), wx.StaticText(self.site_dialog, label = ""), wx.StaticText(self.site_dialog, label = "")]
+	site_dialog_buttons = [wx.Button(self.site_dialog, label = "Browse") for i in range(2)]
+	site_dialog_ok = wx.Button(self.site_dialog, label = "Ok")
+	
+	site_dialog_fgs.Add(self.site_dialog_labels[0], flag = wx.EXPAND|wx.TOP|wx.LEFT, border = 20)
+	site_dialog_fgs.Add(self.site_dialog_labels[2], flag = wx.EXPAND|wx.TOP, border = 20)
+	site_dialog_fgs.Add(site_dialog_buttons[0], flag = wx.EXPAND|wx.TOP|wx.RIGHT, border = 20)
+	site_dialog_fgs.Add(self.site_dialog_labels[1], flag = wx.EXPAND|wx.LEFT, border = 20)
+	site_dialog_fgs.Add(self.site_dialog_labels[3], flag = wx.EXPAND, border = 20)
+	site_dialog_fgs.Add(site_dialog_buttons[1], flag = wx.EXPAND|wx.RIGHT, border = 20)
+	site_dialog_fgs.AddMany([wx.StaticText(self.site_dialog, label = "") for i in range(2)])
+	site_dialog_fgs.Add(site_dialog_ok, flag = wx.EXPAND|wx.RIGHT,border = 20)
+	self.site_dialog.SetSizer(site_dialog_fgs)
+	site_dialog_ok.Bind(wx.EVT_BUTTON, self.onDialogOk)
+
+	self.site_dialog.Center()
+	self.site_dialog.Show()	
+    def onRadianceBrowse(self,e):
+	return
+    def onTransmissionBrowse(self,e):
+	return
+    def onDialogOk(self, e):
+	self.site_dialog.Destroy()
+	
+
     def onBrowse(self, e):
         file_dialog = wx.FileDialog(self, style = wx.FD_SAVE)
         if file_dialog.ShowModal() == wx.ID_OK:
@@ -155,7 +185,6 @@ class atmodel(wx.Frame):
     def onGenerate(self, e):
         
         #initialization
-        
         #initialization -> Parse inputs
         resol = float(self.parameter_inputs[0].GetValue()) 	#resolution
         d = float(self.parameter_inputs[1].GetValue())		#mirror diameters
@@ -164,7 +193,7 @@ class atmodel(wx.Frame):
         freq_end = float(self.parameter_inputs[4].GetValue())	#ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())	#signal to noise ratio
         path = self.output_input.GetValue()
-        site = self.parameter_site_combo.GetValue()
+	site = self.parameter_site_combo.GetValue()
         source = self.parameter_source_combo.GetValue()
         
         #Calculate bling   
