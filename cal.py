@@ -77,7 +77,7 @@ def bling_TME(freq, resol, sigma, mirror_temp):
 #bing_Atmospheric_Radiance
 def bling_AR(freq, rad, resol):
     result = []
-for i in range(len(freq)):
+    for i in range(len(freq)):
         v = freq[i]
         i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
         i_end = int(i + v / (3*10**10)/ ((2 * resol * 0.1)))
