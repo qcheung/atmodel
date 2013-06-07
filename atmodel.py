@@ -71,7 +71,7 @@ class atmodel(wx.Frame):
         top_left.Add(top_left_fgs, flag = wx.EXPAND)
 
 	#Top_left -> Bind eventhandler
-	self.parameter_site_combo.Bind(wx.EVT_COMBOBOX, self.onCustom)
+	#self.parameter_site_combo.Bind(wx.EVT_COMBOBOX, self.onCustom)
 
         #Top_right
         galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45','g_long = 0, g_lat = +90','g_long = 0, g_lat = -90',
@@ -147,37 +147,48 @@ class atmodel(wx.Frame):
         panel.SetSizer(content)
 
     def onCustom(self, e):
-	self.site_dialog = wx.Frame(self,title="Custom Site Files:", size = (300, 150) ) 
-	site_dialog_fgs = wx.FlexGridSizer(2, 3, 6, 6) #declare FlexibleGridSizer
-	self.site_dialog_labels = [wx.StaticText(self.site_dialog, label = "Specify radiance file:"), wx.StaticText(self.site_dialog, label = "specify transimission file:"), wx.StaticText(self.site_dialog, label = ""), wx.StaticText(self.site_dialog, label = "")]
-	site_dialog_buttons = [wx.Button(self.site_dialog, label = "Browse") for i in range(2)]
-	site_dialog_ok = wx.Button(self.site_dialog, label = "Ok")
-	
-	site_dialog_fgs.Add(self.site_dialog_labels[0], flag = wx.EXPAND|wx.TOP|wx.LEFT, border = 20)
-	site_dialog_fgs.Add(self.site_dialog_labels[2], flag = wx.EXPAND|wx.TOP, border = 20)
-	site_dialog_fgs.Add(site_dialog_buttons[0], flag = wx.EXPAND|wx.TOP|wx.RIGHT, border = 20)
-	site_dialog_fgs.Add(self.site_dialog_labels[1], flag = wx.EXPAND|wx.LEFT, border = 20)
-	site_dialog_fgs.Add(self.site_dialog_labels[3], flag = wx.EXPAND, border = 20)
-	site_dialog_fgs.Add(site_dialog_buttons[1], flag = wx.EXPAND|wx.RIGHT, border = 20)
-	site_dialog_fgs.AddMany([wx.StaticText(self.site_dialog, label = "") for i in range(2)])
-	site_dialog_fgs.Add(site_dialog_ok, flag = wx.EXPAND|wx.RIGHT,border = 20)
-	self.site_dialog.SetSizer(site_dialog_fgs)
-	site_dialog_ok.Bind(wx.EVT_BUTTON, self.onDialogOk)
+		#Generate frame and grid
+		self.site_dialog = wx.Frame(self,title="Custom Site Files:", size = (300, 150) ) 
+		site_dialog_fgs = wx.FlexGridSizer(2, 3, 6, 6) #declare FlexibleGridSizer
 
-	self.site_dialog.Center()
-	self.site_dialog.Show()	
+		#Generate
+		self.site_dialog_labels = [wx.StaticText(self.site_dialog, label = "Specify radiance file:"), wx.StaticText(self.site_dialog, label = "specify transimission file:"), wx.StaticText(self.site_dialog, label = ""), wx.StaticText(self.site_dialog, label = "")]
+		site_dialog_buttons = [wx.Button(self.site_dialog, label = "Browse") for i in range(2)]
+		site_dialog_ok = wx.Button(self.site_dialog, label = "Ok")
+	
+		site_dialog_fgs.Add(self.site_dialog_labels[0], flag = wx.EXPAND|wx.TOP|wx.LEFT, border = 20)
+		site_dialog_fgs.Add(self.site_dialog_labels[2], flag = wx.EXPAND|wx.TOP, border = 20)
+		site_dialog_fgs.Add(site_dialog_buttons[0], flag = wx.EXPAND|wx.TOP|wx.RIGHT, border = 20)
+		site_dialog_fgs.Add(self.site_dialog_labels[1], flag = wx.EXPAND|wx.LEFT, border = 20)
+		site_dialog_fgs.Add(self.site_dialog_labels[3], flag = wx.EXPAND, border = 20)
+		site_dialog_fgs.Add(site_dialog_buttons[1], flag = wx.EXPAND|wx.RIGHT, border = 20)
+		site_dialog_fgs.AddMany([wx.StaticText(self.site_dialog, label = "") for i in range(2)])
+		site_dialog_fgs.Add(site_dialog_ok, flag = wx.EXPAND|wx.RIGHT,border = 20)
+		self.site_dialog.SetSizer(site_dialog_fgs)
+		site_dialog_ok.Bind(wx.EVT_BUTTON, self.onDialogOk)
+
+		self.site_dialog.Center()
+		self.site_dialog.Show()	
+
     def onRadianceBrowse(self,e):
-	return
+		file_dialog = wx.FileDialog(self, style = wx.FD_SAVE)
+		if file_dialog.ShowModal() == wx.ID_OK:
+			path = file_dialog.GetPath()
+			self.output_input.Clear()
+			self.output_input.WriteText(self.path)  
+		file_dialog.Destroy()      
+		return
     def onTransmissionBrowse(self,e):
-	return
+		return
     def onDialogOk(self, e):
-	self.site_dialog.Destroy()
+		self.site_dialog.Destroy()
 	
 
     def onBrowse(self, e):
-        file_dialog = wx.FileDialog(self, style = wx.FD_SAVE)
+        file_dialog = wx.FileDialog(self, style = wx.FD_OPEN)
         if file_dialog.ShowModal() == wx.ID_OK:
             self.path = file_dialog.GetPath()
+	   
             self.output_input.Clear()
             self.output_input.WriteText(self.path)  
         file_dialog.Destroy()        

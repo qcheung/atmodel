@@ -1,22 +1,28 @@
 import const
 import numpy as np
-import scipy.integrate as integrate
+from scipy import interpolate
 import plotter
 
-#generate frequency list
-def generate_freq(start = 0.05, stop = 2005, step=0.1):
-    i = start
-    result = []
-    while i < stop:
-        result.append(i)	
-        i += step
-    return result
+def bling_sub(freq, temp, resol):
+	result = []
+	t = interpolate.UnivariateSpline(freq, temp, s=1) #http://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.UnivariateSpline.html#scipy.interpolate.UnivariateSpline
+	step_size = 0.05*3*10**10/10    #characterize the level of details wanted from interpolation. 
+	for v0 in freq:
+		inte_range = v0/resol
+		inte_start = v0 - inte_range/2
+		inte_end = v0 + inte_range/2
+		sum = 0
+		for v in np.arange(inte_start, inte_end, step_size):
+			sum += const.h * const.k * v * t(v) * step_size
+		result.append(sum) 
+	return np.array(result)
 
 #bling_Cosmology_Infrared_Backgrond  
 #bling_Galactic_Emission 
 #bling_Zodiacal_Emission
+'''
 def bling_sub(freq, temp, resol):
-    result = []
+
     for i in range(len(freq)):
         v = freq[i]
         i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
@@ -31,8 +37,8 @@ def bling_sub(freq, temp, resol):
             t0 = temp[j]
             p0 = p0 + const.h * const.k * v0 * t0 * 0.1*10**10*3
         result.append(p0)
-    return np.array(result)
-    
+    return np.array(result)	
+'''
 #bling_Cosmology_Microwave_Backgrond
 def bling_CMB(freq, resol):
     result = []
@@ -115,21 +121,7 @@ def IT(freq, bling_TOT, ratio, ts):
         p0 = ts[i]
         result.append((n0 * ratio / p0)**2)
     return np.array(result)
-
-def trancate(data, start, end):
-    '''
-    Used to trancate an array based on frequency
-    ''' 
-    data = np.transpose(data)
-    result = []
-    for x in data:
-        if x[0] > end:
-            break
-        if x[0] >= start:
-            result.append(x)
-    print np.transpose(result)
-    return np.transpose(result)
-
+    
 #Total_Signal
 def TS(freq, inte, tau, d, resol):
     result = []
@@ -164,6 +156,4 @@ def TS(freq, inte, tau, d, resol):
         result.append(p0)
     return np.array(result)
 '''
-
-#result = TS([0.05+0.1*i for i in range(50,100)], [10 for i in range(50)],[1 for i in range(50)],1,3)
-#plotter.loglogplot([0.05+0.1*i for i in range(50,100)],result)
+#TESTING
