@@ -5,16 +5,27 @@ import plotter
 
 def bling_sub(freq, temp, resol):
 	result = []
-	t = interpolate.UnivariateSpline(freq, temp, s=1) #http://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.UnivariateSpline.html#scipy.interpolate.UnivariateSpline
+	def t(v):
+		if v<freq[0]:
+			return (temp[1]-freq[0]) / (freq[1]-freq[0]) * (v-freq[0]) + temp[0]
+		elif v>freq[-1]:
+			return (temp[-1]-freq[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + temp[-1]
+		else:
+			f = interpolate.interp1d(freq, temp, kind = 'linear')
+			return f(v)
+		
 	step_size = 0.05*3*10**10/10    #characterize the level of details wanted from interpolation. 
+	
 	for v0 in freq:
 		inte_range = v0/resol
 		inte_start = v0 - inte_range/2
 		inte_end = v0 + inte_range/2
+		
 		sum = 0
 		for v in np.arange(inte_start, inte_end, step_size):
 			sum += const.h * const.k * v * t(v) * step_size
 		result.append(sum) 
+		
 	return np.array(result)
 
 #bling_Cosmology_Infrared_Backgrond  
