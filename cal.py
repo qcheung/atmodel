@@ -2,32 +2,37 @@ import const
 import numpy as np
 from scipy import interpolate
 import plotter
+import file_refs
+from excel import ExcelReader
 
 def bling_sub(freq, temp, resol):
-	result = []
-	def t(v):
-		if v<freq[0]:
-			return (temp[1]-freq[0]) / (freq[1]-freq[0]) * (v-freq[0]) + temp[0]
-		elif v>freq[-1]:
-			return (temp[-1]-freq[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + temp[-1]
-		else:
-			f = interpolate.interp1d(freq, temp, kind = 'linear')
-			return f(v)
-		
-	step_size = 0.05*3*10**10/10    #characterize the level of details wanted from interpolation. 
-	
-	for v0 in freq:
-		inte_range = v0/resol
-		inte_start = v0 - inte_range/2
-		inte_end = v0 + inte_range/2
-		
-		sum = 0
-		for v in np.arange(inte_start, inte_end, step_size):
-			sum += const.h * const.k * v * t(v) * step_size
-		result.append(sum) 
-		
-	return np.array(result)
+    resol = float(resol)
+    result = [0]*len(freq)
+    f = interpolate.interp1d(freq, temp, kind = 'linear')
+    def t(v):
+        if v<freq[0]:
+            return (temp[1]-temp[0]) / (freq[1]-freq[0]) * (v-freq[0]) + temp[0]
+        elif v>freq[-1]:
+            return (temp[-1]-temp[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + temp[-1]
+        else:
+            return f(v)
+           
+    step_size = 0.05*3*10**10/2    #characterize the level of details wanted from interpolation. 
 
+    for i in range(len(freq)):
+        v0 = float(freq[i])
+        inte_range = v0/resol
+        inte_start = v0 - inte_range/2
+        inte_end = v0 + inte_range/2
+
+        bling = 0.0
+        for v in np.arange(inte_start, inte_end, step_size):
+            bling += const.h * const.k * v * t(v) * step_size
+        result[i] = bling 
+        print "This is done: ",i,": ",freq[i]
+
+    return np.array(result)
+   
 #bling_Cosmology_Infrared_Backgrond  
 #bling_Galactic_Emission 
 #bling_Zodiacal_Emission
@@ -168,3 +173,14 @@ def TS(freq, inte, tau, d, resol):
     return np.array(result)
 '''
 #TESTING
+
+cib_excel = file_refs.CIB_ref
+cib = ExcelReader(cib_excel)
+cib.set_freq_range(0.05, 100)
+freq = cib.read_from_col(1)
+temp = cib.read_from_col(4)
+bling = bling_sub(freq, temp, 10)
+
+plotter.loglogplot(freq, bling)
+
+#print bling_sub([1,2,3,4,5],[1,2,3,4,5],5)

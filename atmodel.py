@@ -69,8 +69,8 @@ class atmodel(wx.Frame):
                                 # each row represents a row in interface
         top_left.Add(top_left_fgs, flag=wx.EXPAND)
 
-	# Top_left -> Bind eventhandler
-	# self.parameter_site_combo.Bind(wx.EVT_COMBOBOX, self.onCustom)
+        # Top_left -> Bind eventhandler
+        # self.parameter_site_combo.Bind(wx.EVT_COMBOBOX, self.onCustom)
 
         # Top_right
         galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = +90', 'g_long = 0, g_lat = -90',
@@ -130,7 +130,7 @@ class atmodel(wx.Frame):
         # Bottom_right -> Buttons -> Fill up
         bottom_right.Add(generate_button, flag=wx.EXPAND | wx.BOTTOM, border=3)
         bottom_right.Add(cancel_button, flag=wx.EXPAND)
-	
+
         # Bottom_right -> Function Bindings
         output_button.Bind(wx.EVT_BUTTON, self.onBrowse)
         generate_button.Bind(wx.EVT_BUTTON, self.onGenerate)
@@ -170,10 +170,7 @@ class atmodel(wx.Frame):
 
     def onRadianceBrowse(self, e):
         file_dialog = wx.FileDialog(self, style=wx.FD_SAVE)
-        if file_dialog.ShowModal() == wx.ID_OK:
-            path = file_dialog.GetPath()
-            self.output_input.Clear()
-            self.output_input.WriteText(self.path)  
+        if file_dialog.ShowModal() == wx.ID_OK:  
             file_dialog.Destroy()      
         return
     def onTransmissionBrowse(self, e):
@@ -199,7 +196,7 @@ class atmodel(wx.Frame):
         freq_start = float(self.parameter_inputs[3].GetValue())  # starting frequency
         freq_end = float(self.parameter_inputs[4].GetValue())  # ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())  # signal to noise ratio
-		# path = self.output_input.GetValue()
+        # path = self.output_input.GetValue()
         site = self.parameter_site_combo.GetValue()
         source = self.parameter_source_combo.GetValue()
         
