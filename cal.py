@@ -17,7 +17,7 @@ def bling_sub(freq, temp, resol):
         else:
             return f(v)
            
-    step_size = 0.05*3*10**10/2    #characterize the level of details wanted from interpolation. 
+    step_size = 0.1*3*10**10/2    #characterize the level of details wanted from interpolation. 
 
     for i in range(len(freq)):
         v0 = float(freq[i])
@@ -140,6 +140,48 @@ def IT(freq, bling_TOT, ratio, ts):
     
 #Total_Signal
 def TS(freq, inte, tau, d, resol):
+    resol = float(resol)
+    d = float(d)
+    
+    result = [0]*len(freq)
+    f = interpolate.interp1d(freq, inte, kind = 'linear')
+    g = interpolate.interp1d(freq, tau, kind = 'linear')
+    def intensity(v):
+        if v<freq[0]:
+            return (inte[1]-inte[0]) / (freq[1]-freq[0]) * (v-freq[0]) + inte[0]
+        elif v>freq[-1]:
+            return (inte[-1]-inte[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + inte[-1]
+        else:
+            return f(v)
+    
+    def transmission(v):
+        if v<freq[0]:
+            return (tau[1]-tau[0]) / (freq[1]-freq[0]) * (v-freq[0]) + tau[0]
+        elif v>freq[-1]:
+            return (tau[-1]-tau[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + tau[-1]
+        else:
+            return g(v)   
+        
+    inte_resol = 2
+    step_size = 0.1*3*10**10/inte_resol   #characterize the level of details wanted from interpolation. 
+
+    for i in range(len(freq)):
+        v0 = float(freq[i])
+        
+        inte_range = v0/resol
+        inte_start = v0 - inte_range/2
+        inte_end = v0 + inte_range/2
+        
+
+        SED = 0.0
+        for v in np.arange(inte_start, inte_end, step_size):
+            SED +=  np.pi * (d / 2)**2 * transmission(v) * intensity(v) * step_size
+        result[i] = SED 
+        print "This is done: ",i,": ",freq[i]
+
+    return np.array(result)
+'''
+def TS(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
         v = freq[i]
@@ -161,7 +203,7 @@ def TS(freq, inte, tau, d, resol):
             p0 = p0 + np.pi * (float(d) / 2)**2 * tau0 * i0 * 0.1*10**10*3
         result.append(p0)
     return np.array(result)
-'''
+
 def TS(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
@@ -173,7 +215,7 @@ def TS(freq, inte, tau, d, resol):
     return np.array(result)
 '''
 #TESTING
-
+'''
 cib_excel = file_refs.CIB_ref
 cib = ExcelReader(cib_excel)
 cib.set_freq_range(0.05, 100)
@@ -182,5 +224,5 @@ temp = cib.read_from_col(4)
 bling = bling_sub(freq, temp, 10)
 
 plotter.loglogplot(freq, bling)
-
+'''
 #print bling_sub([1,2,3,4,5],[1,2,3,4,5],5)
