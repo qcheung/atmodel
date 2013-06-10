@@ -5,6 +5,7 @@ import cal
 import const
 import numpy as np
 import file_refs
+import time
  
 class atmodel(wx.Frame):
     def __init__(self, parent , title):
@@ -44,7 +45,9 @@ class atmodel(wx.Frame):
         sites = ['13_7Km SOFIA', '30KmBalloon', '40KmBalloon', 'CCAT-0732g', 'CCAT-0978g', 'DomeA-01g', 'DomeA-014g', 'DomeC-015g',
                  'DomeC-024g', 'MaunaKea-1g', 'MaunaKea-15g', 'SantaBarbara-01g', 'SantaBarbara-30g', 'SouthPole-023g',
                  'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Space', 'Custom']
+        
         sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom']
+        
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission',
                        'Atmospheric Radiance', 'Zodiacal Emission']
         
@@ -190,15 +193,25 @@ class atmodel(wx.Frame):
     def onGenerate(self, e):
         
         # initialization -> Parse inputs
+        '''
         resol = float(self.parameter_inputs[0].GetValue())  # resolution @IndentOk
         d = float(self.parameter_inputs[1].GetValue())  # mirror diameters @IndentOk
         mirror_temp = float(self.parameter_inputs[2].GetValue())  # mirror temperature
         freq_start = float(self.parameter_inputs[3].GetValue())  # starting frequency
         freq_end = float(self.parameter_inputs[4].GetValue())  # ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())  # signal to noise ratio
+        '''
         # path = self.output_input.GetValue()
         site = self.parameter_site_combo.GetValue()
         source = self.parameter_source_combo.GetValue()
+
+        #TESTING
+        resol = 3
+        d = 10.0
+        mirror_temp = 230.0
+        freq_start = 0.1 #THz
+        freq_end = 1 #THz
+        ratio = 5.0
         
         # Calculate bling   
         bling = 0
@@ -261,16 +274,26 @@ class atmodel(wx.Frame):
         
         # Source Intensity
         si = ExcelReader(file_refs.source_refs[source])
-        si.set_freq_range(freq_start, freq_end)
+        si.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)        #MODIFIED FOR TESTING
         freq = si.read_from_col(1)
         inte = si.read_from_col(5)
+        print "Reading from source. DONE"
         
         # Source_Total Signal
         at = ExcelReader(file_refs.atm_tran_refs[site])
-        at.set_freq_range(freq_start, freq_end)
-        tau = at.read_from_col(4)
-        ts = cal.TS(freq, inte, tau, d, resol)
+        at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)
         
+        tau = at.read_from_col(4)
+        print "Reading from atmosphere transmission. DONE"
+
+        print "Calculating Total Signal.."
+        start_time = time.time()
+        ts = cal.TS(freq, inte, tau, d, resol)
+        end_time = time.time()
+        print "Total Signal calculation DONE"
+        print "Time used for integration: ", end_time - start_time
+        
+        '''
         # Limiting Flux
         limiting_flux = cal.LF(freq, d, resol, ts)
         
@@ -279,15 +302,20 @@ class atmodel(wx.Frame):
         
         
         # writing
-        freq = np.array(freq)
+        
 
         # xw = ExcelXWriter(path)
         # xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
         # xw.write_col('freq(Hz)', freq)
-        freq_THz = freq * 10 ** (-12)
+          freq_THz = freq * 10 ** (-12)  
         # xw.write_col('freq(THz)', freq_THz)
         # xw.write_col('wavelength(um)', (3 * 10**8) / freq * 10**6)
-         
+
+        '''
+        freq = np.array(freq)
+        freq_THz = freq * 10 ** (-12)                                   #MODIFIED FOR TESTING
+
+        print "Start plotting..."
         # plot
         if self.generate_checkboxs[0].IsChecked():
 
@@ -303,7 +331,7 @@ class atmodel(wx.Frame):
         #    xw.write_col('Integration Time(s)', integration_time)
             plotter.loglogplot(freq_THz, integration_time)
         # xw.save()
-        
+        print "Plotting. DONE"
         
        
         # message box alert

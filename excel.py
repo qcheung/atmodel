@@ -25,6 +25,11 @@ class ExcelReader:
         self.row_start = int((freq_start - self.freq_offset)/self.freq_step_size) + self.row_offset
         self.row_end = int((freq_end - self.freq_offset) / self.freq_step_size)+ 1 + self.row_offset
 
+    def set_freq_range_Hz(self, freq_start, freq_end):
+        self.freq_offset *= 3 * 10 ** 10
+        self.freq_step_size *= 3 * 10 ** 10
+        self.set_freq_range(freq_start, freq_end)
+
 #to generate XLS excel format
 class ExcelWriter:
     def __init__(self, path):
@@ -63,6 +68,5 @@ class ExcelXWriter:
     # write_note(self, note):
     def save(self):
         self.book.close()
-#xw = ExcelXWriter("test.xlsx")
-#xw.write_col("freq", [1,2,3,4,5])
+
 

@@ -1,9 +1,11 @@
+import gc
 import const
 import numpy as np
 from scipy import interpolate
 import plotter
 import file_refs
 from excel import ExcelReader
+gc.disable()
 
 def bling_sub(freq, temp, resol):
     resol = float(resol)
@@ -139,45 +141,46 @@ def IT(freq, bling_TOT, ratio, ts):
     return np.array(result)
     
 #Total_Signal
-def TS(freq, inte, tau, d, resol):
-    resol = float(resol)
-    d = float(d)
-    
+def TS(freq, inte, tau, d, resol):  
     result = [0]*len(freq)
+    print "Interpolating..."
     f = interpolate.interp1d(freq, inte, kind = 'linear')
     g = interpolate.interp1d(freq, tau, kind = 'linear')
+    print "Interpolation DONE"
+    
     def intensity(v):
         if v<freq[0]:
-            return (inte[1]-inte[0]) / (freq[1]-freq[0]) * (v-freq[0]) + inte[0]
+            return (inte[1]-inte[0]) / float((freq[1]-freq[0])) * (v-freq[0]) + inte[0]
         elif v>freq[-1]:
-            return (inte[-1]-inte[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + inte[-1]
-        else:
+            return (inte[-1]-inte[-2]) / float((freq[-1]-freq[-2])) * (v-freq[-1]) + inte[-1]
+        else:   
             return f(v)
     
     def transmission(v):
         if v<freq[0]:
-            return (tau[1]-tau[0]) / (freq[1]-freq[0]) * (v-freq[0]) + tau[0]
+            return (tau[1]-tau[0]) / float((freq[1]-freq[0])) * (v-freq[0]) + tau[0]
         elif v>freq[-1]:
-            return (tau[-1]-tau[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + tau[-1]
+            return (tau[-1]-tau[-2]) / float((freq[-1]-freq[-2])) * (v-freq[-1]) + tau[-1]
         else:
             return g(v)   
-        
-    inte_resol = 2
-    step_size = 0.1*3*10**10/inte_resol   #characterize the level of details wanted from interpolation. 
+    print "helper function definition. DONE"
+    
+    inte_resol = 10.0
+    step_size = 0.1 * 3 * 10 ** 10 / inte_resol   #characterize the level of details wanted from interpolation. 
 
+    print "Start integration..."
     for i in range(len(freq)):
         v0 = float(freq[i])
         
         inte_range = v0/resol
         inte_start = v0 - inte_range/2
         inte_end = v0 + inte_range/2
-        
 
         SED = 0.0
         for v in np.arange(inte_start, inte_end, step_size):
-            SED +=  np.pi * (d / 2)**2 * transmission(v) * intensity(v) * step_size
+            SED +=  3.1416 * (d/2.0)**2 * transmission(v) * intensity(v) * step_size
         result[i] = SED 
-        print "This is done: ",i,": ",freq[i]
+        print "Frequency: ",freq[i], " Hz DONE"
 
     return np.array(result)
 '''
@@ -204,15 +207,6 @@ def TS(freq, inte, tau, d, resol):
         result.append(p0)
     return np.array(result)
 
-def TS(freq, inte, tau, d, resol):
-    result = []
-    for i in range(len(freq)):
-        v0 = freq[i]
-        i0 = inte[i]
-        tau0 = tau[i]
-        p0 = np.pi * (d / 2)**2 * tau0 * i0 * 2 * v0 / resol
-        result.append(p0)
-    return np.array(result)
 '''
 #TESTING
 '''
