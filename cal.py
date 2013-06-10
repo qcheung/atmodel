@@ -183,6 +183,49 @@ def TS(freq, inte, tau, d, resol):
         print "Frequency: ",freq[i], " Hz DONE"
 
     return np.array(result)
+
+def TS2(freq, inte, tau, d, resol):
+    '''
+    This is to create a super fast linear approximation to the integration to calculate Total Signal
+    '''
+    for i in range(len(freq)):
+        v0 = float(freq[i])
+        
+        inte_range = v0/resol
+        fstart = v0 - inte_range/2   #FLOATING POINT START
+        fend = v0 + inte_range/2     #FLOATING POINT END
+
+        SED = 0.0
+        if fstart < freq[0]:
+            
+        inte[1]-inte[0]) / float((freq[1]-freq[0])) * (v-freq[0]) + inte[0]
+        istart = int(((fstart + 0.1) - 0.05) / 0.1)     #INTEGAR START -> ON THE RIGHT OF FSTART
+        iend = int(((fend - 0.05) / 0.1))                #INTEGAR END -> ON THE LEFT OF FEND
+
+        #integration is then divided into three parts
+        #integrate istart -> iend
+        
+        for j in range(istart, iend):
+            integral_1 = 3.1416 * (d/2.0)**2 * inte[j] * tau[j] * step_size
+            integral_2 = 3.1416 * (d/2.0)**2 * inte[j+1] * tau[j+1] * step_size
+            SED += (inte[j+1] + inte[j])/2 * 0.1
+            
+        #integrate fstart -> istart
+        diff = istart - fstart
+        gradient = (inte[istart] - inte[istart-1])/0.1
+        SED += gradient * diff + inte[istart]
+
+        #integrate iend -> fend
+        diff = fend - iend
+        gradient = (inte[iend + 1] - inte[iend])/0.1
+        SED += gradient * diff + inte[iend]
+        
+        #Return result
+        result[i] = SED 
+        print "Frequency: ",freq[i], " Hz DONE"
+
+    return np.array(result)
+    
 '''
 def TS(freq, inte, tau, d, resol):
     result = []
