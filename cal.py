@@ -1,22 +1,44 @@
 import const
 import numpy as np
-import scipy.integrate as integrate
+from scipy import interpolate
 import plotter
+import file_refs
+from excel import ExcelReader
 
-#generate frequency list
-def generate_freq(start = 0.05, stop = 2005, step=0.1):
-    i = start
-    result = []
-    while i < stop:
-        result.append(i)	
-        i += step
-    return result
+def bling_sub(freq, temp, resol):
+    resol = float(resol)
+    result = [0]*len(freq)
+    f = interpolate.interp1d(freq, temp, kind = 'linear')
+    def t(v):
+        if v<freq[0]:
+            return (temp[1]-temp[0]) / (freq[1]-freq[0]) * (v-freq[0]) + temp[0]
+        elif v>freq[-1]:
+            return (temp[-1]-temp[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + temp[-1]
+        else:
+            return f(v)
+           
+    step_size = 0.1*3*10**10/2    #characterize the level of details wanted from interpolation. 
 
+    for i in range(len(freq)):
+        v0 = float(freq[i])
+        inte_range = v0/resol
+        inte_start = v0 - inte_range/2
+        inte_end = v0 + inte_range/2
+
+        bling = 0.0
+        for v in np.arange(inte_start, inte_end, step_size):
+            bling += const.h * const.k * v * t(v) * step_size
+        result[i] = bling 
+        print "This is done: ",i,": ",freq[i]
+
+    return np.array(result)
+   
 #bling_Cosmology_Infrared_Backgrond  
 #bling_Galactic_Emission 
 #bling_Zodiacal_Emission
+'''
 def bling_sub(freq, temp, resol):
-    result = []
+
     for i in range(len(freq)):
         v = freq[i]
         i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
@@ -31,8 +53,8 @@ def bling_sub(freq, temp, resol):
             t0 = temp[j]
             p0 = p0 + const.h * const.k * v0 * t0 * 0.1*10**10*3
         result.append(p0)
-    return np.array(result)
-    
+    return np.array(result)	
+'''
 #bling_Cosmology_Microwave_Backgrond
 def bling_CMB(freq, resol):
     result = []
@@ -115,22 +137,50 @@ def IT(freq, bling_TOT, ratio, ts):
         p0 = ts[i]
         result.append((n0 * ratio / p0)**2)
     return np.array(result)
-
-def trancate(data, start, end):
-    '''
-    Used to trancate an array based on frequency
-    ''' 
-    data = np.transpose(data)
-    result = []
-    for x in data:
-        if x[0] > end:
-            break
-        if x[0] >= start:
-            result.append(x)
-    print np.transpose(result)
-    return np.transpose(result)
-
+    
 #Total_Signal
+def TS(freq, inte, tau, d, resol):
+    resol = float(resol)
+    d = float(d)
+    
+    result = [0]*len(freq)
+    f = interpolate.interp1d(freq, inte, kind = 'linear')
+    g = interpolate.interp1d(freq, tau, kind = 'linear')
+    def intensity(v):
+        if v<freq[0]:
+            return (inte[1]-inte[0]) / (freq[1]-freq[0]) * (v-freq[0]) + inte[0]
+        elif v>freq[-1]:
+            return (inte[-1]-inte[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + inte[-1]
+        else:
+            return f(v)
+    
+    def transmission(v):
+        if v<freq[0]:
+            return (tau[1]-tau[0]) / (freq[1]-freq[0]) * (v-freq[0]) + tau[0]
+        elif v>freq[-1]:
+            return (tau[-1]-tau[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + tau[-1]
+        else:
+            return g(v)   
+        
+    inte_resol = 2
+    step_size = 0.1*3*10**10/inte_resol   #characterize the level of details wanted from interpolation. 
+
+    for i in range(len(freq)):
+        v0 = float(freq[i])
+        
+        inte_range = v0/resol
+        inte_start = v0 - inte_range/2
+        inte_end = v0 + inte_range/2
+        
+
+        SED = 0.0
+        for v in np.arange(inte_start, inte_end, step_size):
+            SED +=  np.pi * (d / 2)**2 * transmission(v) * intensity(v) * step_size
+        result[i] = SED 
+        print "This is done: ",i,": ",freq[i]
+
+    return np.array(result)
+'''
 def TS(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
@@ -153,7 +203,7 @@ def TS(freq, inte, tau, d, resol):
             p0 = p0 + np.pi * (float(d) / 2)**2 * tau0 * i0 * 0.1*10**10*3
         result.append(p0)
     return np.array(result)
-'''
+
 def TS(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
@@ -164,6 +214,15 @@ def TS(freq, inte, tau, d, resol):
         result.append(p0)
     return np.array(result)
 '''
+#TESTING
+'''
+cib_excel = file_refs.CIB_ref
+cib = ExcelReader(cib_excel)
+cib.set_freq_range(0.05, 100)
+freq = cib.read_from_col(1)
+temp = cib.read_from_col(4)
+bling = bling_sub(freq, temp, 10)
 
-#result = TS([0.05+0.1*i for i in range(50,100)], [10 for i in range(50)],[1 for i in range(50)],1,3)
-#plotter.loglogplot([0.05+0.1*i for i in range(50,100)],result)
+plotter.loglogplot(freq, bling)
+'''
+#print bling_sub([1,2,3,4,5],[1,2,3,4,5],5)
