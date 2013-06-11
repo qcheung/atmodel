@@ -6,6 +6,7 @@ def run_command(command):
             stderr=subprocess.STDOUT)
     return p.communicate()
 
+print 'Commiting changes'
 msg = 'update'
 command = 'git commit -a -m \''+msg+'\''
 result = run_command(command)
@@ -30,7 +31,7 @@ if 'y' in input_read:
     print 'Updating website...'
     ret = run_command('git push origin master')[0]
     print ret
-    raw_input("PRESS ANY KEY TO QUIT")
+    raw_input("PRESS ANY KEY")
 else:
-    print 'bye'
+    print 'Bye'
 
