@@ -9,8 +9,10 @@ def run_command(command):
 result = run_command('git commit -a -m \'update\'')
 ret = result[0]
 
-if 'git add' in result[0]:
+if 'git add' in ret:
     print 'in'
-    result = run_command('git add *.py')
-
-print result[0]
+    run_command('git add *.py')
+    result = run_command('git commit -a -m \'update\'')
+    ret = result[0]
+    
+print ret
