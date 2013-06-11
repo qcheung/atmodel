@@ -13,4 +13,4 @@ if 'git add' in result[0]:
     print 'in'
     result = run_command('git add *.py')
 
-print result
+print result[0]
