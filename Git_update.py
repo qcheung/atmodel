@@ -31,3 +31,5 @@ if 'y' in input_read:
     print ret
 else:
     print 'bye'
+
+raw_input("")
