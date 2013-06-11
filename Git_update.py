@@ -30,13 +30,12 @@ input_read = raw_input("Do you want to upload your changes to website?(y/n)")
 if 'y' in input_read:
     print 'Updating website...'
     command = 'git push origin master'
-    p = subprocess.Popen(command, shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT)
-    result = p.communicate()
-    print result[0], 'test'
+    result = run_command(command)
+    print result[0]
+    '''
     p.stdin.write('zoom.aaron@gmail.com')
     p.communicate()
     p.stdin.write('baoding3213')
     result = p.communicate()
     print result[0]
+    '''
