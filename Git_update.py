@@ -29,7 +29,7 @@ if 'y' in input_read:
     print 'Updating website...'
     ret = run_command('git push origin master')[0]
     print ret
+    raw_input("PRESS ANY KEY TO QUIT")
 else:
     print 'bye'
 
-raw_input("")
