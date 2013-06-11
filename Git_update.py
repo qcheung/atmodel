@@ -10,8 +10,6 @@ print "Committing changes..."
 result = run_command('git commit -a -m \'update\'')
 ret = result[0]
 print "Commit DONE"
-print "Commit Result:"
-print ret
 
 if 'git add' in ret:
     print 'Untracked files found, adding...'
@@ -29,12 +27,7 @@ print ret
 input_read = raw_input("Do you want to upload your changes to website?(y/n)")
 if 'y' in input_read:
     print 'Updating website...'
-    command = 'git push origin master'
-    p = subprocess.Popen(command,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT)
-    ret = p.communicate("\nzoom.aaron@gmail.com\nbaoding321\n")[0]
+    ret = run_command('git push origin master')[0]
     print ret
 else:
-    'bye'
+    print 'bye'
