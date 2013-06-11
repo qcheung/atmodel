@@ -1,7 +1,7 @@
 import subprocess
 
 def run_command(command):
-    p = subprocess.Popen(command, shell=True,
+    p = subprocess.Popen(command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
     return p.communicate()
@@ -30,6 +30,7 @@ input_read = raw_input("Do you want to upload your changes to website?(y/n)")
 if 'y' in input_read:
     print 'Updating website...'
     command = 'git push origin master'
+    print 'up to here'
     result = run_command(command)
     print result[0]
     '''
