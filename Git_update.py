@@ -1,13 +1,14 @@
 import subprocess
-
+import sys
 def run_command(command):
     p = subprocess.Popen(command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
     return p.communicate()
 
-print "Committing changes..."
-result = run_command('git commit -a -m \'update\'')
+msg = 'update'
+command = 'git commit -a -m \''+msg+'\''
+result = run_command(command)
 ret = result[0]
 print "Commit DONE"
 
