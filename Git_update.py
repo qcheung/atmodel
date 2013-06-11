@@ -10,6 +10,8 @@ print "Committing changes..."
 result = run_command('git commit -a -m \'update\'')
 ret = result[0]
 print "Commit DONE"
+print "Commit Result:"
+print ret
 
 if 'git add' in ret:
     print 'Untracked files found, adding...'
