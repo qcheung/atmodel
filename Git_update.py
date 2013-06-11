@@ -31,7 +31,6 @@ if 'y' in input_read:
     print 'Updating website...'
     command = 'git push origin master'
     p = subprocess.Popen(command, shell=True,
-            stdin =subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
     result = p.communicate()
