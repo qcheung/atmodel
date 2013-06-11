@@ -22,3 +22,17 @@ if 'git add' in ret:
     
 print "RESULT:"
 print ret
+
+
+input_read = input("Do you want to upload your changes to website?(y/n)")
+if 'y' in input_read:
+    print 'Updating website...'
+    command = 'git push origin master'
+    p = subprocess.Popen(command, shell=True,
+            stdin =subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT)
+    p.communicate()
+    p.communicate(input = 'zoom.aaron@gmail.com')
+    result = p.communicate(input = 'baoding321')
+    print result[0]
