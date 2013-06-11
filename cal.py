@@ -120,7 +120,6 @@ def bling_AR(freq, rad, resol):
 
 #bling_Zodiacal_Emission
 
-#Total_Signal
 
 #Limiting_Flux
 def LF(freq, d, resol, ts):
@@ -196,12 +195,18 @@ def TS2(freq, inte, tau, d, resol):
         fend = v0 + inte_range/2     #FLOATING POINT END
 
         SED = 0.0
-        if fstart < freq[0]:
+        
             
         inte[1]-inte[0]) / float((freq[1]-freq[0])) * (v-freq[0]) + inte[0]
         istart = int(((fstart + 0.1) - 0.05) / 0.1)     #INTEGAR START -> ON THE RIGHT OF FSTART
         iend = int(((fend - 0.05) / 0.1))                #INTEGAR END -> ON THE LEFT OF FEND
 
+        if fstart < freq[0]:    #If starting point is smaller than the first entry
+            integral_1 = 3.1416 * (d/2.0)**2 * inte[0] * tau[0]
+            gradient =  - 3.1416 * (d/2.0)**2 * inte[j+1] * tau[1] * step_size)/0.1
+            SED += gradient
+        if fend > freq[-1]:
+            
         #integration is then divided into three parts
         #integrate istart -> iend
         
