@@ -31,7 +31,7 @@ if 'y' in input_read:
     print 'Updating website...'
     ret = run_command('git push origin master')[0]
     print ret
-    raw_input("PRESS ANY KEY")
+    raw_input("PRESS ENTER TO EXIT")
 else:
     print 'Bye'
 
