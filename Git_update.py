@@ -35,6 +35,8 @@ if 'y' in input_read:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
     p.communicate()
-    p.communicate(input = 'zoom.aaron@gmail.com')
-    result = p.communicate(input = 'baoding321')
+    p.stdin.write('zoom.aaron@gmail.com')
+    p.communicate()
+    p.stdin.write('baoding3213')
+    result = p.communicate()
     print result[0]
