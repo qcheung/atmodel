@@ -182,7 +182,7 @@ def TS(freq, inte, tau, d, resol):
         print "Frequency: ",freq[i], " Hz DONE"
 
     return np.array(result)
-
+'''
 def TS2(freq, inte, tau, d, resol):
     '''
     This is to create a super fast linear approximation to the integration to calculate Total Signal
@@ -230,7 +230,7 @@ def TS2(freq, inte, tau, d, resol):
         print "Frequency: ",freq[i], " Hz DONE"
 
     return np.array(result)
-    
+'''
 '''
 def TS(freq, inte, tau, d, resol):
     result = []
