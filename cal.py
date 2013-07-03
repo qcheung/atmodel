@@ -5,7 +5,6 @@ from scipy import interpolate
 import plotter
 import file_refs
 from excel import ExcelReader
-gc.disable()
 
 def bling_sub(freq, temp, resol):
     resol = float(resol)
@@ -144,8 +143,10 @@ def IT(freq, bling_TOT, ratio, ts):
 def TS(freq, inte, tau, d, resol):  
     result = [0]*len(freq)
     print "Interpolating..."
-    f = interpolate.interp1d(freq, inte, kind = 'linear')
-    g = interpolate.interp1d(freq, tau, kind = 'linear')
+    #f = interpolate.interp1d(freq, inte, kind = 'linear')
+    f = interpolate.InterpolatedUnivariateSpline(freq,inte)
+    #g = interpolate.interp1d(freq, tau, kind = 'linear')
+    g = interpolate.InterpolatedUnivariateSpline(freq,tau)
     print "Interpolation DONE"
     
     def intensity(v):
@@ -163,9 +164,8 @@ def TS(freq, inte, tau, d, resol):
             return (tau[-1]-tau[-2]) / float((freq[-1]-freq[-2])) * (v-freq[-1]) + tau[-1]
         else:
             return g(v)   
-    print "helper function definition. DONE"
     
-    inte_resol = 10.0
+    inte_resol = 1000.0
     step_size = 0.1 * 3 * 10 ** 10 / inte_resol   #characterize the level of details wanted from interpolation. 
 
     print "Start integration..."
@@ -185,9 +185,8 @@ def TS(freq, inte, tau, d, resol):
     return np.array(result)
 '''
 def TS2(freq, inte, tau, d, resol):
-    '''
-    This is to create a super fast linear approximation to the integration to calculate Total Signal
-    '''
+    #This is to create a super fast linear approximation to the integration to calculate Total Signal
+    
     for i in range(len(freq)):
         v0 = float(freq[i])
         
@@ -237,9 +236,7 @@ def TS(freq, inte, tau, d, resol):
     result = []
     for i in range(len(freq)):
         v = freq[i]
-        #i_start = int((v - v/2/resol -0.05)/0.1 )
         i_start = int( i - v / (3*10**10)/((2 * resol * 0.1)))
-        #i_end = int((v + v/2/resol -0.05)/0.1 )
         i_end = int(i + v / (3*10**10)/ ((2 * resol * 0.1)))
         
         if i_start <= 0:

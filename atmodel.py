@@ -149,6 +149,9 @@ class atmodel(wx.Frame):
         panel.SetSizer(content)
 
     def onCustom(self, e):
+        '''
+        this is not implemented yet. 
+        '''
         # Generate frame and grid
         self.site_dialog = wx.Frame(self, title="Custom Site Files:", size=(300, 150)) 
         site_dialog_fgs = wx.FlexGridSizer(2, 3, 6, 6)  # declare FlexibleGridSizer
@@ -172,46 +175,48 @@ class atmodel(wx.Frame):
         self.site_dialog.Show()	
 
     def onRadianceBrowse(self, e):
+        '''
+        this is not implemented yet
+        '''
         file_dialog = wx.FileDialog(self, style=wx.FD_SAVE)
         if file_dialog.ShowModal() == wx.ID_OK:  
             file_dialog.Destroy()      
         return
-    def onTransmissionBrowse(self, e):
-        return
+
     def onDialogOk(self, e):
+        #this controls a button on a pop up under custom
+        #this feature is not yet implemented
         self.site_dialog.Destroy()
 
     def onBrowse(self, e):
+        #After clicking browse to choose a place to store new excel file
         file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
         if file_dialog.ShowModal() == wx.ID_OK:
             self.path = file_dialog.GetPath()
-
             self.output_input.Clear()
             self.output_input.WriteText(self.path)  
         file_dialog.Destroy()        
         
     def onGenerate(self, e):
-        
         # initialization -> Parse inputs
         resol = float(self.parameter_inputs[0].GetValue())  # resolution
         d = float(self.parameter_inputs[1].GetValue())  # mirror diameters
         mirror_temp = float(self.parameter_inputs[2].GetValue())  # mirror temperature
-        freq_start = float(self.parameter_inputs[3].GetValue())  # starting frequency
-        freq_end = float(self.parameter_inputs[4].GetValue())  # ending frequency
+        #freq_start = float(self.parameter_inputs[3].GetValue())  # starting frequency
+        #freq_end = float(self.parameter_inputs[4].GetValue())  # ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())  # signal to noise ratio
         path = self.output_input.GetValue()
-        '''
         site = self.parameter_site_combo.GetValue()
         source = self.parameter_source_combo.GetValue()
         
         #TESTING
-        resol = 3
-        d = 10.0
-        mirror_temp = 230.0
+        #resol = 3
+        #d = 10.0
+        #mirror_temp = 230.0
         freq_start = 0.1 #THz
         freq_end = 1 #THz
-        ratio = 5.0
-        
+        #ratio = 5.0
+
         # Calculate bling   
         bling = 0
         
@@ -307,7 +312,7 @@ class atmodel(wx.Frame):
         # xw = ExcelXWriter(path)
         # xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
         # xw.write_col('freq(Hz)', freq)
-          freq_THz = freq * 10 ** (-12)  
+        freq_THz = freq * 10 ** (-12)  
         # xw.write_col('freq(THz)', freq_THz)
         # xw.write_col('wavelength(um)', (3 * 10**8) / freq * 10**6)
 
