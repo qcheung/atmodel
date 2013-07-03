@@ -185,7 +185,8 @@ def TS(freq, inte, tau, d, resol):
     return np.array(result)
 '''
 def TS2(freq, inte, tau, d, resol):
-    #This is to create a super fast linear approximation to the integration to calculate Total Signal
+    #This is to create a fast linear approximation to the integration to calculate Total Signal
+    #not completed yet
     
     for i in range(len(freq)):
         v0 = float(freq[i])
