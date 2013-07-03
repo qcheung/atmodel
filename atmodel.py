@@ -193,18 +193,17 @@ class atmodel(wx.Frame):
     def onGenerate(self, e):
         
         # initialization -> Parse inputs
-        '''
-        resol = float(self.parameter_inputs[0].GetValue())  # resolution @IndentOk
-        d = float(self.parameter_inputs[1].GetValue())  # mirror diameters @IndentOk
+        resol = float(self.parameter_inputs[0].GetValue())  # resolution
+        d = float(self.parameter_inputs[1].GetValue())  # mirror diameters
         mirror_temp = float(self.parameter_inputs[2].GetValue())  # mirror temperature
         freq_start = float(self.parameter_inputs[3].GetValue())  # starting frequency
         freq_end = float(self.parameter_inputs[4].GetValue())  # ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())  # signal to noise ratio
+        path = self.output_input.GetValue()
         '''
-        # path = self.output_input.GetValue()
         site = self.parameter_site_combo.GetValue()
         source = self.parameter_source_combo.GetValue()
-
+        
         #TESTING
         resol = 3
         d = 10.0
@@ -280,12 +279,13 @@ class atmodel(wx.Frame):
         print "Reading from source. DONE"
         
         # Source_Total Signal
-        at = ExcelReader(file_refs.atm_tran_refs[site])
-        at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)
+        at = ExcelReader(file_refs.atm_tran_refs[site])         #Atmospherical transmission file
+        at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12) #modified for testing
         
         tau = at.read_from_col(4)
         print "Reading from atmosphere transmission. DONE"
 
+        #TESTING TOTAL SIGNAL RUN TIME
         print "Calculating Total Signal.."
         start_time = time.time()
         ts = cal.TS(freq, inte, tau, d, resol)
@@ -324,6 +324,7 @@ class atmodel(wx.Frame):
         if self.generate_checkboxs[1].IsChecked():
         #    xw.write_col('Total signal(W/m^2/sr/Hz)', ts)
             plotter.loglogplot(freq_THz, ts)
+        '''
         if self.generate_checkboxs[2].IsChecked():
         #    xw.write_col('Limiting Flux(W)', limiting_flux)
             plotter.loglogplot(freq_THz, limiting_flux)
@@ -331,6 +332,7 @@ class atmodel(wx.Frame):
         #    xw.write_col('Integration Time(s)', integration_time)
             plotter.loglogplot(freq_THz, integration_time)
         # xw.save()
+        '''
         print "Plotting. DONE"
         
        

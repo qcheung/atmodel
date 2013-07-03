@@ -138,6 +138,7 @@ def IT(freq, bling_TOT, ratio, ts):
         p0 = ts[i]
         result.append((n0 * ratio / p0)**2)
     return np.array(result)
+
     
 #Total_Signal
 def TS(freq, inte, tau, d, resol):  
