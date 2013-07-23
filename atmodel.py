@@ -202,8 +202,8 @@ class atmodel(wx.Frame):
         resol = float(self.parameter_inputs[0].GetValue())  # resolution
         d = float(self.parameter_inputs[1].GetValue())  # mirror diameters
         mirror_temp = float(self.parameter_inputs[2].GetValue())  # mirror temperature
-        #freq_start = float(self.parameter_inputs[3].GetValue())  # starting frequency
-        #freq_end = float(self.parameter_inputs[4].GetValue())  # ending frequency
+        freq_start = float(self.parameter_inputs[3].GetValue())  # starting frequency
+        freq_end = float(self.parameter_inputs[4].GetValue())  # ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())  # signal to noise ratio
         path = self.output_input.GetValue()
         site = self.parameter_site_combo.GetValue()
@@ -213,8 +213,8 @@ class atmodel(wx.Frame):
         #resol = 3
         #d = 10.0
         #mirror_temp = 230.0
-        freq_start = 0.1 #THz
-        freq_end = 1 #THz
+        #freq_start = 0.1 #THz
+        #freq_end = 1 #THz
         #ratio = 5.0
 
         # Calculate bling   
@@ -278,27 +278,27 @@ class atmodel(wx.Frame):
         
         # Source Intensity
         si = ExcelReader(file_refs.source_refs[source])
-        si.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)        #MODIFIED FOR TESTING
+        si.set_freq_range(freq_start, freq_end)        #MODIFIED FOR TESTING
         freq = si.read_from_col(1)
         inte = si.read_from_col(5)
         print "Reading from source. DONE"
         
         # Source_Total Signal
         at = ExcelReader(file_refs.atm_tran_refs[site])         #Atmospherical transmission file
-        at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12) #modified for testing
+        at.set_freq_range(freq_start, freq_end) #modified for testing
         
         tau = at.read_from_col(4)
-        print "Reading from atmosphere transmission. DONE"
+        #print "Reading from atmosphere transmission. DONE"
 
         #TESTING TOTAL SIGNAL RUN TIME
-        print "Calculating Total Signal.."
-        start_time = time.time()
+        #print "Calculating Total Signal.."
+        #start_time = time.time()
         ts = cal.TS(freq, inte, tau, d, resol)
-        end_time = time.time()
-        print "Total Signal calculation DONE"
-        print "Time used for integration: ", end_time - start_time
+        #end_time = time.time()
+        #print "Total Signal calculation DONE"
+        #print "Time used for integration: ", end_time - start_time
         
-        '''
+        
         # Limiting Flux
         limiting_flux = cal.LF(freq, d, resol, ts)
         
@@ -308,7 +308,6 @@ class atmodel(wx.Frame):
         
         # writing
         
-
         # xw = ExcelXWriter(path)
         # xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
         # xw.write_col('freq(Hz)', freq)
