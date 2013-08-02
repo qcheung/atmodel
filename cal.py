@@ -90,27 +90,25 @@ def IT(freq, bling_TOT, ratio, ts):
 
     
 #Total_Signal
-def TS(freq, inte, tau, d, resol):  
-    result = [0]*len(freq)
-    print "Interpolating..."
-    f = interpolate.InterpolatedUnivariateSpline(freq,inte, k=1)
-    g = interpolate.InterpolatedUnivariateSpline(freq,tau, k=1)
-    print "Interpolation DONE" 
+def TS(freq, inte, tau, d, resol):
+    try: assert len(freq)==len(tau)
+    except AssertionError:
+        raise ValueError("The two arrays must have the same length!")
+    freq = np.array(freq, dtype="float")
+    inte = np.abs(np.array(inte, dtype="float"))
+    tau = np.abs(np.array(tau, dtype="float"))
+    
+    f = interpolate.InterpolatedUnivariateSpline(freq, inte, k=1)
+    g = interpolate.InterpolatedUnivariateSpline(freq, tau, k=1)  
     
     inte_resol = 1000.0
     step_size = 0.1 * 3 * 10 ** 10 / inte_resol   #characterize the level of details wanted from interpolation. 
+    c = np.pi*(d/2.0)**2*step_size
+    int_range_length = freq/2/resol
+    int_range = np.zeros((len(freq), 2))
+    int_range[:,0]=freq - int_range_length
+    int_range[:,1]=freq + int_range_length
 
-    c = 3.1416*(d/2.0)**2*step_size
-    print "Start integration..."
-    for i in range(len(freq)):
-        v0 = float(freq[i])
-        
-        inte_range = v0/resol
-        inte_start = v0 - inte_range/2
-        inte_end = v0 + inte_range/2
+    ranges = (np.arange(*(list(i)+[step_size])) for i in int_range)
 
-        x = np.arange(inte_start, inte_end, step_size)
-        result[i] = c*np.sum(f(x)*g(x))
-        print "Frequency: ",freq[i], " Hz DONE"
-
-    return np.array(result)
+    return np.array([c*np.sum(f(i)*g(i)) for i in ranges])
