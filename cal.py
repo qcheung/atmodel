@@ -18,8 +18,8 @@ def bling_sub(freq, temp, resol):
            
     step_size = 1.5e9    #characterize the level of details wanted from interpolation. 
 
-    for i in np.arange(freq): #changed from array of len(freq)
-        v0 = float(i)
+    for i in np.arange(len(freq)):
+        v0 = float(freq[i])
         inte_range = v0/resol
         inte_start = v0 - inte_range/2
         inte_end = v0 + inte_range/2
@@ -38,7 +38,7 @@ def bling_sub(freq, temp, resol):
 def bling_CMB(freq, resol):
     result = []
     for i, v in enumerate(freq):
-        i_a = int( i - v / (3e10)/((2 * resol * 0.1)))
+        i_a = int( i - v / (3e10)/((2 * resol * 0.1))) #question: why do we want this to be integer?
         i_b = int(i + v / (3e10)/ ((2 * resol * 0.1)))
         if i_a <= 0:
             i_a = 0
@@ -93,29 +93,14 @@ def IT(freq, bling_TOT, ratio, ts):
 def TS(freq, inte, tau, d, resol):  
     result = [0]*len(freq)
     print "Interpolating..."
-    f = interpolate.InterpolatedUnivariateSpline(freq,inte)
-    g = interpolate.InterpolatedUnivariateSpline(freq,tau)
-    print "Interpolation DONE"
-    
-    def intensity(v):
-        if v<freq[0]:
-            return (inte[1]-inte[0]) / float((freq[1]-freq[0])) * (v-freq[0]) + inte[0]
-        elif v>freq[-1]:
-            return (inte[-1]-inte[-2]) / float((freq[-1]-freq[-2])) * (v-freq[-1]) + inte[-1]
-        else:   
-            return f(v)
-    
-    def transmission(v):
-        if v<freq[0]:
-            return (tau[1]-tau[0]) / float((freq[1]-freq[0])) * (v-freq[0]) + tau[0]
-        elif v>freq[-1]:
-            return (tau[-1]-tau[-2]) / float((freq[-1]-freq[-2])) * (v-freq[-1]) + tau[-1]
-        else:
-            return g(v)   
+    f = interpolate.InterpolatedUnivariateSpline(freq,inte, k=1)
+    g = interpolate.InterpolatedUnivariateSpline(freq,tau, k=1)
+    print "Interpolation DONE" 
     
     inte_resol = 1000.0
     step_size = 0.1 * 3 * 10 ** 10 / inte_resol   #characterize the level of details wanted from interpolation. 
 
+    c = 3.1416*(d/2.0)**2*step_size
     print "Start integration..."
     for i in range(len(freq)):
         v0 = float(freq[i])
@@ -124,10 +109,8 @@ def TS(freq, inte, tau, d, resol):
         inte_start = v0 - inte_range/2
         inte_end = v0 + inte_range/2
 
-        SED = 0.0
-        for v in np.arange(inte_start, inte_end, step_size):
-            SED +=  3.1416 * (d/2.0)**2 * transmission(v) * intensity(v) * step_size
-        result[i] = SED 
+        x = np.arange(inte_start, inte_end, step_size)
+        result[i] = c*np.sum(f(x)*g(x))
         print "Frequency: ",freq[i], " Hz DONE"
 
     return np.array(result)
