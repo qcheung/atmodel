@@ -5,32 +5,20 @@ from excel import ExcelReader
 
 #bling_sub is for: CIB, Galactic Emission, and Zodiacal Emission
 def bling_sub(freq, temp, resol):
+    freq = np.array(freq, dtype="float")
     resol = float(resol)
-    result = np.zeros(len(freq))
-    f = interpolate.interp1d(freq, temp, kind = 'linear')
-    def t(v):
-        if v<freq[0]:
-            return (temp[1]-temp[0]) / (freq[1]-freq[0]) * (v-freq[0]) + temp[0]
-        elif v>freq[-1]:
-            return (temp[-1]-temp[-2]) / (freq[-1]-freq[-2]) * (v-freq[-1]) + temp[-1]
-        else:
-            return f(v)
+    f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1)
            
     step_size = 1.5e9    #characterize the level of details wanted from interpolation. 
+    c = const.h * const.k * step_size
+    int_range_length = freq/2/resol
+    int_range = np.zeros((len(freq), 2))
+    int_range[:,0]=freq - int_range_length
+    int_range[:,1]=freq + int_range_length
 
-    for i in np.arange(len(freq)):
-        v0 = float(freq[i])
-        inte_range = v0/resol
-        inte_start = v0 - inte_range/2
-        inte_end = v0 + inte_range/2
+    ranges = (np.arange(*(list(i)+[step_size])) for i in int_range)
 
-        bling = 0.0
-        for v in np.arange(inte_start, inte_end, step_size):
-            bling += const.h * const.k * v * t(v) * step_size
-        result[i] = bling
-        print "This is done: ",i,": ",freq[i]
-
-    return np.array(result)
+    return np.array([c*np.sum(f(i)) for i in ranges])
    
     
 
