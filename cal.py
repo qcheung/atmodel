@@ -6,19 +6,20 @@ from excel import ExcelReader
 #bling_sub is for: CIB, Galactic Emission, and Zodiacal Emission
 def bling_sub(freq, temp, resol):
     freq = np.array(freq, dtype="float")
+    temp = np.array(temp, dtype="float")
     resol = float(resol)
     f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1)
-           
-    step_size = 1.5e9    #characterize the level of details wanted from interpolation. 
-    c = const.h * const.k * step_size
+ 
+    c = const.h * const.k * 1.5e9
     int_range_length = freq/2/resol
     int_range = np.zeros((len(freq), 2))
     int_range[:,0]=freq - int_range_length
     int_range[:,1]=freq + int_range_length
 
-    ranges = (np.arange(*(list(i)+[step_size])) for i in int_range)
+    ranges = (np.arange(*(list(i)+[1.5e9])) for i in int_range)
 
-    return np.array([c*np.sum(f(i)) for i in ranges])
+    result = np.array([c*np.sum(f(i)) for i in ranges])
+    return result
    
     
 
