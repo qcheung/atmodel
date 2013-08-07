@@ -224,11 +224,12 @@ class atmodel(wx.Frame):
         if self.background_checkboxs[0].IsChecked():
             cib_excel = file_refs.CIB_ref
             cib = ExcelReader(cib_excel)
-            cib.set_freq_range(freq_start, freq_end)
-            freq = cib.read_from_col(1)
-            temp = cib.read_from_col(4)
-            bling += cal.bling_sub(freq, temp, resol)
-            
+            cib.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
+            print "Reading array from", cib_excel
+            freqCIB = np.array(cib.read_from_col(1), dtype="float")
+            freqCIB_THz = freqCIB * 10 ** (-12)
+            temp = np.array(cib.read_from_col(4), dtype="float")
+            bling += calchanges2.bling_sub(freqCIB, temp, resol)            
         
         # CMB
         if self.background_checkboxs[1].IsChecked():
