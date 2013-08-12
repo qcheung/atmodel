@@ -7,18 +7,21 @@ from excel import ExcelReader
 def bling_sub(freq, temp, resol):
     freq = np.array(freq, dtype="float")
     temp = np.array(temp, dtype="float")
+    print "freq =", freq
+    print "temp =", temp
     resol = float(resol)
     f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1)
- 
-    c = const.h * const.k * 1.5e9
+    step_size = 1.5e5
+    c = const.h * const.k * step_size #increasing this step size shifts up the values
     int_range_length = freq/2/resol
     int_range = np.zeros((len(freq), 2))
     int_range[:,0]=freq - int_range_length
     int_range[:,1]=freq + int_range_length
 
-    ranges = (np.arange(*(list(i)+[1.5e9])) for i in int_range)
+    ranges = (np.arange(*(list(i)+[step_size])) for i in int_range) # increasing this step size smooths plot
 
-    result = np.array([c*np.sum(f(i)) for i in ranges])
+    result = np.array([c*np.sum(i*f(i)) for i in ranges])
+    print "result is ", result
     return result
    
     
