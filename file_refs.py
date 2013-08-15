@@ -36,7 +36,7 @@ atm_tran_refs = {'13_7Km SOFIA': "data/Backgrounds/Atmospheric Tranimission_site
                 'MaunaKea-15g': "data/Backgrounds/Atmospheric Tranimission_sites/MaunaKea-15g-Transmission-1976Model-45Deg-0-2000cm.xlsx",
                 'MaunaKea-1g':"data/Backgrounds/Atmospheric Tranimission_sites/MaunaKea-1g-Transmission-1976Model-45Deg-0-2000cm.xlsx",
                 'SantaBarbara-01g': "data/Backgrounds/Atmospheric Tranimission_sites/SantaBarbara-01g-Transmission-1976Model-45Deg-0-2000cm.xlsx",
-                'SantaBarbara-3_0g':"data/Backgrounds/Atmospheric Tranimission_sites/SantaBarbara-3_0g-Transmission-1976Model-45Deg-0-2000cm.xlsx",
+                'SantaBarbara-30g':"data/Backgrounds/Atmospheric Tranimission_sites/SantaBarbara-3_0g-Transmission-1976Model-45Deg-0-2000cm.xlsx",
                 'SouthPole-023g': "data/Backgrounds/Atmospheric Tranimission_sites/SouthPole-023g-Transmission-1976Model-45Deg-0-2000cm.xlsx",
                 'SouthPole-032g': "data/Backgrounds/Atmospheric Tranimission_sites/SouthPole-032g-Transmission-1976Model-45Deg-0-2000cm.xlsx",
                 'WhiteMountain-115g': "data/Backgrounds/Atmospheric Tranimission_sites/WhiteMountain-115g-Transmission-1976Model-45Deg-0-2000cm.xlsx",
