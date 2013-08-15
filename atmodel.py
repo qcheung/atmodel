@@ -41,7 +41,7 @@ class atmodel(wx.Frame):
         parameters = ['Specify Parameters', 'Spectral Resolution:',
                       'Mirror Diameter(m):', 'Mirror Temperature(K):',
                       'Choose a Site:', 'Choose a source:', 'Choose backgrounds:',
-                      'Specify starting frequency(cm^-1)', 'Specify ending frequency(cm^-1)', 'Signal to noise ratio' ]
+                      'Specify starting frequency(THz)', 'Specify ending frequency(THz)', 'Signal to noise ratio' ]
         sites = ['13_7Km SOFIA', '30KmBalloon', '40KmBalloon', 'CCAT-0732g', 'CCAT-0978g', 'DomeA-01g', 'DomeA-014g', 'DomeC-015g',
                  'DomeC-024g', 'MaunaKea-1g', 'MaunaKea-15g', 'SantaBarbara-01g', 'SantaBarbara-30g', 'SouthPole-023g',
                  'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Space', 'Custom']
@@ -149,9 +149,6 @@ class atmodel(wx.Frame):
         panel.SetSizer(content)
 
     def onCustom(self, e):
-        '''
-        this is not implemented yet. 
-        '''
         # Generate frame and grid
         self.site_dialog = wx.Frame(self, title="Custom Site Files:", size=(300, 150)) 
         site_dialog_fgs = wx.FlexGridSizer(2, 3, 6, 6)  # declare FlexibleGridSizer
@@ -175,161 +172,207 @@ class atmodel(wx.Frame):
         self.site_dialog.Show()	
 
     def onRadianceBrowse(self, e):
-        '''
-        this is not implemented yet
-        '''
         file_dialog = wx.FileDialog(self, style=wx.FD_SAVE)
         if file_dialog.ShowModal() == wx.ID_OK:  
             file_dialog.Destroy()      
         return
-
+    def onTransmissionBrowse(self, e):
+        return
     def onDialogOk(self, e):
-        #this controls a button on a pop up under custom
-        #this feature is not yet implemented
         self.site_dialog.Destroy()
 
     def onBrowse(self, e):
-        #After clicking browse to choose a place to store new excel file
         file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
         if file_dialog.ShowModal() == wx.ID_OK:
             self.path = file_dialog.GetPath()
+
             self.output_input.Clear()
             self.output_input.WriteText(self.path)  
         file_dialog.Destroy()        
         
     def onGenerate(self, e):
+        
         # initialization -> Parse inputs
-        resol = float(self.parameter_inputs[0].GetValue())  # resolution
-        d = float(self.parameter_inputs[1].GetValue())  # mirror diameters
+
+        resol = float(self.parameter_inputs[0].GetValue())  # resolution @IndentOk
+        d = float(self.parameter_inputs[1].GetValue())  # mirror diameters @IndentOk
         mirror_temp = float(self.parameter_inputs[2].GetValue())  # mirror temperature
         freq_start = float(self.parameter_inputs[3].GetValue())  # starting frequency
         freq_end = float(self.parameter_inputs[4].GetValue())  # ending frequency
         ratio = float(self.parameter_inputs[5].GetValue())  # signal to noise ratio
+
         path = self.output_input.GetValue()
         site = self.parameter_site_combo.GetValue()
         source = self.parameter_source_combo.GetValue()
-        
-        #TESTING
-        #resol = 3
-        #d = 10.0
-        #mirror_temp = 230.0
-        #freq_start = 0.1 #THz
-        #freq_end = 1 #THz
-        #ratio = 5.0
 
-        # Calculate bling   
-        bling = 0
-        
-        # CIB
-        if self.background_checkboxs[0].IsChecked():
-            cib_excel = file_refs.CIB_ref
-            cib = ExcelReader(cib_excel)
-            cib.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
-            print "Reading array from", cib_excel
-            freqCIB = np.array(cib.read_from_col(1), dtype="float")
-            freqCIB_THz = freqCIB * 10 ** (-12)
-            temp = np.array(cib.read_from_col(4), dtype="float")
-            bling += calchanges2.bling_sub(freqCIB, temp, resol)            
-        
-        # CMB
-        if self.background_checkboxs[1].IsChecked():
-            cmb_excel = file_refs.CMB_ref
-            cmb = ExcelReader(cmb_excel)
-            cmb.set_freq_range(freq_start, freq_end)
-            freq = cmb.read_from_col(1)
-            bling += cal.bling_CMB(freq, resol)
-        
-        # Galactic Emission    
-        if self.background_checkboxs[2].IsChecked():
-            index = self.galactic_direction_combo.GetCurrentSelection()
-            ge = ExcelReader(file_refs.Galatic_Emission_refs[index])
-            ge.set_freq_range(freq_start, freq_end)
-            freq = ge.read_from_col(1)
-            temp = ge.read_from_col(8)
-            bling += cal.bling_sub(freq, temp, resol)
+        if self.generate_checkboxs[0].IsChecked(): # if Total Noise is checked
+            start_time = time.time()
+            # Calculate bling   
+            bling = 0
+            title = [] # append names of which BLINGS were checked to put in title
+
+            #using calchanges2.py as cal module
+            # CIB
+            if self.background_checkboxs[0].IsChecked():
+                title.append('Cosmic Infrared Background')
+                cib_excel = file_refs.CIB_ref
+                cib = ExcelReader(cib_excel)
+                cib.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
+                print "Reading array from", cib_excel
+                freqNoise = np.array(cib.read_from_col(1), dtype="float")
+                freqNoise_THz = freqNoise * 10 ** (-12)
+                print "len(freq)=", len(freqNoise)
+                temp = np.array(cib.read_from_col(4), dtype="float")
+                print "len(temp)=", len(temp)
+                bling += calchanges2.bling_sub(freqNoise, temp, resol)
             
-        
-        # Thermal Mirror Emission    
-        if self.background_checkboxs[3].IsChecked():
-            index = self.thermal_mirror_material_combo.GetCurrentSelection()
-            tme = ExcelReader(file_refs.TME_ref)
-            tme.set_freq_range(freq_start, freq_end)
-            freq = tme.read_from_col(1)
-            sigma = const.sigma[index]
-            bling += cal.bling_TME(freq, resol, sigma, mirror_temp)
-        
-        # Atmospheric Radiance
-        if self.background_checkboxs[4].IsChecked(): 
-            ar = ExcelReader(file_refs.atm_rad_refs[site])
-            ar.set_freq_range(freq_start, freq_end)
-            freq = ar.read_from_col(1)
-            rad = ar.read_from_col(4)
-            bling += cal.bling_AR(freq, rad, resol)
-        
-        # Zodiacal Emission
-        if self.background_checkboxs[5].IsChecked():
-            index = self.zodiacal_direction_combo.GetCurrentSelection()
-            ze = ExcelReader(file_refs.ZODI_refs[index])
-            ze.set_freq_range(freq_start, freq_end)
-            freq = ze.read_from_col(1)
-            temp = ze.read_from_col(4)
-            bling += cal.bling_sub(freq, temp, resol)
-        
-        bling_TOT = bling ** 0.5
-        
-        # Source Intensity
-        si = ExcelReader(file_refs.source_refs[source])
-        si.set_freq_range(freq_start, freq_end)        #MODIFIED FOR TESTING
-        freq = si.read_from_col(1)
-        inte = si.read_from_col(5)
-        print "Reading from source. DONE"
-        
-        # Source_Total Signal
-        at = ExcelReader(file_refs.atm_tran_refs[site])         #Atmospherical transmission file
-        at.set_freq_range(freq_start, freq_end) #modified for testing
-        
-        tau = at.read_from_col(4)
-        #print "Reading from atmosphere transmission. DONE"
-
-        #TESTING TOTAL SIGNAL RUN TIME
-        #print "Calculating Total Signal.."
-        #start_time = time.time()
-        ts = cal.TS(freq, inte, tau, d, resol)
-        #end_time = time.time()
-        #print "Total Signal calculation DONE"
-        #print "Time used for integration: ", end_time - start_time
-        
-        
+            # CMB
+            if self.background_checkboxs[1].IsChecked():
+                title.append('Cosmic Microwave Background')
+                cmb_excel = file_refs.CMB_ref
+                cmb = ExcelReader(cmb_excel)
+                cmb.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
+                freqNoise = np.array(cmb.read_from_col(1), dtype="float")
+                freqNoise_THz = freqNoise * 10 ** (-12)
+                bling += calchanges2.bling_CMB(freqNoise, resol) 
+            
+            # Galactic Emission    
+            if self.background_checkboxs[2].IsChecked():
+                index = self.galactic_direction_combo.GetCurrentSelection()
+                if index == 0:
+                    title.append('Galactic Emission(g_long=0, g_lat=0)')
+                elif index == 1:
+                    title.append('Galactic Emission(g_long=0, g_lat=45)')
+                elif index == 2:
+                    title.append('Galactic Emission(g_long=0, g_lat=90)')
+                elif index == 3:
+                    title.append('Galactic Emission(g_long=0, g_lat=-90)')
+                elif index == 4:
+                    title.append('Galactic Emission(g_long=180, g_lat=90)')
+                ge = ExcelReader(file_refs.Galatic_Emission_refs[index])
+                ge.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
+                freqNoise = np.array(ge.read_from_col(1), dtype='float')
+                freqNoise_THz = freqNoise * 10 ** (-12)
+                temp = np.array(ge.read_from_col(8), dtype='float')
+                bling += calchanges2.bling_sub(freqNoise, temp, resol)
+                
+            
+            # Thermal Mirror Emission    
+            if self.background_checkboxs[3].IsChecked():
+                title.append('Thermal Mirror Emission')
+                index = self.thermal_mirror_material_combo.GetCurrentSelection()
+                tme = ExcelReader(file_refs.TME_ref)
+                tme.set_freq_range(freq_start, freq_end)
+                freq = tme.read_from_col(1)
+                sigma = const.sigma[index]
+                bling += calchanges2.bling_TME(freq, resol, sigma, mirror_temp)
+            
+            # Atmospheric Radiance
+            if self.background_checkboxs[4].IsChecked(): 
+                title.append('Atmospheric Radiance' + str([site]))
+                ar = ExcelReader(file_refs.atm_rad_refs[site])
+                ar.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
+                freqNoise = np.array(ar.read_from_col(1), dtype='float')
+                freqNoise_THz = freqNoise * 10 ** (-12)
+                rad = np.array(ar.read_from_col(4), dtype='float')
+                bling += calchanges2.bling_AR(freqNoise, rad, resol)
+            
+            # Zodiacal Emission
+            if self.background_checkboxs[5].IsChecked():
+                index = self.zodiacal_direction_combo.GetCurrentSelection()
+                if index == 0:
+                    title.append('Zodiacal Emission(g_long=0,g_lat=0)')
+                if index == 1:
+                    title.append('Zodiacal Emission(g_long=0,g_lat=45)')
+                if index == 2:
+                    title.append('Zodiacal Emission(g_long=180,g_lat=90)')
+                ze = ExcelReader(file_refs.ZODI_refs[index])
+                ze.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
+                freqNoise = np.array(ze.read_from_col(1), dtype='float')
+                freqNoise_THz = freqNoise * 10 ** (-12)
+                temp = np.array(ze.read_from_col(4), dtype='float')
+                bling += calchanges2.bling_sub(freqNoise, temp, resol)
+            
+            bling_TOT = (bling) ** 0.5
+            end_time = time.time()
+            print "BLING calculation DONE"
+            print "Time used for integration: ", end_time - start_time 
+        '''
         # Limiting Flux
-        limiting_flux = cal.LF(freq, d, resol, ts)
+        limiting_flux = cal.LF(freq, d, resol, ts) #make calchanges2
         
         # Integration Time
         integration_time = cal.IT(freq, bling_TOT, ratio, ts)
         
         
         # writing
-        
-        # xw = ExcelXWriter(path)
-        # xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
-        # xw.write_col('freq(Hz)', freq)
-        freq_THz = freq * 10 ** (-12)  
-        # xw.write_col('freq(THz)', freq_THz)
-        # xw.write_col('wavelength(um)', (3 * 10**8) / freq * 10**6)
-
         '''
-        freq = np.array(freq)
-        freq_THz = freq * 10 ** (-12)                                   #MODIFIED FOR TESTING
 
-        print "Start plotting..."
-        # plot
-        if self.generate_checkboxs[0].IsChecked():
+        # plotting
+        # instead of having a plotter module, I put function directly in so labels and titles are changeable
+        def loglogplot(x, y):
+            print "Start plotting..."
+            pos = np.where(np.abs(np.diff(y)) >= .0015)[0] + 1 #jumps over .0015 THz are not connected
+            x = np.insert(x, pos, np.nan)
+            y = np.insert(y, pos, np.nan)
+            pylab.plot(x, y)
+            pylab.xscale('log')
+            pylab.yscale('log')
 
-        #    xw.write_col('Total Noise_BLING(W Hz^(-1/2))', bling_TOT)
-            plotter.loglogplot(freq_THz, bling_TOT)
-        if self.generate_checkboxs[1].IsChecked():
-        #    xw.write_col('Total signal(W/m^2/sr/Hz)', ts)
-            plotter.loglogplot(freq_THz, ts)
-        '''
+        if self.generate_checkboxs[0].IsChecked(): # if Total Noise is checked
+            # write file
+            xw = ExcelXWriter(path)
+            xw.write_col('freq(cm^-1)', freqNoise / (3 * 10**10))
+            xw.write_col('freq(Hz)', freqNoise)
+            xw.write_col('freq(THz)', freqNoise_THz)
+            xw.write_col('wavelength(um)', (3 * 10**8) / freqNoise * 10**6)
+            xw.write_col('Total Noise_BLING(W Hz^(-1/2))', bling_TOT)
+
+            # draw plot
+            loglogplot(freqNoise_THz, bling_TOT)
+            pylab.ylabel("BLING(W*Hz^(-1/2))")
+            pylab.xlabel("Frequency(THz)")
+            pylab.suptitle("Total Noise" + str(title) + " vs. Frequency\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nMirror has diameter " + str(d) + "m and temperature " + str(mirror_temp) + "K.", fontsize=10)
+            pylab.show()
+        if self.generate_checkboxs[1].IsChecked(): # if Total Signal is checked
+            # Source Intensity
+            si = ExcelReader(file_refs.source_refs[source])
+            si.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)        #MODIFIED FOR TESTING
+            freq = si.read_from_col(1)
+            inte = si.read_from_col(5)
+            print "Reading from source. DONE"
+            
+            # Source_Total Signal
+            at = ExcelReader(file_refs.atm_tran_refs[site])
+            at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)
+            
+            tau = at.read_from_col(4)
+            print "Reading from atmosphere transmission. DONE"
+
+            print "Calculating Total Signal.."
+            start_time = time.time()
+            ts = calchanges2.TS(freq, inte, tau, d, resol)
+            end_time = time.time()
+            print "Total Signal calculation DONE"
+            print "Time used for integration: ", end_time - start_time
+            freq = np.array(freq)
+            freq_THz = freq * 10 ** (-12) #MODIFIED FOR TESTING
+
+            # draw plot
+            loglogplot(freq_THz, ts)
+            pylab.ylabel("Signal(W)")
+            pylab.xlabel("Frequency(THz)")
+            pylab.suptitle("Total Signal vs. Frequency at " + str(site) + " from " + str(source) + ".\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nMirror has diameter " + str(d) + "m and temperature " + str(mirror_temp) + "K.", fontsize=10)
+            pylab.show()
+
+            # write file
+            xw = ExcelXWriter(path)
+            xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
+            xw.write_col('freq(Hz)', freq)
+            xw.write_col('freq(THz)', freq_THz)
+            xw.write_col('wavelength(um)', (3 * 10**8) / freq * 10**6)
+            xw.write_col('Total signal(W)', ts)
+            
         if self.generate_checkboxs[2].IsChecked():
         #    xw.write_col('Limiting Flux(W)', limiting_flux)
             plotter.loglogplot(freq_THz, limiting_flux)
@@ -337,7 +380,6 @@ class atmodel(wx.Frame):
         #    xw.write_col('Integration Time(s)', integration_time)
             plotter.loglogplot(freq_THz, integration_time)
         # xw.save()
-        '''
         print "Plotting. DONE"
         
        
