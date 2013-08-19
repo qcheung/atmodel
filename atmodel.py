@@ -1,6 +1,5 @@
 import wx
 from excel import ExcelXWriter, ExcelReader
-import plotter
 import cal
 import const
 import numpy as np
@@ -211,7 +210,6 @@ class atmodel(wx.Frame):
             bling = 0
             title = [] # append names of which BLINGS were checked to put in title
 
-            #using calchanges2.py as cal module
             # CIB
             if self.background_checkboxs[0].IsChecked():
                 title.append('Cosmic Infrared Background')
@@ -224,7 +222,7 @@ class atmodel(wx.Frame):
                 print "len(freq)=", len(freqNoise)
                 temp = np.array(cib.read_from_col(4), dtype="float")
                 print "len(temp)=", len(temp)
-                bling += calchanges2.bling_sub(freqNoise, temp, resol)
+                bling += cal.bling_sub(freqNoise, temp, resol)
             
             # CMB
             if self.background_checkboxs[1].IsChecked():
@@ -234,7 +232,7 @@ class atmodel(wx.Frame):
                 cmb.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
                 freqNoise = np.array(cmb.read_from_col(1), dtype="float")
                 freqNoise_THz = freqNoise * 10 ** (-12)
-                bling += calchanges2.bling_CMB(freqNoise, resol) 
+                bling += cal.bling_CMB(freqNoise, resol) 
             
             # Galactic Emission    
             if self.background_checkboxs[2].IsChecked():
@@ -254,18 +252,26 @@ class atmodel(wx.Frame):
                 freqNoise = np.array(ge.read_from_col(1), dtype='float')
                 freqNoise_THz = freqNoise * 10 ** (-12)
                 temp = np.array(ge.read_from_col(8), dtype='float')
-                bling += calchanges2.bling_sub(freqNoise, temp, resol)
-                
+                bling += cal.bling_sub(freqNoise, temp, resol)
+               
             
             # Thermal Mirror Emission    
             if self.background_checkboxs[3].IsChecked():
-                title.append('Thermal Mirror Emission')
                 index = self.thermal_mirror_material_combo.GetCurrentSelection()
+                if index == 0:
+                    title.append('Thermal Mirror Emission(Beryllium)')
+                if index == 1:
+                    title.append('Thermal Mirror Emission(Aluminum)')
+                if index == 2:
+                    title.append('Thermal Mirror Emission(Gold)')
+                if index == 3:
+                    title.append('Thermal Mirror Emission(Silver)')
                 tme = ExcelReader(file_refs.TME_ref)
-                tme.set_freq_range(freq_start, freq_end)
-                freq = tme.read_from_col(1)
+                tme.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
+                freqNoise = np.array(tme.read_from_col(1), dtype = 'float')
+                freqNoise_THz = freqNoise * 10 ** (-12)
                 sigma = const.sigma[index]
-                bling += calchanges2.bling_TME(freq, resol, sigma, mirror_temp)
+                bling += cal.bling_TME(freqNoise, resol, sigma, mirror_temp)
             
             # Atmospheric Radiance
             if self.background_checkboxs[4].IsChecked(): 
@@ -275,7 +281,7 @@ class atmodel(wx.Frame):
                 freqNoise = np.array(ar.read_from_col(1), dtype='float')
                 freqNoise_THz = freqNoise * 10 ** (-12)
                 rad = np.array(ar.read_from_col(4), dtype='float')
-                bling += calchanges2.bling_AR(freqNoise, rad, resol)
+                bling += cal.bling_AR(freqNoise, rad, resol)
             
             # Zodiacal Emission
             if self.background_checkboxs[5].IsChecked():
@@ -291,12 +297,21 @@ class atmodel(wx.Frame):
                 freqNoise = np.array(ze.read_from_col(1), dtype='float')
                 freqNoise_THz = freqNoise * 10 ** (-12)
                 temp = np.array(ze.read_from_col(4), dtype='float')
-                bling += calchanges2.bling_sub(freqNoise, temp, resol)
+                bling += cal.bling_sub(freqNoise, temp, resol)
             
             bling_TOT = (bling) ** 0.5
             end_time = time.time()
             print "BLING calculation DONE"
             print "Time used for integration: ", end_time - start_time 
+            
+            if self.background_checkboxs[0].IsChecked(): #setting title if all BLINGs are checked
+                if self.background_checkboxs[1].IsChecked():
+                    if self.background_checkboxs[2].IsChecked():
+                        if self.background_checkboxs[3].IsChecked():
+                            if self.background_checkboxs[4].IsChecked():
+                                if self.background_checkboxs[5].IsChecked():
+                                    title = '[Total]'
+            
         '''
         # Limiting Flux
         limiting_flux = cal.LF(freq, d, resol, ts) #make calchanges2
