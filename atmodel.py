@@ -314,7 +314,7 @@ class atmodel(wx.Frame):
             
         '''
         # Limiting Flux
-        limiting_flux = cal.LF(freq, d, resol, ts) #make calchanges2
+        limiting_flux = cal.LF(freq, d, resol, ts)
         
         # Integration Time
         integration_time = cal.IT(freq, bling_TOT, ratio, ts)
@@ -366,7 +366,7 @@ class atmodel(wx.Frame):
 
             print "Calculating Total Signal.."
             start_time = time.time()
-            ts = calchanges2.TS(freq, inte, tau, d, resol)
+            ts = cal.TS(freq, inte, tau, d, resol)
             end_time = time.time()
             print "Total Signal calculation DONE"
             print "Time used for integration: ", end_time - start_time
