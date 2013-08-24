@@ -18,7 +18,7 @@ def bling_sub(freq, temp, resol):  #calculates BLING(squared) for "Cosmic Infrar
 ## 2) Calculate integration constants and integration range
     resol = float(resol)  #ensure "resol" is a float not an integer
     step_size = 1.5e5  #characterize the level of details wanted from interpolation
-    #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
+        #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
     c = 2 * const.h * const.k * step_size  #2 is number of modes, constants come from equation 2.15 in Denny(without the radical), "step_size" is the increment of the Riemann sum
     int_range = np.zeros((len(freq), 2)) #create 2 by (length of frequency range) array full of 0's to be replaced with values
     int_range_length = freq/2/resol  #2nd term in integration bounds from equation 2.15 in Denny
@@ -26,16 +26,15 @@ def bling_sub(freq, temp, resol):  #calculates BLING(squared) for "Cosmic Infrar
     int_range[:,1]=freq + int_range_length  #fill up 2nd column of 0's array with top integration bound from equation 2.15 in Denny
 
     ranges = (np.arange(*(list(i)+[step_size])) for i in int_range)  #"i in int_range" refers to each row(which has a start and end to the integration range)
-        #for each row, the "step_size" is added to each value and a new 2x(length of frequency range) array called "ranges" is created
-        ##QUESTION: why is "step_size" added?
+        #for each row, an array is created with values ranging from the starting value to the ending value, in increments of "step_size"
 
 ## 3) Calculate BLING(squared from antenna temperature
-    blingsub_squared = np.array([c*np.sum(i*f(i)) for i in ranges])  #"i in ranges" refers to each row(of the bounds plus "step_size") from the array created above
+    blingSUB_squared = np.array([c*np.sum(i*f(i)) for i in ranges])  #"i in ranges" refers to each row(of the bounds plus "step_size") from the array created above
         #for each row, each of the 2 bounds is multiplied by its corresponding temperature from the linear interpolation done at the start and then are summed
-        ##QUESTION: why do we sum up "i*f(i)"?
+        #summing does the integral for each frequency
         #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
-        #the result should be square rooted but, since the BLINGs are to be added in quaderature, squaring each BLING cancels out the radical
-    return blingsub_squared
+        #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
+    return blingSUB_squared
 
 
 def bling_CMB(freq, resol):  #calculates BLING(squared) for "Cosmic Microwave Background"
@@ -55,10 +54,10 @@ def bling_CMB(freq, resol):  #calculates BLING(squared) for "Cosmic Microwave Ba
         temp.append(antenna_temp)  #add calculated temperature to "temp" list
     temp = np.array(temp)  #turn "temp" list into "temp" array
 
-## 3) Calculate BLING(squared) from antenna temperature(as done in "bling_sub")
+## 3) Calculate BLING(squared) from antenna temperature
     f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1) #linear interpolation of "temp" vs. "freq"
     step_size = 1.5e5  #characterize the level of details wanted from interpolation
-    #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
+        #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
     c = 2 * const.h * const.k * step_size  #2 is number of modes, constants come from equation 2.15 in Denny(without the radical), "step_size" is the increment of the Riemann sum
     int_range = np.zeros((len(freq), 2)) #create 2 by (length of frequency range) array full of 0's to be replaced with values
     int_range_length = freq/2/resol  #2nd term in integration bounds from equation 2.15 in Denny
@@ -66,34 +65,51 @@ def bling_CMB(freq, resol):  #calculates BLING(squared) for "Cosmic Microwave Ba
     int_range[:,1]=freq + int_range_length  #fill up 2nd column of 0's array with top integration bound from equation 2.15 in Denny
 
     ranges = (np.arange(*(list(i)+[step_size])) for i in int_range)  #"i in int_range" refers to each row(which has a start and end to the integration range)
-    #for each row, the "step_size" is added to each value and a new 2x(length of frequency range) array called "ranges" is created
-    ##QUESTION: why is "step_size" added?
+        #for each row, an array is created with values ranging from the starting value to the ending value, in increments of "step_size"
 
-    blingcmb_squared = np.array([c*np.sum(i*f(i)) for i in ranges])  #"i in ranges" refers to each row(of the bounds plus "step_size") from the array created above
-    #for each row, each of the 2 bounds is multiplied by its corresponding temperature from the linear interpolation done at the start and then are summed
-    ##QUESTION: why do we sum up "i*f(i)"?
-    #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
-    #the result should be square rooted but, since the BLINGs are to be added in quaderature, squaring each BLING cancels out the radical
+    blingCMB_squared = np.array([c*np.sum(i*f(i)) for i in ranges])  #"i in ranges" refers to each row(of the bounds plus "step_size") from the array created above
+        #for each row, each of the 2 bounds is multiplied by its corresponding temperature from the linear interpolation done at the start and then are summed
+        #summing does the integral for each frequency
+        #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
+        #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
 
-    print np.array(blingcmb_squared)
-    return np.array(blingcmb_squared)
-    
-    
-#bling_Atmospheric Radiance
-def bling_AR(freq, rad, resol):
-    result = []
-    for i, v in enumerate(freq):
-        i_a = int( i - v / (3*10**10)/((2 * resol * 0.1)))
-        i_b = int(i + v / (3*10**10)/ ((2 * resol * 0.1)))
-        if i_a <= 0:
-            i_a = 0
-        if i_b > len(freq):
-            i_b = len(freq)
-        rad_array = np.array(rad[i_a:i_b]) #make arrays of lists to divide them
-        freq_array = np.array(freq[i_a:i_b])
-        t0 = rad_array/freq_array #divide arrays instead of lists
-        result.append(const.c**2*const.h*3e9*np.sum(t0))
-    return np.array(result)
+    return np.array(blingCMB_squared)
+
+        
+def bling_AR(freq, rad, resol):  #calculates BLING(squared) for "Atmospheric Radiance"
+##    What will be done: 1) Interpolate radiance vs. frequency
+##                       2) Calculate antenna temperature from radiance
+##                       3) Calculate BLING(squared) from antenna temperature
+## 1) Interpolate radiance vs. frequency
+    rad = interpolate.InterpolatedUnivariateSpline(freq, rad, k=1) #linear interpolation of "rad" vs. "freq"
+
+## 2) Calculate antenna temperature from radiance
+    temp = []  #create list to be filled with calculated temperatures
+    for i in freq:
+        antenna_temp = rad(i) * (const.c ** 2)/(const.k * (i**2))  #calculate antenna temperature from equation 2.7 in Denny
+        temp.append(antenna_temp)  #add calculated temperature to "temp" list
+    temp = np.array(temp)  #turn "temp" list into "temp" array
+
+## 3) Calculate BLING(squared) from antenna temperature
+    f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1) #linear interpolation of "temp" vs. "freq"
+    step_size = 1.5e5  #characterize the level of details wanted from interpolation
+        #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
+    c = 2 * const.h * const.k * step_size  #2 is number of modes, constants come from equation 2.15 in Denny(without the radical), "step_size" is the increment of the Riemann sum
+    int_range = np.zeros((len(freq), 2)) #create 2 by (length of frequency range) array full of 0's to be replaced with values
+    int_range_length = freq/2/resol  #2nd term in integration bounds from equation 2.15 in Denny
+    int_range[:,0]=freq - int_range_length  #fill up 1st column of 0's array with bottom integration bound from equation 2.15 in Denny
+    int_range[:,1]=freq + int_range_length  #fill up 2nd column of 0's array with top integration bound from equation 2.15 in Denny
+
+    ranges = (np.arange(*(list(i)+[step_size])) for i in int_range)  #"i in int_range" refers to each row(which has a start and end to the integration range)
+        #for each row, an array is created with values ranging from the starting value to the ending value, in increments of "step_size"
+
+    blingAR_squared = np.array([c*np.sum(i*f(i)) for i in ranges])  #"i in ranges" refers to each row(of the bounds plus "step_size") from the array created above
+        #for each row, each of the 2 bounds is multiplied by its corresponding temperature from the linear interpolation done at the start and then are summed
+        #summing does the integral for each frequency
+        #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
+        #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
+
+    return np.array(blingAR_squared)
 
 #bling_Thermal Mirror Emission
 def bling_TME(freq, resol, sigma, mirror_temp):
