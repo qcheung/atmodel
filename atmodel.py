@@ -204,117 +204,118 @@ class atmodel(wx.Frame):
         site = self.parameter_site_combo.GetValue()
         source = self.parameter_source_combo.GetValue()
 
-        if self.generate_checkboxs[0].IsChecked(): # if Total Noise is checked
-            start_time = time.time()
-            # Calculate bling   
-            bling = 0
-            title = [] # append names of which BLINGS were checked to put in title
+        if self.generate_checkboxs[0].IsChecked():  # if "Total Noise" is checked
+            start_time = time.time()  #begins clock for calculation time
+            # Calculate BLING   
+            bling_squared = 0  #checking boxes for different backgrounds will add values to this "bling_squared" array
+                #the squares of BLINGs are added up since the final result is equal to BLINGs added in quadrature
+            title = []  #append names of which backgrounds are checked to put in title
 
-            # CIB
+            #if "Cosmic Infrared Background" box is checked
             if self.background_checkboxs[0].IsChecked():
                 title.append('Cosmic Infrared Background')
-                cib_excel = file_refs.CIB_ref
+                cib_excel = file_refs.CIB_ref  #name excel file to read from
                 cib = ExcelReader(cib_excel)
-                cib.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
+                cib.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
                 print "Reading array from", cib_excel
-                freqNoise = np.array(cib.read_from_col(1), dtype="float")
-                freqNoise_THz = freqNoise * 10 ** (-12)
+                freqNoise = np.array(cib.read_from_col(1), dtype="float")  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
                 print "len(freq)=", len(freqNoise)
-                temp = np.array(cib.read_from_col(4), dtype="float")
+                temp = np.array(cib.read_from_col(4), dtype="float")  #create array of temperature(K) from 5th column of excel file, reading as floats
                 print "len(temp)=", len(temp)
-                bling += cal.bling_sub(freqNoise, temp, resol)
-            
-            # CMB
+                bling_squared += calchanges2.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Cosmic Infrared Background to "bling_squared"
+
+            #if "Cosmic Microwave Background" box is checked
             if self.background_checkboxs[1].IsChecked():
                 title.append('Cosmic Microwave Background')
-                cmb_excel = file_refs.CMB_ref
+                cmb_excel = file_refs.CMB_ref  #name excel file to read from
                 cmb = ExcelReader(cmb_excel)
-                cmb.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
-                freqNoise = np.array(cmb.read_from_col(1), dtype="float")
-                freqNoise_THz = freqNoise * 10 ** (-12)
-                bling += cal.bling_CMB(freqNoise, resol) 
-            
-            # Galactic Emission    
+                cmb.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                print "Reading array from", cmb_excel
+                freqNoise = np.array(cmb.read_from_col(1), dtype="float")  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
+                bling_squared += calchanges2.bling_CMB(freqNoise, resol)  #calculate and add BLING(squared) of Cosmic Microwave Background to "bling_squared"
+
+            #if "Galactic Emission" box is checked
             if self.background_checkboxs[2].IsChecked():
-                index = self.galactic_direction_combo.GetCurrentSelection()
-                if index == 0:
+                index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, or 4 depending on which ecliptic coordinates are selected 
+                if index == 0:  #if (g_long=0, g_lat=0) is selected
                     title.append('Galactic Emission(g_long=0, g_lat=0)')
-                elif index == 1:
+                elif index == 1:  #if (g_long=0, g_lat=45) is selected
                     title.append('Galactic Emission(g_long=0, g_lat=45)')
-                elif index == 2:
+                elif index == 2:  #if (g_long=0, g_lat=90) is selected
                     title.append('Galactic Emission(g_long=0, g_lat=90)')
-                elif index == 3:
+                elif index == 3:  #if (g_long=0, g_lat=-90) is selected
                     title.append('Galactic Emission(g_long=0, g_lat=-90)')
-                elif index == 4:
+                elif index == 4:  #if (g_long=180, g_lat=90) is selected
                     title.append('Galactic Emission(g_long=180, g_lat=90)')
-                ge = ExcelReader(file_refs.Galatic_Emission_refs[index])
-                ge.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
-                freqNoise = np.array(ge.read_from_col(1), dtype='float')
-                freqNoise_THz = freqNoise * 10 ** (-12)
-                temp = np.array(ge.read_from_col(8), dtype='float')
-                bling += cal.bling_sub(freqNoise, temp, resol)
-               
-            
-            # Thermal Mirror Emission    
+                ge = ExcelReader(file_refs.Galatic_Emission_refs[index])  #name excel file to read from
+                ge.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(ge.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
+                temp = np.array(ge.read_from_col(8), dtype='float')  #create array of temperature(K) from 9th column of excel file, reading as floats
+                bling_squared += calchanges2.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Galactic Emission to "bling_squared"
+
+            #if "Thermal Mirror Emission" box is checked 
             if self.background_checkboxs[3].IsChecked():
-                index = self.thermal_mirror_material_combo.GetCurrentSelection()
-                if index == 0:
+                index = self.thermal_mirror_material_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which material is selected
+                if index == 0:  #if "Be" is selected
                     title.append('Thermal Mirror Emission(Beryllium)')
-                if index == 1:
+                if index == 1:  #if "Al" is selected
                     title.append('Thermal Mirror Emission(Aluminum)')
-                if index == 2:
+                if index == 2:  #if "Au" is selected
                     title.append('Thermal Mirror Emission(Gold)')
-                if index == 3:
+                if index == 3:  #if "Ag" is selected
                     title.append('Thermal Mirror Emission(Silver)')
-                tme = ExcelReader(file_refs.TME_ref)
-                tme.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
-                freqNoise = np.array(tme.read_from_col(1), dtype = 'float')
-                freqNoise_THz = freqNoise * 10 ** (-12)
-                sigma = const.sigma[index]
-                bling += cal.bling_TME(freqNoise, resol, sigma, mirror_temp)
-            
-            # Atmospheric Radiance
-            if self.background_checkboxs[4].IsChecked(): 
-                title.append('Atmospheric Radiance' + str([site]))
-                ar = ExcelReader(file_refs.atm_rad_refs[site])
-                ar.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
-                freqNoise = np.array(ar.read_from_col(1), dtype='float')
-                freqNoise_THz = freqNoise * 10 ** (-12)
-                rad = np.array(ar.read_from_col(4), dtype='float')
-                bling += cal.bling_AR(freqNoise, rad, resol)
-            
-            # Zodiacal Emission
+                tme = ExcelReader(file_refs.TME_ref)  #name excel file to read from
+                tme.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(tme.read_from_col(1), dtype = 'float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
+                sigma = const.sigma[index]  #from file "const", get "Material Constant" depending on which material is selected
+                wavelength = np.array(tme.read_from_col(3), dtype = 'float')  #create array of wavelengths(microns)
+                bling_squared += calchanges2.bling_TME(freqNoise, resol, sigma, mirror_temp, wavelength)  #calculate and add BLING(squared) of Thermal Mirror Emission to "bling_sqared"
+
+            #if "Atmospheric Radiance" box is checked
+            if self.background_checkboxs[4].IsChecked():
+                title.append('Atmospheric Radiance(' + str(site) + ")") #title depends on name of site chosen
+                ar = ExcelReader(file_refs.atm_rad_refs[site])  #name excel file to read from, depending on site chosen
+                ar.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(ar.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
+                rad = np.array(ar.read_from_col(4), dtype='float')  #create array of radiance(W/cm^2/st/cm^-1) from 5th column of excel file, reading as floats
+                bling_squared += calchanges2.bling_AR(freqNoise, rad, resol)  #calculate and add BLING(squared) of Atmospheric Radiance to "bling_squared"
+
+            #if "Zodiacial Emission" box is checked
             if self.background_checkboxs[5].IsChecked():
-                index = self.zodiacal_direction_combo.GetCurrentSelection()
-                if index == 0:
+                index = self.zodiacal_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which ecliptic coordinates are selected
+                if index == 0:  #if (g_long=0,g_lat=0) is selected
                     title.append('Zodiacal Emission(g_long=0,g_lat=0)')
-                if index == 1:
+                if index == 1:  #if (g_long=0,g_lat=45) is selected
                     title.append('Zodiacal Emission(g_long=0,g_lat=45)')
-                if index == 2:
+                if index == 2:  #if (g_long=180,g_lat=90) is selected
                     title.append('Zodiacal Emission(g_long=180,g_lat=90)')
-                ze = ExcelReader(file_refs.ZODI_refs[index])
-                ze.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)
-                freqNoise = np.array(ze.read_from_col(1), dtype='float')
-                freqNoise_THz = freqNoise * 10 ** (-12)
-                temp = np.array(ze.read_from_col(4), dtype='float')
-                bling += cal.bling_sub(freqNoise, temp, resol)
+                ze = ExcelReader(file_refs.ZODI_refs[index])  #name excel file to read from, depending on site chosen
+                ze.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(ze.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
+                temp = np.array(ze.read_from_col(4), dtype='float')  #create array of temperature(K) from 5th column of excel file, reading as floats
+                bling_squared += calchanges2.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Zodiacal Emission to "bling_squared"
             
-            bling_TOT = (bling) ** 0.5
-            end_time = time.time()
+            bling_TOT = (bling_squared) ** 0.5  #"bling_squared" is the sum of the squared bling of each background so "bling_TOT" is the radical of "bling_squared" since the result is the BLINGS added in quadrature
+            end_time = time.time()  #stops clock for calculation time
             print "BLING calculation DONE"
-            print "Time used for integration: ", end_time - start_time 
-            
-            if self.background_checkboxs[0].IsChecked(): #setting title if all BLINGs are checked
+            print "Time used for BLING calculation: ", end_time - start_time, " seconds"
+
+            if self.background_checkboxs[0].IsChecked():  #setting title to 'Noise[Total]' if all BLINGs are checked
                 if self.background_checkboxs[1].IsChecked():
                     if self.background_checkboxs[2].IsChecked():
                         if self.background_checkboxs[3].IsChecked():
                             if self.background_checkboxs[4].IsChecked():
                                 if self.background_checkboxs[5].IsChecked():
                                     title = '[Total]'
-            
         '''
         # Limiting Flux
-        limiting_flux = cal.LF(freq, d, resol, ts)
+        limiting_flux = cal.LF(freq, d, resol, ts) #make calchanges2
         
         # Integration Time
         integration_time = cal.IT(freq, bling_TOT, ratio, ts)
@@ -327,61 +328,60 @@ class atmodel(wx.Frame):
         # instead of having a plotter module, I put function directly in so labels and titles are changeable
         def loglogplot(x, y):
             print "Start plotting..."
-            pos = np.where(np.abs(np.diff(y)) >= .0015)[0] + 1 #jumps over .0015 THz are not connected
+            pos = np.where(np.abs(np.diff(y)) >= .0015)[0] + 1  #jumps over .0015 THz(1.5 GHz) are not connected
             x = np.insert(x, pos, np.nan)
             y = np.insert(y, pos, np.nan)
             pylab.plot(x, y)
             pylab.xscale('log')
             pylab.yscale('log')
 
-        if self.generate_checkboxs[0].IsChecked(): # if Total Noise is checked
+        if self.generate_checkboxs[0].IsChecked():  #if "Total Noise" is checked
             # write file
             xw = ExcelXWriter(path)
             xw.write_col('freq(cm^-1)', freqNoise / (3 * 10**10))
             xw.write_col('freq(Hz)', freqNoise)
             xw.write_col('freq(THz)', freqNoise_THz)
-            xw.write_col('wavelength(um)', (3 * 10**8) / freqNoise * 10**6)
+            xw.write_col('wavelength(um)', (3 * 10**8) / freqNoise * 10**6) 
             xw.write_col('Total Noise_BLING(W Hz^(-1/2))', bling_TOT)
 
             # draw plot
             loglogplot(freqNoise_THz, bling_TOT)
             pylab.ylabel("BLING(W*Hz^(-1/2))")
             pylab.xlabel("Frequency(THz)")
-            pylab.suptitle("Total Noise" + str(title) + " vs. Frequency\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nMirror has diameter " + str(d) + "m and temperature " + str(mirror_temp) + "K.", fontsize=10)
+            pylab.suptitle("Noise" + str(title) + " vs. Frequency.\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nMirror has diameter " + str(d) + "m and temperature " + str(mirror_temp) + "K.", fontsize=10)
             pylab.show()
-        if self.generate_checkboxs[1].IsChecked(): # if Total Signal is checked
-            # Source Intensity
-            si = ExcelReader(file_refs.source_refs[source])
-            si.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)        #MODIFIED FOR TESTING
-            freq = si.read_from_col(1)
-            inte = si.read_from_col(5)
+        if self.generate_checkboxs[1].IsChecked():  #if "Total Signal" is checked
+            # Calculate Source Intensity
+            si = ExcelReader(file_refs.source_refs[source])  #find file of source galaxy
+            si.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+            freq = np.array(si.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+            inte = np.array(si.read_from_col(5), dtype='float')  #create array of intensity(Jy) from 6th column of excel file, reading as floats
             print "Reading from source. DONE"
             
-            # Source_Total Signal
-            at = ExcelReader(file_refs.atm_tran_refs[site])
-            at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)
+            # Calculate Total Signal
+            at = ExcelReader(file_refs.atm_tran_refs[site])  #find file of site
+            at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)  #set where in excel file to start/stop reading by converting input from THz to Hz
             
-            tau = at.read_from_col(4)
-            print "Reading from atmosphere transmission. DONE"
+            tau = np.array(at.read_from_col(4), dtype='float')  #create array of transmission from 5th column of excel file, reading as floats
+            print "Reading from Atmosphere Transmission. DONE"
 
             print "Calculating Total Signal.."
-            start_time = time.time()
-            ts = cal.TS(freq, inte, tau, d, resol)
-            end_time = time.time()
+            start_time = time.time()  #begins clock for calculation time
+            ts = calchanges2.TS(freq, inte, tau, d, resol)  #returns array of total signal from inputs
+            end_time = time.time()  #stops clock for calculation time
             print "Total Signal calculation DONE"
-            print "Time used for integration: ", end_time - start_time
-            freq = np.array(freq)
-            freq_THz = freq * 10 ** (-12) #MODIFIED FOR TESTING
+            print "Time used for Total Signal calculation: ", end_time - start_time, " seconds"
+            freq_THz = freq * 10 ** (-12)  #create array that converts "freq" into THz
 
             # draw plot
-            loglogplot(freq_THz, ts)
+            loglogplot(freq_THz, ts)  #plot is log(base 10)-scaled
             pylab.ylabel("Signal(W)")
             pylab.xlabel("Frequency(THz)")
             pylab.suptitle("Total Signal vs. Frequency at " + str(site) + " from " + str(source) + ".\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nMirror has diameter " + str(d) + "m and temperature " + str(mirror_temp) + "K.", fontsize=10)
             pylab.show()
 
             # write file
-            xw = ExcelXWriter(path)
+            xw = ExcelXWriter(path)  #creates xlsx file with the name inputted
             xw.write_col('freq(cm^-1)', freq / (3 * 10**10))
             xw.write_col('freq(Hz)', freq)
             xw.write_col('freq(THz)', freq_THz)
