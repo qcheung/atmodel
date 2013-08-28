@@ -74,7 +74,7 @@ def bling_CMB(freq, resol):  #calculates BLING(squared) for "Cosmic Microwave Ba
         #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
         #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
 
-    return np.array(blingCMB_squared)
+    return blingCMB_squared
 
         
 def bling_AR(freq, rad, resol):  #calculates BLING(squared) for "Atmospheric Radiance"
@@ -111,7 +111,7 @@ def bling_AR(freq, rad, resol):  #calculates BLING(squared) for "Atmospheric Rad
         #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
         #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
 
-    return np.array(blingAR_squared)
+    return blingAR_squared
 
 
 def bling_TME(freq, resol, sigma, mirror_temp, wavelength):  #calculates BLING(squared) for "Thermal Mirror Emission"
@@ -158,26 +158,26 @@ def bling_TME(freq, resol, sigma, mirror_temp, wavelength):  #calculates BLING(s
         #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
         #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
 
-    return np.array(blingTME_squared)
+    return blingTME_squared
     
 
 #Limiting_Flux
 def LF(freq, d, resol, ts):
-    return ts*resol/(2*np.pi*(d/2)**2*freq)
+    return np.array(ts*resol/(2*np.pi*(d/2)**2*freq), dtype="float")
 
 
-#Integration_Time
-def IT(freq, bling_TOT, ratio, ts):
-    return (bling_TOT*ratio/ts)**2
+def IT(bling_TOT, ratio, ts):  #calculates Integration Time
+    return np.array((bling_TOT * ratio / ts)**2, dtype='float')  #follows equation 4.1 in Denny
 
     
-def TS(freq, inte, tau, d, resol):  #Calculates Total Signal
+def TS(freq, inte, tau, d, resol):  #calculates Total Signal
     try: assert len(freq)==len(tau)  #if the "freq" array is not the same length as the "tau" array, program will say this is an error
     except AssertionError:
         raise ValueError("The two arrays must have the same length.")
-    
+
     f = interpolate.InterpolatedUnivariateSpline(freq, inte, k=1)  #linear interpolation of "inte" vs. "freq"
     g = interpolate.InterpolatedUnivariateSpline(freq, tau, k=1)   #linear interpolation of "tau" vs. "freq"
+    resol = float(resol)  #ensure "resol" is a float not an integer
     
     inte_resol = 1000.0
     step_size = 0.1 * 3 * 10 ** 10 / inte_resol   #characterize the level of details wanted from interpolation 
@@ -194,3 +194,5 @@ def TS(freq, inte, tau, d, resol):  #Calculates Total Signal
         #for each row, each of the 2 bounds is multiplied by the corresponding intensity and transmission functions from the linear interpolation done at the start
         #summing does the integral for each frequency
         #multiplying by the constants finishes equation 3.13 in Denny et al
+
+    return ts
