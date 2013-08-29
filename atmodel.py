@@ -8,12 +8,12 @@ import time
  
 class atmodel(wx.Frame):
     def __init__(self, parent , title):
-        super(atmodel, self).__init__(parent, title=title, size=(700, 500))
+        super(atmodel, self).__init__(parent, title=title, size=(700, 550))
         self.InitUI()
         self.Centre()
         self.Show()     
         
-    def InitUI(self):
+    def InitUI(self):  #create GUI
         
         # Creating Panel 
         panel = wx.Panel(self)
@@ -39,8 +39,9 @@ class atmodel(wx.Frame):
         # Top_left -> parameters
         parameters = ['Specify Parameters', 'Spectral Resolution:',
                       'Mirror Diameter(m):', 'Mirror Temperature(K):',
-                      'Choose a Site:', 'Choose a source:', 'Choose backgrounds:',
-                      'Specify starting frequency(THz)', 'Specify ending frequency(THz)', 'Signal to noise ratio' ]
+                      'Choose a Site:', 'Choose a Source:', 'Choose Backgrounds:',
+                      'Specify Starting Frequency(THz)', 'Specify Ending Frequency(THz)', 'Signal to Noise Ratio',
+                      'Specify Dependent Minimum: 10 to the', 'Specify Dependent Maximum: 10 to the']
         sites = ['13_7Km SOFIA', '30KmBalloon', '40KmBalloon', 'CCAT-0732g', 'CCAT-0978g', 'DomeA-01g', 'DomeA-014g', 'DomeC-015g',
                  'DomeC-024g', 'MaunaKea-1g', 'MaunaKea-15g', 'SantaBarbara-01g', 'SantaBarbara-30g', 'SouthPole-023g',
                  'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Space', 'Custom']
@@ -48,13 +49,15 @@ class atmodel(wx.Frame):
         sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom']
         
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission',
-                       'Atmospheric Radiance', 'Zodiacal Emission']
+                       'Atmospheric Radiance', 'Zodiacal Emission', 'Cumulative']
         
         # Top_left -> Controls
-        parameter_labels = [wx.StaticText(panel, label=parameters[i]) for i in range(10)]
-        self.parameter_inputs = [wx.TextCtrl(panel) for i in range(6)]
+        parameter_labels = [wx.StaticText(panel, label=parameters[i]) for i in range(12)]
+        self.parameter_inputs = [wx.TextCtrl(panel) for i in range(8)]
         self.parameter_site_combo = wx.ComboBox(panel, choices=sites, style=wx.CB_READONLY) 
         self.parameter_source_combo = wx.ComboBox(panel, choices=sources, style=wx.CB_READONLY)
+
+        self.dependent_limits_checkbox = wx.CheckBox(panel, label='Manually Input Range of Dependent Axis')
         
         # Top_left -> fill up contains 
         parameter_labels[0].SetFont(font)  # set a title font
@@ -67,17 +70,19 @@ class atmodel(wx.Frame):
                               (parameter_labels[5], 0, wx.EXPAND), (self.parameter_source_combo, 0, wx.EXPAND),
                               (parameter_labels[7], 0, wx.EXPAND), (self.parameter_inputs[3], 0, wx.EXPAND),
                               (parameter_labels[8], 0, wx.EXPAND), (self.parameter_inputs[4], 0, wx.EXPAND),
-                              (parameter_labels[9], 0, wx.EXPAND), (self.parameter_inputs[5], 0, wx.EXPAND)])
-                                # each row represents a row in interface
+                              (parameter_labels[9], 0, wx.EXPAND), (self.parameter_inputs[5], 0, wx.EXPAND),
+                              self.dependent_limits_checkbox, (wx.StaticText(panel, label='')),
+                              (parameter_labels[10], 0, wx.EXPAND), (self.parameter_inputs[6], 0, wx.EXPAND),
+                              (parameter_labels[11], 0, wx.EXPAND), (self.parameter_inputs[7], 0, wx.EXPAND)])
+                              #each line represents a row in interface
         top_left.Add(top_left_fgs, flag=wx.EXPAND)
 
         # Top_left -> Bind eventhandler
         # self.parameter_site_combo.Bind(wx.EVT_COMBOBOX, self.onCustom)
 
         # Top_right
-        galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = +90', 'g_long = 0, g_lat = -90',
-                               'g_long = 180, g_lat = 90']
-        zodiacal_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 180, g_lat = 90']
+        galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = +90', 'g_long = 0, g_lat = -90']
+        zodiacal_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = 90']
         thermal_mirror_materials = ['Be', 'Al', 'Au', 'Ag']
         
         # Top_right -> controls
@@ -97,6 +102,7 @@ class atmodel(wx.Frame):
         top_right.Add(self.background_checkboxs[4], flag=wx.BOTTOM | wx.TOP, border=3)
         top_right.Add(self.background_checkboxs[5], flag=wx.BOTTOM, border=3)
         top_right.Add(self.zodiacal_direction_combo, flag=wx.LEFT, border=20)
+        top_right.Add(self.background_checkboxs[6], flag=wx.BOTTOM, border=3)
         
 
         # Bottom_left 
@@ -213,7 +219,7 @@ class atmodel(wx.Frame):
             title_bling = []  #append names of which backgrounds are checked to put in title
 
 #if "Cosmic Infrared Background" box is checked
-            if self.background_checkboxs[0].IsChecked():
+            if self.background_checkboxs[0].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_bling.append('Cosmic Infrared Background')
                 cib_excel = file_refs.CIB_ref  #name excel file to read from
                 cib = ExcelReader(cib_excel)
@@ -227,7 +233,7 @@ class atmodel(wx.Frame):
                 bling_squared += calchanges2.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Cosmic Infrared Background to "bling_squared"
 
 #if "Cosmic Microwave Background" box is checked
-            if self.background_checkboxs[1].IsChecked():
+            if self.background_checkboxs[1].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_bling.append('Cosmic Microwave Background')
                 cmb_excel = file_refs.CMB_ref  #name excel file to read from
                 cmb = ExcelReader(cmb_excel)
@@ -238,7 +244,7 @@ class atmodel(wx.Frame):
                 bling_squared += calchanges2.bling_CMB(freqNoise, resol)  #calculate and add BLING(squared) of Cosmic Microwave Background to "bling_squared"
 
 #if "Galactic Emission" box is checked
-            if self.background_checkboxs[2].IsChecked():
+            if self.background_checkboxs[2].IsChecked() or self.background_checkboxs[6].IsChecked():
                 index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, or 4 depending on which ecliptic coordinates are selected 
                 if index == 0:  #if (g_long=0, g_lat=0) is selected
                     title_bling.append('Galactic Emission(g_long=0, g_lat=0)')
@@ -248,8 +254,6 @@ class atmodel(wx.Frame):
                     title_bling.append('Galactic Emission(g_long=0, g_lat=90)')
                 elif index == 3:  #if (g_long=0, g_lat=-90) is selected
                     title_bling.append('Galactic Emission(g_long=0, g_lat=-90)')
-                elif index == 4:  #if (g_long=180, g_lat=90) is selected
-                    title_bling.append('Galactic Emission(g_long=180, g_lat=90)')
                 ge = ExcelReader(file_refs.Galatic_Emission_refs[index])  #name excel file to read from
                 ge.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
                 freqNoise = np.array(ge.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
@@ -258,7 +262,7 @@ class atmodel(wx.Frame):
                 bling_squared += calchanges2.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Galactic Emission to "bling_squared"
 
 #if "Thermal Mirror Emission" box is checked 
-            if self.background_checkboxs[3].IsChecked():
+            if self.background_checkboxs[3].IsChecked() or self.background_checkboxs[6].IsChecked():
                 mirror_temp = float(self.parameter_inputs[2].GetValue())  #only need mirror temperature input if "Thermal Mirror Emission" is checked
                 index = self.thermal_mirror_material_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which material is selected
                 if index == 0:  #if "Be" is selected
@@ -278,7 +282,7 @@ class atmodel(wx.Frame):
                 bling_squared += calchanges2.bling_TME(freqNoise, resol, sigma, mirror_temp, wavelength)  #calculate and add BLING(squared) of Thermal Mirror Emission to "bling_sqared"
 
 #if "Atmospheric Radiance" box is checked
-            if self.background_checkboxs[4].IsChecked():
+            if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_bling.append('Atmospheric Radiance(' + str(site) + ")") #title depends on name of site chosen
                 ar = ExcelReader(file_refs.atm_rad_refs[site])  #name excel file to read from, depending on site chosen
                 ar.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
@@ -288,14 +292,14 @@ class atmodel(wx.Frame):
                 bling_squared += calchanges2.bling_AR(freqNoise, rad, resol)  #calculate and add BLING(squared) of Atmospheric Radiance to "bling_squared"
 
 #if "Zodiacial Emission" box is checked
-            if self.background_checkboxs[5].IsChecked():
+            if self.background_checkboxs[5].IsChecked() or self.background_checkboxs[6].IsChecked():
                 index = self.zodiacal_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which ecliptic coordinates are selected
                 if index == 0:  #if (g_long=0,g_lat=0) is selected
                     title_bling.append('Zodiacal Emission(g_long=0,g_lat=0)')
                 if index == 1:  #if (g_long=0,g_lat=45) is selected
                     title_bling.append('Zodiacal Emission(g_long=0,g_lat=45)')
-                if index == 2:  #if (g_long=180,g_lat=90) is selected
-                    title_bling.append('Zodiacal Emission(g_long=180,g_lat=90)')
+                if index == 2:  #if (g_long=0,g_lat=90) is selected
+                    title_bling.append('Zodiacal Emission(g_long=0,g_lat=90)')
                 ze = ExcelReader(file_refs.ZODI_refs[index])  #name excel file to read from, depending on site chosen
                 ze.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
                 freqNoise = np.array(ze.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
@@ -308,13 +312,8 @@ class atmodel(wx.Frame):
             print "BLING calculation DONE"
             print "Time used for BLING calculation: ", end_time - start_time, " seconds"
 
-            if self.background_checkboxs[0].IsChecked():  #setting title to 'Noise[Total]' if all BLINGs are checked
-                if self.background_checkboxs[1].IsChecked():
-                    if self.background_checkboxs[2].IsChecked():
-                        if self.background_checkboxs[3].IsChecked():
-                            if self.background_checkboxs[4].IsChecked():
-                                if self.background_checkboxs[5].IsChecked():
-                                    title_bling = '[Total]'
+            if self.background_checkboxs[6].IsChecked():  #setting title to 'Noise[Total]' if all BLINGs are checked
+                title_bling = '[Total]'
 
 
         if self.generate_checkboxs[1].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
@@ -343,7 +342,7 @@ class atmodel(wx.Frame):
 
 
 # plotting and writing file
-# instead of having a plotter module, I put function directly in so labels and titles are changeable
+# instead of having a plotter module, a plotting function is defined here so labels and titles are changeable
         def loglogplot(x, y):
             print "Start plotting..."
             pos = np.where(np.abs(np.diff(y)) >= .0015)[0] + 1  #jumps over .0015 THz(1.5 GHz) are not connected
@@ -352,6 +351,12 @@ class atmodel(wx.Frame):
             pylab.plot(x, y)
             pylab.xscale('log')
             pylab.yscale('log')
+            if self.dependent_limits_checkbox.IsChecked():  #if "Manually Input Range of Dependent Axis" box is checked, values must be input for following 2 boxes
+                start_magnitude = float(self.parameter_inputs[6].GetValue())  #get order of magnitude for y-axis minumum
+                dep_start = 10 ** start_magnitude  #turn order of magnitude into value of minimum
+                end_magnitude = float(self.parameter_inputs[7].GetValue())  #get order of magnitude for y-axis maximum
+                dep_end = 10 ** end_magnitude  #turn order of magnitude into value of maximum
+                pylab.ylim(dep_start, dep_end)
 
 
 #if "Total Noise" is checked
@@ -371,9 +376,11 @@ class atmodel(wx.Frame):
             pylab.ylabel("Temp(K)")
             pylab.xlabel("Frequency(THz)")
             #title = "Temp" + str(title) + " vs. Frequency.\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nMirror has diameter " + str(d) + "m and temperature " + str(mirror_temp) + "K.", fontsize=10
-            title = "Noise" + str(title_bling) + " vs. Frequency.\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz."
-            if self.background_checkboxs[3].IsChecked():  #if "Thermal Mirror Emission" is included, add "mirror_temp" to the title
-                title = title + "\nMirror has temperature " + str(mirror_temp) + "K."
+            title = "Noise" + str(title_bling) + " vs. Frequency at Spectral Resolution of " + str(resol) + ".\nFrequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.  "
+            if self.background_checkboxs[3].IsChecked() or self.background_checkboxs[6].IsChecked():  #if "Thermal Mirror Emission" is included, add "mirror_temp" to the title
+                title = title + "Mirror has temperature " + str(mirror_temp) + "K.  "
+            if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():  #if "Atmospheric" is included, add the site to the title
+                title = title + str(site) + " is the site."
             pylab.suptitle(title, fontsize=10)            
             pylab.show()
 
