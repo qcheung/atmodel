@@ -8,6 +8,11 @@ from excel import ExcelReader
 # and
 # "Fundamental Limits of Detection in the Far Infrared" by Denny et al
 
+# The 1st 4 functions defined calculate BLING(squared) for the backgrounds
+# The 3 functions after calculate antenna temperature for the backgrounds(a preliminary step for the BLING functions)
+    # There is no temperature function for "bling_sub" since those backgrounds have given temperatures in data files
+# The functions after that calculate: limiting flux, integration time, and total signal
+
 def bling_sub(freq, temp, resol):  #calculates BLING(squared) for "Cosmic Infrared Background", "Galactic Emission", and/or "Zodiacal Emission"
 ##    What will be done: 1) Interpolate temperature vs. frequency
 ##                       2) Calculate integration constants and integration range
@@ -59,7 +64,7 @@ def bling_CMB(freq, resol):  #calculates BLING(squared) for "Cosmic Microwave Ba
     f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1) #linear interpolation of "temp" vs. "freq"
     step_size = 1.5e5  #characterize the level of details wanted from interpolation
         #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
-    c = 2 * const.h * const.k * step_size  #2 is number of modes, constants come from equation 2.15 in Denny(without the radical), "step_size" is the increment of the Riemann sum
+    c = const.h * const.k * step_size  #constants come from equation 2.15 in Denny(without the radical) and "step_size" is the increment of the Riemann sum
     int_range = np.zeros((len(freq), 2))  #create 2 by (length of frequency range) array full of 0's to be replaced with values
     int_range_length = freq/2/resol  #2nd term in integration bounds from equation 2.15 in Denny
     int_range[:,0]=freq - int_range_length  #fill up 1st column of 0's array with bottom integration bound from equation 2.15 in Denny
@@ -88,7 +93,7 @@ def bling_AR(freq, rad, resol):  #calculates BLING(squared) for "Atmospheric Rad
 ## 2) Calculate antenna temperature from radiance
     temp = []  #create list to be filled with calculated temperatures
     for i in freq:
-        antenna_temp = rad(i) * (const.c ** 2)/(const.k * (i**2))  #calculate antenna temperature from equation 2.7 in Denny
+        antenna_temp = .5 * rad(i) * (const.c ** 2)/(const.k * (i**2))  #calculate antenna temperature from equation 2.7 in Denny
         temp.append(antenna_temp)  #add calculated temperature to "temp" list
     temp = np.array(temp)  #turn "temp" list into "temp" array
 
@@ -96,7 +101,7 @@ def bling_AR(freq, rad, resol):  #calculates BLING(squared) for "Atmospheric Rad
     f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1)  #linear interpolation of "temp" vs. "freq"
     step_size = 1.5e5  #characterize the level of details wanted from interpolation
         #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
-    c = 2 * const.h * const.k * step_size  #2 is number of modes, constants come from equation 2.15 in Denny(without the radical), "step_size" is the increment of the Riemann sum
+    c = const.h * const.k * step_size  #constants come from equation 2.15 in Denny(without the radical) and "step_size" is the increment of the Riemann sum
     int_range = np.zeros((len(freq), 2))  #create 2 by (length of frequency range) array full of 0's to be replaced with values
     int_range_length = freq/2/resol  #2nd term in integration bounds from equation 2.15 in Denny
     int_range[:,0]=freq - int_range_length  #fill up 1st column of 0's array with bottom integration bound from equation 2.15 in Denny
@@ -120,9 +125,9 @@ def bling_TME(freq, resol, sigma, mirror_temp, wavelength):  #calculates BLING(s
 ##                       2) Calculate BLING(squared) from effective temperature
 ## 1) Calculate emissivity from surface electrical conductivity("sigma") of specific metal
     em = []  #create list to be filled with emissivities, depending on wavelength
-    wavelength = wavelength * (1e-6)  #convert wavelength from microns to meters
+    w_l = wavelength * (1e-6)  #convert wavelength from microns to meters
     c1 = 16 * np.pi * const.c * const.epsilon / sigma  #constants from equation 2.17 in Denny
-    for i in wavelength:
+    for i in w_l:
         emis = (c1 / i)**.5  #emissivity a function of the radical of the constants divided by wavelength from equation 2.17 in Denny
         em.append(emis)  #add calculated emissivities to "em" list
     em = np.array(em)  #turn "em" list into "em" array
@@ -131,19 +136,19 @@ def bling_TME(freq, resol, sigma, mirror_temp, wavelength):  #calculates BLING(s
     effective_temp = []  #create list to be filled with effective temperatures
     mirror_temp = float(mirror_temp)  #ensure "mirror_temp" is a float not an integer
     f = interpolate.InterpolatedUnivariateSpline(freq, em, k=1)  #linear interpolation of "em" vs. "freq"
-    c2 = const.k * mirror_temp  #constant from equation 2.20 in Denny
-    c3 = const.h / const.k
+    c2 = const.h / (const.k * mirror_temp)  #a constant from equation 2.20 in Denny
+    c3 = const.h / const.k  #a constant from equation 2.20 in Denny
     for i in freq:
-        denom = np.exp(const.h * i / c2) - 1  #calculate part of the denominator in equation 2.20 in Denny
+        denom = np.exp(c2 * i) - 1  #calculate part of the denominator in equation 2.20 in Denny
         temp_eff = f(i) * i * c3 / denom  #calculate effective temperature from the product of frequency, corresponding emissivity, constants, and the denominator from equation 2.20 in Denny
-        effective_temp.append(temp_eff)
+        effective_temp.append(temp_eff)  #add calculated effective temperatures to "effective_temp" list
     temp = np.array(effective_temp)  #turn "effective_temp" list into "temp" array
 
 ## 3) Calculate BLING(squared) from effective temperature
     f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1)  #linear interpolation of "temp" vs. "freq"
     step_size = 1.5e5  #characterize the level of details wanted from interpolation
         #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
-    c = 2 * const.h * const.k * step_size  #2 is number of modes, constants come from equation 2.15 in Denny(without the radical), "step_size" is the increment of the Riemann sum
+    c = const.h * const.k * step_size  #constants come from equation 2.15 in Denny(without the radical) and "step_size" is the increment of the Riemann sum
     int_range = np.zeros((len(freq), 2))  #create 2 by (length of frequency range) array full of 0's to be replaced with values
     int_range_length = freq/2/resol  #2nd term in integration bounds from equation 2.15 in Denny
     int_range[:,0]=freq - int_range_length  #fill up 1st column of 0's array with bottom integration bound from equation 2.15 in Denny
@@ -159,6 +164,66 @@ def bling_TME(freq, resol, sigma, mirror_temp, wavelength):  #calculates BLING(s
         #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
 
     return blingTME_squared
+
+
+def temp_TME(freq, sigma, mirror_temp, wavelength):  #calculates antenna temperature for "Thermal Mirror Emission"
+##    What will be done: 1) Calculate emissivity from surface electrical conductivity("sigma") of specific metal
+##                       1) Calculate effective temperature from emissivity and mirror temperature
+## 1) Calculate emissivity from surface electrical conductivity("sigma") of specific metal
+    em = []  #create list to be filled with emissivities, depending on wavelength
+    w_l = wavelength * (1e-6)  #convert wavelength from microns to meters
+    c1 = 16 * np.pi * const.c * const.epsilon / sigma  #constants from equation 2.17 in Denny
+    for i in w_l:
+        emis = (c1 / i)**.5  #emissivity a function of the radical of the constants divided by wavelength from equation 2.17 in Denny
+        em.append(emis)  #add calculated emissivities to "em" list
+    em = np.array(em)  #turn "em" list into "em" array
+
+## 2) Calculate effective temperature from emissivity and mirror temperature
+    effective_temp = []  #create list to be filled with effective temperatures
+    mirror_temp = float(mirror_temp)  #ensure "mirror_temp" is a float not an integer
+    f = interpolate.InterpolatedUnivariateSpline(freq, em, k=1)  #linear interpolation of "em" vs. "freq"
+    c2 = const.h / (const.k * mirror_temp)  #a constant from equation 2.20 in Denny
+    c3 = const.h / const.k  #a constant from equation 2.20 in Denny
+    for i in freq:
+        denom = np.exp(c2 * i) - 1  #calculate part of the denominator in equation 2.20 in Denny
+        temp_eff = f(i) * i * c3 / denom  #calculate effective temperature from the product of frequency, corresponding emissivity, constants, and the denominator from equation 2.20 in Denny
+        effective_temp.append(temp_eff)  #add calculated effective temperatures to "effective_temp" list
+    temp = np.array(effective_temp)  #turn "effective_temp" list into "temp" array
+    return temp
+
+
+def temp_CMB(freq):  #calculates antenna temperature for "Cosmic Microwave Background"
+##    What will be done: 1) Calculate intensity from frequency
+##                       2) Calculate antenna temperature from intensity
+## 1) Calculate intensity from frequency
+    temp = []  #create list to be filled with calculated temperatures
+    c1 = const.h / (const.k * const.T)  #constants from equation 2.16 in Denny
+    c2 = 2 * const.h / (const.c ** 2)  #constants from equation 2.16 in Denny
+    for i in freq:
+        denom = np.exp(c1 * i) - 1  #calculate part of the denominator in equation 2.16 in Denny
+        intensity = c2 * (i ** 3)/denom  #calculate intensity from equation 2.16 in Denny
+
+## 2) Calculate antenna temperature from intensity
+        antenna_temp = intensity * (const.c ** 2)/(const.k * (i**2))  #calculate antenna temperature from equation 2.7 in Denny
+        temp.append(antenna_temp)  #add calculated temperature to "temp" list
+    temp = np.array(temp)  #turn "temp" list into "temp" array
+    return temp
+
+
+def temp_AR(freq, rad):  #calculates antenna temperature for "Atmospheric Radiance"
+##    What will be done: 1) Interpolate radiance vs. frequency
+##                       2) Calculate antenna temperature from radiance
+## 1) Interpolate radiance vs. frequency
+    rad = rad / (3e6)  #radiance files are given in W/cm^2/st/cm^-1 but are converted to W/m^2/st/Hz
+    rad = interpolate.InterpolatedUnivariateSpline(freq, rad, k=1)  #linear interpolation of "rad" vs. "freq"
+
+## 2) Calculate antenna temperature from radiance
+    temp = []  #create list to be filled with calculated temperatures
+    for i in freq:
+        antenna_temp = .5 * rad(i) * (const.c ** 2)/(const.k * (i**2))  #calculate antenna temperature from equation 2.7 in Denny
+        temp.append(antenna_temp)  #add calculated temperature to "temp" list
+    temp = np.array(temp)  #turn "temp" list into "temp" array
+    return temp
     
 
 #Limiting_Flux
