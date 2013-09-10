@@ -38,7 +38,7 @@ def bling_sub(freq, temp, resol):  #calculates BLING(squared) for "Cosmic Infrar
         #for each row, each of the 2 bounds is multiplied by its corresponding temperature from the linear interpolation done at the start and then are summed
         #summing does the integral for each frequency
         #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
-        #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
+        #the result should be square rooted but, since the BLINGs are to be added in quadrature, the squares of each background's BLING are added up then square rooted
     return blingSUB_squared
 
 
@@ -56,7 +56,8 @@ def bling_CMB(freq, resol):  #calculates BLING(squared) for "Cosmic Microwave Ba
         intensity = c2 * (i ** 3)/denom  #calculate intensity from equation 2.16 in Denny
 
 ## 2) Calculate antenna temperature from intensity
-        antenna_temp = intensity * (const.c ** 2)/(const.k * (i**2))  #calculate antenna temperature from equation 2.7 in Denny
+        antenna_temp = .5 * intensity * (const.c ** 2)/(const.k * (i**2))  #calculate antenna temperature from equation 2.7 in Denny
+            #.5 comes from modes=2
         temp.append(antenna_temp)  #add calculated temperature to "temp" list
     temp = np.array(temp)  #turn "temp" list into "temp" array
 
@@ -64,7 +65,7 @@ def bling_CMB(freq, resol):  #calculates BLING(squared) for "Cosmic Microwave Ba
     f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1) #linear interpolation of "temp" vs. "freq"
     step_size = 1.5e5  #characterize the level of details wanted from interpolation
         #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
-    c = const.h * const.k * step_size  #constants come from equation 2.15 in Denny(without the radical) and "step_size" is the increment of the Riemann sum
+    c = 2 * const.h * const.k * step_size  #2 is number of polarization modes, constants come from equation 2.15 in Denny(without the radical) and "step_size" is the increment of the Riemann sum
     int_range = np.zeros((len(freq), 2))  #create 2 by (length of frequency range) array full of 0's to be replaced with values
     int_range_length = freq/2/resol  #2nd term in integration bounds from equation 2.15 in Denny
     int_range[:,0]=freq - int_range_length  #fill up 1st column of 0's array with bottom integration bound from equation 2.15 in Denny
@@ -77,7 +78,7 @@ def bling_CMB(freq, resol):  #calculates BLING(squared) for "Cosmic Microwave Ba
         #for each row, each of the 2 bounds is multiplied by its corresponding temperature from the linear interpolation done at the start and then are summed
         #summing does the integral for each frequency
         #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
-        #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
+        #the result should be square rooted but, since the BLINGs are to be added in quadrature, the squares of each background's BLING are added up then square rooted
 
     return blingCMB_squared
 
@@ -114,7 +115,7 @@ def bling_AR(freq, rad, resol):  #calculates BLING(squared) for "Atmospheric Rad
         #for each row, each of the 2 bounds is multiplied by its corresponding temperature from the linear interpolation done at the start and then are summed
         #summing does the integral for each frequency
         #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
-        #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
+        #the result should be square rooted but, since the BLINGs are to be added in quadrature, the squares of each background's BLING are added up then square rooted
 
     return blingAR_squared
 
@@ -140,7 +141,8 @@ def bling_TME(freq, resol, sigma, mirror_temp, wavelength):  #calculates BLING(s
     c3 = const.h / const.k  #a constant from equation 2.20 in Denny
     for i in freq:
         denom = np.exp(c2 * i) - 1  #calculate part of the denominator in equation 2.20 in Denny
-        temp_eff = f(i) * i * c3 / denom  #calculate effective temperature from the product of frequency, corresponding emissivity, constants, and the denominator from equation 2.20 in Denny
+        temp_eff = .5 * f(i) * i * c3 / denom  #calculate effective temperature from the product of frequency, corresponding emissivity, constants, and the denominator from equation 2.20 in Denny
+            #.5 comes from modes=2
         effective_temp.append(temp_eff)  #add calculated effective temperatures to "effective_temp" list
     temp = np.array(effective_temp)  #turn "effective_temp" list into "temp" array
 
@@ -148,7 +150,7 @@ def bling_TME(freq, resol, sigma, mirror_temp, wavelength):  #calculates BLING(s
     f = interpolate.InterpolatedUnivariateSpline(freq, temp, k=1)  #linear interpolation of "temp" vs. "freq"
     step_size = 1.5e5  #characterize the level of details wanted from interpolation
         #decreasing "step_size" can lose smoothness of plot and increasing "step_size" lengthens calculation time
-    c = const.h * const.k * step_size  #constants come from equation 2.15 in Denny(without the radical) and "step_size" is the increment of the Riemann sum
+    c = 2 * const.h * const.k * step_size  #2 is number of polarization modes, constants come from equation 2.15 in Denny(without the radical) and "step_size" is the increment of the Riemann sum
     int_range = np.zeros((len(freq), 2))  #create 2 by (length of frequency range) array full of 0's to be replaced with values
     int_range_length = freq/2/resol  #2nd term in integration bounds from equation 2.15 in Denny
     int_range[:,0]=freq - int_range_length  #fill up 1st column of 0's array with bottom integration bound from equation 2.15 in Denny
@@ -161,7 +163,7 @@ def bling_TME(freq, resol, sigma, mirror_temp, wavelength):  #calculates BLING(s
         #for each row, each of the 2 bounds is multiplied by its corresponding temperature from the linear interpolation done at the start and then are summed
         #summing does the integral for each frequency
         #the sum is multiplied by the number of modes, physical constants, and "step_size" which gives the BLING
-        #the result should be square rooted but, since the BLINGs are to be added in quadrature, squaring each BLING cancels out the radical
+        #the result should be square rooted but, since the BLINGs are to be added in quadrature, the squares of each background's BLING are added up then square rooted
 
     return blingTME_squared
 
@@ -187,6 +189,7 @@ def temp_TME(freq, sigma, mirror_temp, wavelength):  #calculates antenna tempera
     for i in freq:
         denom = np.exp(c2 * i) - 1  #calculate part of the denominator in equation 2.20 in Denny
         temp_eff = f(i) * i * c3 / denom  #calculate effective temperature from the product of frequency, corresponding emissivity, constants, and the denominator from equation 2.20 in Denny
+            #.5 comes from modes=2
         effective_temp.append(temp_eff)  #add calculated effective temperatures to "effective_temp" list
     temp = np.array(effective_temp)  #turn "effective_temp" list into "temp" array
     return temp
@@ -205,6 +208,7 @@ def temp_CMB(freq):  #calculates antenna temperature for "Cosmic Microwave Backg
 
 ## 2) Calculate antenna temperature from intensity
         antenna_temp = intensity * (const.c ** 2)/(const.k * (i**2))  #calculate antenna temperature from equation 2.7 in Denny
+            #.5 comes from modes=2
         temp.append(antenna_temp)  #add calculated temperature to "temp" list
     temp = np.array(temp)  #turn "temp" list into "temp" array
     return temp
@@ -261,3 +265,4 @@ def TS(freq, inte, tau, d, resol):  #calculates Total Signal
         #multiplying by the constants finishes equation 3.13 in Denny et al
 
     return ts
+
