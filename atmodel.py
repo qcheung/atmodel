@@ -174,7 +174,7 @@ class atmodel(wx.Frame):
         site_dialog_ok.Bind(wx.EVT_BUTTON, self.onDialogOk)
 
         self.site_dialog.Center()
-        self.site_dialog.Show()	
+        self.site_dialog.Show()
 
     def onRadianceBrowse(self, e):
         file_dialog = wx.FileDialog(self, style=wx.FD_SAVE)
@@ -219,7 +219,7 @@ class atmodel(wx.Frame):
                 #the squares of BLINGs are added up since the final result is equal to BLINGs added in quadrature
             title_bling = []  #append names of which backgrounds are checked to put in title
 
-#if "Cosmic Infrared Background" box is checked
+#if "Cosmic Infrared Background" box or "Cumulative" is checked
             if self.background_checkboxs[0].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_bling.append('Cosmic Infrared Background')
                 cib_excel = file_refs.CIB_ref  #name excel file to read from
@@ -233,7 +233,7 @@ class atmodel(wx.Frame):
                 print "len(temp)=", len(temp)
                 bling_squared += cal.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Cosmic Infrared Background to "bling_squared"
 
-#if "Cosmic Microwave Background" box is checked
+#if "Cosmic Microwave Background" or "Cumulative" box is checked
             if self.background_checkboxs[1].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_bling.append('Cosmic Microwave Background')
                 cmb_excel = file_refs.CMB_ref  #name excel file to read from
@@ -244,7 +244,7 @@ class atmodel(wx.Frame):
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
                 bling_squared += cal.bling_CMB(freqNoise, resol)  #calculate and add BLING(squared) of Cosmic Microwave Background to "bling_squared"
 
-#if "Galactic Emission" box is checked
+#if "Galactic Emission" box or "Cumulative" is checked
             if self.background_checkboxs[2].IsChecked() or self.background_checkboxs[6].IsChecked():
                 index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which ecliptic coordinates are selected 
                 if index == 0:  #if (g_long=0, g_lat=0) is selected
@@ -262,7 +262,7 @@ class atmodel(wx.Frame):
                 temp = np.array(ge.read_from_col(8), dtype='float')  #create array of temperature(K) from 9th column of excel file, reading as floats
                 bling_squared += cal.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Galactic Emission to "bling_squared"
 
-#if "Thermal Mirror Emission" box is checked 
+#if "Thermal Mirror Emission" or "Cumulative" box is checked 
             if self.background_checkboxs[3].IsChecked() or self.background_checkboxs[6].IsChecked():
                 mirror_temp = float(self.parameter_inputs[2].GetValue())  #only need mirror temperature input if "Thermal Mirror Emission" is checked
                 index = self.thermal_mirror_material_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which material is selected
@@ -282,17 +282,24 @@ class atmodel(wx.Frame):
                 wavelength = np.array(tme.read_from_col(3), dtype = 'float')  #create array of wavelengths(microns)
                 bling_squared += cal.bling_TME(freqNoise, resol, sigma, mirror_temp, wavelength)  #calculate and add BLING(squared) of Thermal Mirror Emission to "bling_sqared"
 
-#if "Atmospheric Radiance" box is checked
+#if "Atmospheric Radiance" or "Cumulative" box is checked
             if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_bling.append('Atmospheric Radiance') #title depends on name of site chosen
-                ar = ExcelReader(file_refs.atm_rad_refs[site])  #name excel file to read from, depending on site chosen
+                if site == "Custom":  #find transmission file from custom site
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)  #open browser to select file
+                    if file_dialog.ShowModal() == wx.ID_OK:
+                        self.site_rad = file_dialog.GetPath()
+                        ar = ExcelReader(self.site_rad)
+                    file_dialog.Destroy()
+                else:  #if site not custom, find file
+                    ar = ExcelReader(file_refs.atm_rad_refs[site])  #name excel file to read from, depending on site chosen
                 ar.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
                 freqNoise = np.array(ar.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
                 rad = np.array(ar.read_from_col(4), dtype='float')  #create array of radiance(W/cm^2/st/cm^-1) from 5th column of excel file, reading as floats
                 bling_squared += cal.bling_AR(freqNoise, rad, resol)  #calculate and add BLING(squared) of Atmospheric Radiance to "bling_squared"
 
-#if "Zodiacial Emission" box is checked
+#if "Zodiacial Emission" or "Cumulative" box is checked
             if self.background_checkboxs[5].IsChecked() or self.background_checkboxs[6].IsChecked():
                 index = self.zodiacal_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which ecliptic coordinates are selected
                 if index == 0:  #if (g_long=0,g_lat=0) is selected
@@ -388,7 +395,14 @@ class atmodel(wx.Frame):
 #if "Atmospheric Radiance" box is checked
             if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_temp.append('Atmospheric Radiance') #title depends on name of site chosen
-                ar = ExcelReader(file_refs.atm_rad_refs[site])  #name excel file to read from, depending on site chosen
+                if site == "Custom":  #find transmission file from custom site
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)  #open browser to select file
+                    if file_dialog.ShowModal() == wx.ID_OK:
+                        self.site_rad = file_dialog.GetPath()
+                        ar = ExcelReader(self.site_rad)
+                    file_dialog.Destroy()
+                else:  #if site not custom, find file
+                    ar = ExcelReader(file_refs.atm_rad_refs[site])  #name excel file to read from, depending on site chosen
                 ar.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
                 freqNoise = np.array(ar.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
@@ -422,14 +436,28 @@ class atmodel(wx.Frame):
         if self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[4].IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
 # Calculate Source Intensity
             d = float(self.parameter_inputs[1].GetValue())  #only need mirror diameter input if "Total Signal" is checked
-            si = ExcelReader(file_refs.source_refs[source])  #find file of source galaxy
+            if source == "Custom":  #find file of custom source
+                file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)  #open browser to select file
+                if file_dialog.ShowModal() == wx.ID_OK:
+                    self.source = file_dialog.GetPath()
+                    at = ExcelReader(self.source)
+                file_dialog.Destroy()
+            else:  #if source not custom, find file
+                si = ExcelReader(file_refs.source_refs[source])  #find file of source galaxy
             si.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)  #set where in excel file to start/stop reading by converting input from THz to Hz
             freq = np.array(si.read_from_col(1), dtype='float')  #create list of frequency(Hz) from 2nd column of excel file
             inte = np.array(si.read_from_col(5), dtype='float')  #create list of intensity(Jy) from 6th column of excel file, reading as floats
             print "Reading from source. DONE"
             
 # Calculate Total Signal
-            at = ExcelReader(file_refs.atm_tran_refs[site])  #find file of site
+            if site == "Custom":  #find transmission file from custom site
+                file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)  #open browser to select file
+                if file_dialog.ShowModal() == wx.ID_OK:
+                    self.site_trans = file_dialog.GetPath()
+                    at = ExcelReader(self.site_trans)
+                file_dialog.Destroy()
+            else:  #if site not custom, find file
+                at = ExcelReader(file_refs.atm_tran_refs[site])
             at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)  #set where in excel file to start/stop reading by converting input from THz to Hz
             
             tau = np.array(at.read_from_col(4), dtype='float')  #create array of transmission from 5th column of excel file, reading as floats
@@ -500,7 +528,7 @@ class atmodel(wx.Frame):
 
             # draw plot
             loglogplot(freqNoise_THz, temperature)  #plot of Temperature is log(base 10)-scaled
-            pylab.ylabel("Temp(K)")
+            pylab.ylabel("Temperature(Kelvin)")
             pylab.xlabel("Frequency(THz)")
             title = "Temperature" + str(title_temp) + " vs. Frequency.\nFrequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.  "
             if self.background_checkboxs[3].IsChecked() or self.background_checkboxs[6].IsChecked():  #if "Thermal Mirror Emission" is included, add "mirror_temp" to the title
@@ -545,9 +573,9 @@ class atmodel(wx.Frame):
             loglogplot(freq_THz, integration_time)  #plot of integration time is log(base 10)-scaled
             pylab.ylabel("Integration Time(sec)")
             pylab.xlabel("Frequency(THz)")
-            title = "Integration time vs. Frequency at " + str(site) + " from " + str(source) + ".\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nSignal to Noise ratio is " + str(ratio) + "."
-            if self.background_checkboxs[3].IsChecked():  #if "Thermal Mirror Emission" is included, add "mirror_temp" to the title
-                title = title + "Mirror has temperature " + str(mirror_temp) + "K."
+            title = "Integration time vs. Frequency at " + str(site) + " from " + str(source) + ".\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nSignal to Noise ratio is " + str(ratio) + " and mirror diameter is " + str(d) + "m."
+            if self.background_checkboxs[3].IsChecked() or self.background_checkboxs[6].IsChecked():  #if "Thermal Mirror Emission" is included, add "mirror_temp" to the title
+                title = title + "  Mirror has temperature " + str(mirror_temp) + "K."
             pylab.suptitle(title, fontsize=10)
             pylab.show()
             
