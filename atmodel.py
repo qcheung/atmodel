@@ -199,10 +199,10 @@ class atmodel(wx.Frame):
         
 # initialization -> Parse inputs
 
+        #There must be inputs for resolution, starting frequency, and ending frequency
         freq_start = float(self.parameter_inputs[3].GetValue())  #get starting frequency input as a float
         freq_end = float(self.parameter_inputs[4].GetValue())  #get ending frequency input as a float
-        #The preceding lines requires there to be inputs for resolution, starting frequency, and ending frequency
-            #so the other inputs are only required to have entries if they are needed in the calculation that is checked
+        #the other inputs are only required to have entries if they are needed in the calculation that is checked
 
         if self.generate_checkboxs[0].IsChecked() or self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked() or self.generate_checkboxs[4].IsChecked():  #only need resolution if any option other than "Total Temperature" is checked
             resol = float(self.parameter_inputs[0].GetValue())  #get resolution input as a float
@@ -286,7 +286,13 @@ class atmodel(wx.Frame):
             if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_bling.append('Atmospheric Radiance') #title depends on name of site chosen
                 if site == "Custom":  #find transmission file from custom site
-                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)  #open browser to select file
+                    # create window to let user know to pick the file
+                    message_dialog = wx.MessageDialog(self, message='Select file for site radiance')
+                    if message_dialog.ShowModal() == wx.ID_OK:
+                        message_dialog.Destroy()
+
+                    # open file browser
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                     if file_dialog.ShowModal() == wx.ID_OK:
                         self.site_rad = file_dialog.GetPath()
                         ar = ExcelReader(self.site_rad)
@@ -396,7 +402,13 @@ class atmodel(wx.Frame):
             if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_temp.append('Atmospheric Radiance') #title depends on name of site chosen
                 if site == "Custom":  #find transmission file from custom site
-                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)  #open browser to select file
+                    # create window to let user know to pick the file
+                    message_dialog = wx.MessageDialog(self, message='Select file for site radiance')
+                    if message_dialog.ShowModal() == wx.ID_OK:
+                        message_dialog.Destroy()
+
+                    # open file browser
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                     if file_dialog.ShowModal() == wx.ID_OK:
                         self.site_rad = file_dialog.GetPath()
                         ar = ExcelReader(self.site_rad)
@@ -433,14 +445,21 @@ class atmodel(wx.Frame):
                 title_temp = '[Total]'
 
 
+# Calculate Total Signal
         if self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[4].IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
 # Calculate Source Intensity
             d = float(self.parameter_inputs[1].GetValue())  #only need mirror diameter input if "Total Signal" is checked
             if source == "Custom":  #find file of custom source
-                file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)  #open browser to select file
+                # create window to let user know to pick the file
+                message_dialog = wx.MessageDialog(self, message='Select file for source')
+                if message_dialog.ShowModal() == wx.ID_OK:
+                    message_dialog.Destroy()
+
+                # open file browser
+                file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                 if file_dialog.ShowModal() == wx.ID_OK:
                     self.source = file_dialog.GetPath()
-                    at = ExcelReader(self.source)
+                    si = ExcelReader(self.source)
                 file_dialog.Destroy()
             else:  #if source not custom, find file
                 si = ExcelReader(file_refs.source_refs[source])  #find file of source galaxy
@@ -451,7 +470,13 @@ class atmodel(wx.Frame):
             
 # Calculate Total Signal
             if site == "Custom":  #find transmission file from custom site
-                file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)  #open browser to select file
+                # create window to let user know to pick the file
+                message_dialog = wx.MessageDialog(self, message='Select file for site transmission')
+                if message_dialog.ShowModal() == wx.ID_OK:
+                    message_dialog.Destroy()
+
+                # open file browser
+                file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                 if file_dialog.ShowModal() == wx.ID_OK:
                     self.site_trans = file_dialog.GetPath()
                     at = ExcelReader(self.site_trans)
@@ -472,7 +497,7 @@ class atmodel(wx.Frame):
             freq_THz = freq * 10 ** (-12)  #create array that converts "freq" into THz
 
 
-# plotting and writing file
+# Plotting and writing file
 # instead of having a plotter module, a plotting function is defined here so labels and titles are changeable
         def loglogplot(x, y):
             print "Start plotting..."
@@ -606,4 +631,5 @@ if __name__ == '__main__':
     app = wx.App()
     atmodel(None, title='Atmosphere Modeling for Telescope')
     app.MainLoop()
+
 
