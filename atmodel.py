@@ -110,7 +110,7 @@ class atmodel(wx.Frame):
         generate_label = wx.StaticText(panel, label='Generates:')
         generate_label.SetFont(font)  # Title
 
-        generates = ['Total Noise', 'Total Temperature', 'Total Signal', 'Limiting Flux', 'Integration time'] 
+        generates = ['Total Noise', 'Total Temperature', 'Total Signal', 'Integration time'] 
         self.generate_checkboxs = [wx.CheckBox(panel, label=generates[i]) for i in range(len(generates))]
 
         # Bottom_left -> Fill up contents
@@ -204,7 +204,7 @@ class atmodel(wx.Frame):
         freq_end = float(self.parameter_inputs[4].GetValue())  #get ending frequency input as a float
         #the other inputs are only required to have entries if they are needed in the calculation that is checked
 
-        if self.generate_checkboxs[0].IsChecked() or self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked() or self.generate_checkboxs[4].IsChecked():  #only need resolution if any option other than "Total Temperature" is checked
+        if self.generate_checkboxs[0].IsChecked() or self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only need resolution if any option other than "Total Temperature" is checked
             resol = float(self.parameter_inputs[0].GetValue())  #get resolution input as a float
 
         path = self.output_input.GetValue()  #get input as name of file to be written
@@ -213,7 +213,7 @@ class atmodel(wx.Frame):
 
 
 # Calculate BLING
-        if self.generate_checkboxs[0].IsChecked() or self.generate_checkboxs[4].IsChecked():  #only do BLING calculations if "Total Noise" or "Integration Time" is checked
+        if self.generate_checkboxs[0].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only do BLING calculations if "Total Noise" or "Integration Time" is checked
             start_time = time.time()  #begins clock for calculation time   
             bling_squared = 0  #checking boxes for different backgrounds will add values to this "bling_squared" array
                 #the squares of BLINGs are added up since the final result is equal to BLINGs added in quadrature
@@ -324,7 +324,6 @@ class atmodel(wx.Frame):
             bling_TOT = (bling_squared) ** 0.5  #"bling_squared" is the sum of the squared bling of each background so "bling_TOT" is the radical of "bling_squared" since the result is the BLINGS added in quadrature
             end_time = time.time()  #stops clock for calculation time
             print "BLING calculation DONE"
-            print bling_TOT
             print "Time used for BLING calculation: ", end_time - start_time, " seconds"
 
             if self.background_checkboxs[6].IsChecked():  #setting title to 'Noise[Total]' if all BLINGs are checked
@@ -446,7 +445,7 @@ class atmodel(wx.Frame):
 
 
 # Calculate Total Signal
-        if self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[4].IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
+        if self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
 # Calculate Source Intensity
             d = float(self.parameter_inputs[1].GetValue())  #only need mirror diameter input if "Total Signal" is checked
             if source == "Custom":  #find file of custom source
@@ -498,7 +497,7 @@ class atmodel(wx.Frame):
 
 
 # Plotting and writing file
-# instead of having a plotter module, a plotting function is defined here so labels and titles are changeable
+# instead of having a plotter module, a plotting function is defined here so the y-axis range is adjustable though it may be wiser to define this in a module
         def loglogplot(x, y):
             print "Start plotting..."
 ##            pos = np.where(np.abs(np.diff(y)) >= .0015)[0] + 1  #jumps over .0015 THz(1.5 GHz) are not connected
@@ -583,14 +582,8 @@ class atmodel(wx.Frame):
             xw.write_col('Total signal(W)', ts)
 
 
-#if "Limiting Flux" is checked            
-        if self.generate_checkboxs[3].IsChecked():
-        #    xw.write_col('Limiting Flux(W)', limiting_flux)
-            loglogplot(freq_THz, limiting_flux)
-
-
 #if "Integration Time" is checked
-        if self.generate_checkboxs[4].IsChecked():
+        if self.generate_checkboxs[3].IsChecked():
             ratio = float(self.parameter_inputs[5].GetValue())  #only need signal to noise ratio input if "Integration Time" is checked
 
             # draw plot
@@ -631,5 +624,3 @@ if __name__ == '__main__':
     app = wx.App()
     atmodel(None, title='Atmosphere Modeling for Telescope')
     app.MainLoop()
-
-
