@@ -228,11 +228,6 @@ def temp_AR(freq, rad):  #calculates antenna temperature for "Atmospheric Radian
         temp.append(antenna_temp)  #add calculated temperature to "temp" list
     temp = np.array(temp)  #turn "temp" list into "temp" array
     return temp
-    
-
-#Limiting_Flux
-def LF(freq, d, resol, ts):
-    return np.array(ts*resol/(2*np.pi*(d/2)**2*freq), dtype="float")
 
 
 def IT(bling_TOT, ratio, ts):  #calculates Integration Time
