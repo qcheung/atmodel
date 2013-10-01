@@ -44,7 +44,7 @@ class atmodel(wx.Frame):
                       'Specify Dependent Minimum: 10 to the', 'Specify Dependent Maximum: 10 to the']
         sites = ['13_7Km SOFIA', '30KmBalloon', '40KmBalloon', 'CCAT-0732g', 'CCAT-0978g', 'DomeA-01g', 'DomeA-014g', 'DomeC-015g',
                  'DomeC-024g', 'MaunaKea-1g', 'MaunaKea-15g', 'SantaBarbara-01g', 'SantaBarbara-30g', 'SouthPole-023g',
-                 'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Space', 'Custom']
+                 'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Custom']
         
         sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom']
         
