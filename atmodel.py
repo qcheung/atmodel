@@ -310,17 +310,32 @@ class atmodel(wx.Frame):
                 index = self.zodiacal_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which ecliptic coordinates are selected
                 if index == 0:  #if (g_long=0,g_lat=0) is selected
                     title_bling.append('Zodiacal Emission(g_long=0,g_lat=0)')
+                    ze = ExcelReader(file_refs.ZODI_refs[0])  #name excel file to read from, depending on coordinates chosen
                 if index == 1:  #if (g_long=0,g_lat=45) is selected
                     title_bling.append('Zodiacal Emission(g_long=0,g_lat=45)')
+                    ze = ExcelReader(file_refs.ZODI_refs[1])  #name excel file to read from, depending on coordinates chosen
                 if index == 2:  #if (g_long=0,g_lat=90) is selected
                     title_bling.append('Zodiacal Emission(g_long=0,g_lat=90)')
-                ze = ExcelReader(file_refs.ZODI_refs[index])  #name excel file to read from, depending on site chosen
+                    ze = ExcelReader(file_refs.ZODI_refs[2])  #name excel file to read from, depending on coordinates chosen
+                if index == 3:  #if "Custom" is selected
+                    title_bling.append('Zodiacal Emission')
+                    # create window to let user know to pick the file
+                    message_dialog = wx.MessageDialog(self, message='Select file for Zodiacal Temperature')
+                    if message_dialog.ShowModal() == wx.ID_OK:
+                        message_dialog.Destroy()
+
+                    # open file browser
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
+                    if file_dialog.ShowModal() == wx.ID_OK:
+                        self.zodi = file_dialog.GetPath()
+                        ze = ExcelReader(self.zodi)
+                    file_dialog.Destroy()
                 ze.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
                 freqNoise = np.array(ze.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
                 temp = np.array(ze.read_from_col(4), dtype='float')  #create array of temperature(K) from 5th column of excel file, reading as floats
                 bling_squared += cal.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Zodiacal Emission to "bling_squared"
-            
+
             bling_TOT = (bling_squared) ** 0.5  #"bling_squared" is the sum of the squared bling of each background so "bling_TOT" is the radical of "bling_squared" since the result is the BLINGS added in quadrature
             end_time = time.time()  #stops clock for calculation time
             print "BLING calculation DONE"
