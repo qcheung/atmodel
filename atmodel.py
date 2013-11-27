@@ -1,11 +1,22 @@
-import wx
-from excel import ExcelXWriter, ExcelReader
-import cal
-import const
-import numpy as np
-import file_refs
-import time
+#comments made by Quincy Cheung
 
+from scipy import interpolate
+import numpy as np
+import matplotlib.pyplot as plt
+import sys
+import xlrd
+import xlwt
+import wx
+import xlsxwriter
+import os
+import excel
+import gc
+import file_refs
+import cal
+import time
+import pylab
+import const
+from excel import ExcelXWriter, ExcelReader
 class atmodel(wx.Frame):
     def __init__(self, parent , title):
         super(atmodel, self).__init__(parent, title=title, size=(700, 550))
@@ -82,7 +93,7 @@ class atmodel(wx.Frame):
 
         # Top_right
         galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = +90', 'g_long = 0, g_lat = -90']
-        zodiacal_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = 90']
+        zodiacal_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = 90', 'Custom']
         thermal_mirror_materials = ['Be', 'Al', 'Au', 'Ag']
         
         # Top_right -> controls
@@ -335,7 +346,7 @@ class atmodel(wx.Frame):
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
                 temp = np.array(ze.read_from_col(4), dtype='float')  #create array of temperature(K) from 5th column of excel file, reading as floats
                 bling_squared += cal.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Zodiacal Emission to "bling_squared"
-
+            
             bling_TOT = (bling_squared) ** 0.5  #"bling_squared" is the sum of the squared bling of each background so "bling_TOT" is the radical of "bling_squared" since the result is the BLINGS added in quadrature
             end_time = time.time()  #stops clock for calculation time
             print "BLING calculation DONE"
@@ -515,9 +526,11 @@ class atmodel(wx.Frame):
 # instead of having a plotter module, a plotting function is defined here so the y-axis range is adjustable though it may be wiser to define this in a module
         def loglogplot(x, y):
             print "Start plotting..."
-##            pos = np.where(np.abs(np.diff(y)) >= .0015)[0] + 1  #jumps over .0015 THz(1.5 GHz) are not connected
-##            x = np.insert(x, pos, np.nan)  #replace values in "x" that correspond to nonpositives in "y" with "not a number"s
-##            y = np.insert(y, pos, np.nan)  #replace nonpositives in "y" with "not a number"s
+            pos = np.where(np.abs(np.diff(y)) >= .0015)[0] + 1  #jumps over .0015 THz(1.5 GHz) are not connected
+            x = np.insert(x, pos, np.nan)  #replace values in "x" that correspond to nonpositives in "y" with "not a number"s
+            y = np.insert(y, pos, np.nan)  #replace nonpositives in "y" with "not a number"s
+##            print("x is " + x)
+##            print("\ny is " + y)
             pylab.plot(x, y)
             pylab.xscale('log')
             pylab.yscale('log')
