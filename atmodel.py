@@ -1,4 +1,4 @@
-#comments made by Quincy Cheung
+#comments made by Aaron Guan, Lois Shen, Quincy Cheung
 
 from scipy import interpolate
 import numpy as np
@@ -17,14 +17,15 @@ import time
 import pylab
 import const
 from excel import ExcelXWriter, ExcelReader
+
 class atmodel(wx.Frame):
     def __init__(self, parent , title):
         super(atmodel, self).__init__(parent, title=title, size=(700, 550))
         self.InitUI()
         self.Centre()
         self.Show()     
-        
-    def InitUI(self):  #create GUI
+    # Set up GUI using wx
+    def InitUI(self):
         
         # Creating Panel 
         panel = wx.Panel(self)
@@ -44,25 +45,29 @@ class atmodel(wx.Frame):
         bottom_left = wx.BoxSizer(wx.VERTICAL)
         bottom_right = wx.BoxSizer(wx.VERTICAL)
         
-        # Top_left
+    # Top_left
         top_left_fgs = wx.FlexGridSizer(7, 2, 6, 6)  # declare FlexibleGridSizer
         
-        # Top_left -> parameters
+    # Top_left -> parameters
         parameters = ['Specify Parameters', 'Spectral Resolution:',
                       'Mirror Diameter(m):', 'Mirror Temperature(K):',
                       'Choose a Site:', 'Choose a Source:', 'Choose Backgrounds:',
                       'Specify Starting Frequency(THz)', 'Specify Ending Frequency(THz)', 'Signal to Noise Ratio',
                       'Specify Dependent Minimum: 10 to the', 'Specify Dependent Maximum: 10 to the']
+    
+        # Observation sites
         sites = ['13_7Km SOFIA', '30KmBalloon', '40KmBalloon', 'CCAT-0732g', 'CCAT-0978g', 'DomeA-01g', 'DomeA-014g', 'DomeC-015g',
                  'DomeC-024g', 'MaunaKea-1g', 'MaunaKea-15g', 'SantaBarbara-01g', 'SantaBarbara-30g', 'SouthPole-023g',
                  'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Custom']
-        
+    
+        # Source galaxies    
         sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom']
-        
+    
+        # Sources of noise    
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission',
                        'Atmospheric Radiance', 'Zodiacal Emission', 'Cumulative']
         
-        # Top_left -> Controls
+    # Top_left -> Controls
         parameter_labels = [wx.StaticText(panel, label=parameters[i]) for i in range(12)]
         self.parameter_inputs = [wx.TextCtrl(panel) for i in range(8)]
         self.parameter_site_combo = wx.ComboBox(panel, choices=sites, style=wx.CB_READONLY) 
@@ -74,6 +79,10 @@ class atmodel(wx.Frame):
         parameter_labels[0].SetFont(font)  # set a title font
         top_left_fgs.Add(parameter_labels[0], flag=wx.EXPAND | wx.BOTTOM, border=6)
         top_left_fgs.Add(wx.StaticText(panel), flag=wx.EXPAND)  # empty grid
+        
+        #each line represents a row in interface
+        #parameters are referenced above in the list "parameters"
+                            #left column: name of parameter     right column: text box/drop menu for user input
         top_left_fgs.AddMany([(parameter_labels[1], 0, wx.EXPAND), (self.parameter_inputs[0], 0, wx.EXPAND),
                               (parameter_labels[2], 0, wx.EXPAND), (self.parameter_inputs[1], 0, wx.EXPAND),
                               (parameter_labels[3], 0, wx.EXPAND), (self.parameter_inputs[2], 0, wx.EXPAND),
@@ -85,24 +94,28 @@ class atmodel(wx.Frame):
                               self.dependent_limits_checkbox, (wx.StaticText(panel, label='')),
                               (parameter_labels[10], 0, wx.EXPAND), (self.parameter_inputs[6], 0, wx.EXPAND),
                               (parameter_labels[11], 0, wx.EXPAND), (self.parameter_inputs[7], 0, wx.EXPAND)])
-                              #each line represents a row in interface
+                    
         top_left.Add(top_left_fgs, flag=wx.EXPAND)
 
         # Top_left -> Bind eventhandler
         # self.parameter_site_combo.Bind(wx.EVT_COMBOBOX, self.onCustom)
 
         # Top_right
+        #drop bars for extra details of background noise:
+        #ecliptic coordinates for Galactic/Zodiacal Emissions and mirror material for Thermal Mirror Emission
         galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = +90', 'g_long = 0, g_lat = -90']
         zodiacal_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = 90', 'Custom']
         thermal_mirror_materials = ['Be', 'Al', 'Au', 'Ag']
         
-        # Top_right -> controls
+    # Top_right -> controls
+        #create checkboxes and drop menus for background in the top right
         self.background_checkboxs = [wx.CheckBox(panel, label=backgrounds[i]) for i in range(len(backgrounds))]
         self.galactic_direction_combo = wx.ComboBox(panel, choices=galactic_directions, style=wx.CB_READONLY) 
         self.zodiacal_direction_combo = wx.ComboBox(panel, choices=zodiacal_directions, style=wx.CB_READONLY)
         self.thermal_mirror_material_combo = wx.ComboBox(panel, choices=thermal_mirror_materials, style=wx.CB_READONLY)
         
-        # Top_right -> fill up contents
+    # Top_right -> fill up contents
+        #label checkboxes and drop menus for backgroundes in top right
         top_right.Add(parameter_labels[6], flag=wx.BOTTOM, border=6)
         top_right.Add(self.background_checkboxs[0], flag=wx.BOTTOM, border=3)
         top_right.Add(self.background_checkboxs[1], flag=wx.BOTTOM, border=3)
@@ -115,42 +128,45 @@ class atmodel(wx.Frame):
         top_right.Add(self.zodiacal_direction_combo, flag=wx.LEFT, border=20)
         top_right.Add(self.background_checkboxs[6], flag=wx.BOTTOM, border=3)
         
-
-        # Bottom_left 
-        # Bottom_left -> Controls
+    # Bottom_left -> Controls
+        #create list of what calculation should be done
         generate_label = wx.StaticText(panel, label='Generates:')
         generate_label.SetFont(font)  # Title
 
         generates = ['Total Noise', 'Total Temperature', 'Total Signal', 'Integration time'] 
         self.generate_checkboxs = [wx.CheckBox(panel, label=generates[i]) for i in range(len(generates))]
 
-        # Bottom_left -> Fill up contents
+    # Bottom_left -> Fill up contents
         bottom_left.Add(generate_label, flag=wx.BOTTOM, border=10)
         for i in range(len(generates)):
             bottom_left.Add(self.generate_checkboxs[i], flag=wx.BOTTOM, border=3)
 
-        # Bottom_right
+    # Bottom_right
         # Bottom_right -> Output -> Controls
+        #create textbox for outputting a data file
+        #type in "name_of_file.type_of_file" and data will be written into it after generating plot
+        #output file will be created in same location as this python file
         output_sizer = wx.BoxSizer(wx.HORIZONTAL)
         output_label = wx.StaticText(panel, label='Output to:')
         self.output_input = wx.TextCtrl(panel, size=(200, 30))
         output_button = wx.Button(panel, size=(80, 30), label='Browse')
         
-        # Bottom_right -> Output -> Fill up contents
+    # Bottom_right -> Output -> Fill up contents
         bottom_right.Add(output_label, flag=wx.TOP, border=20)
         output_sizer.Add(self.output_input, flag=wx.EXPAND)
         output_sizer.Add(output_button)
         bottom_right.Add(output_sizer, flag=wx.BOTTOM, border=8)
 
-        # Bottom_right -> Buttons
+    # Bottom_right -> Buttons
+        #click generate to run calculation, create plot, and write output file
         generate_button = wx.Button(panel, label='Generate')
         cancel_button = wx.Button(panel, label='Cancel')
         
-        # Bottom_right -> Buttons -> Fill up
+    # Bottom_right -> Buttons -> Fill up
         bottom_right.Add(generate_button, flag=wx.EXPAND | wx.BOTTOM, border=3)
         bottom_right.Add(cancel_button, flag=wx.EXPAND)
 
-        # Bottom_right -> Function Bindings
+    # Bottom_right -> Function Bindings
         output_button.Bind(wx.EVT_BUTTON, self.onBrowse)
         generate_button.Bind(wx.EVT_BUTTON, self.onGenerate)
         cancel_button.Bind(wx.EVT_BUTTON, self.onCancel)
@@ -164,7 +180,7 @@ class atmodel(wx.Frame):
         content.Add(bottom, flag=wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
         panel.SetSizer(content)
 
-    def onCustom(self, e):
+    def onCustom(self, e): 
         # Generate frame and grid
         self.site_dialog = wx.Frame(self, title="Custom Site Files:", size=(300, 150)) 
         site_dialog_fgs = wx.FlexGridSizer(2, 3, 6, 6)  # declare FlexibleGridSizer
@@ -206,7 +222,7 @@ class atmodel(wx.Frame):
             self.output_input.WriteText(self.path)  
         file_dialog.Destroy()        
         
-    def onGenerate(self, e):
+    def onGenerate(self, e): #what follows are the functions
         
 # initialization -> Parse inputs
 
