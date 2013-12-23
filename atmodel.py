@@ -101,24 +101,31 @@ class atmodel(wx.Frame):
         # self.parameter_site_combo.Bind(wx.EVT_COMBOBOX, self.onCustom)
 
         # Top_right
-        #drop bars for extra details of background noise:
-        #ecliptic coordinates for Galactic/Zodiacal Emissions and mirror material for Thermal Mirror Emission
-        galactic_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = +90', 'g_long = 0, g_lat = -90']
-        zodiacal_directions = ['g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = 90', 'Custom']
-        thermal_mirror_materials = ['Be', 'Al', 'Au', 'Ag']
+        #drop bars to determine background noise file should be used:
+        file_choice = ['Last Used', "Default", "Choose New"] #Used for CIB, CMB, Atmospheric Radiance
+        #extra details needed for:
+        galactic_directions = ['Last Used', 'g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = +90', 'g_long = 0, g_lat = -90', 'Choose New'] #ecliptic coordinates for Galactic Emission
+        zodiacal_directions = ['Last Used', 'g_long = 0, g_lat = 0', 'g_long = 0, g_lat = 45', 'g_long = 0, g_lat = 90', 'Choose New'] #ecliptic coordinates for Zodiacal Emission
+        thermal_mirror_materials = ['Be', 'Al', 'Au', 'Ag'] #mirror material for Thermal Mirror Emission
+        
         
     # Top_right -> controls
         #create checkboxes and drop menus for background in the top right
         self.background_checkboxs = [wx.CheckBox(panel, label=backgrounds[i]) for i in range(len(backgrounds))]
+        self.CIB_file_choice = wx.ComboBox(panel, choices=file_choice, style=wx.CB_READONLY)
+        self.CMB_file_choice = wx.ComboBox(panel, choices=file_choice, style=wx.CB_READONLY)
         self.galactic_direction_combo = wx.ComboBox(panel, choices=galactic_directions, style=wx.CB_READONLY) 
-        self.zodiacal_direction_combo = wx.ComboBox(panel, choices=zodiacal_directions, style=wx.CB_READONLY)
         self.thermal_mirror_material_combo = wx.ComboBox(panel, choices=thermal_mirror_materials, style=wx.CB_READONLY)
+        self.zodiacal_direction_combo = wx.ComboBox(panel, choices=zodiacal_directions, style=wx.CB_READONLY)
+        #a drop bar is not necessary for "Atmospheric Radiance" since the file is chosen in "Choose a Site" on the left
         
     # Top_right -> fill up contents
         #label checkboxes and drop menus for backgroundes in top right
         top_right.Add(parameter_labels[6], flag=wx.BOTTOM, border=6)
         top_right.Add(self.background_checkboxs[0], flag=wx.BOTTOM, border=3)
+        top_right.Add(self.CIB_file_choice, flag=wx.LEFT, border=20)
         top_right.Add(self.background_checkboxs[1], flag=wx.BOTTOM, border=3)
+        top_right.Add(self.CMB_file_choice, flag=wx.LEFT, border=20)
         top_right.Add(self.background_checkboxs[2], flag=wx.BOTTOM, border=3)
         top_right.Add(self.galactic_direction_combo, flag=wx.LEFT, border=20)
         top_right.Add(self.background_checkboxs[3], flag=wx.BOTTOM | wx.TOP, border=3)
@@ -127,6 +134,7 @@ class atmodel(wx.Frame):
         top_right.Add(self.background_checkboxs[5], flag=wx.BOTTOM, border=3)
         top_right.Add(self.zodiacal_direction_combo, flag=wx.LEFT, border=20)
         top_right.Add(self.background_checkboxs[6], flag=wx.BOTTOM, border=3)
+        #CUMALATIVE NEEDS CUSTOM FEATURE
         
     # Bottom_left -> Controls
         #create list of what calculation should be done
@@ -248,6 +256,10 @@ class atmodel(wx.Frame):
 
 #if "Cosmic Infrared Background" box or "Cumulative" is checked
             if self.background_checkboxs[0].IsChecked() or self.background_checkboxs[6].IsChecked():
+##                index = self.CIB_file_choice.GetCurrentSelection()  #creates "index"=0, 1, & 2 depending on file for selection
+##                if index == 0:  #if "Last Used" is selected
+##                    ######NEED TO FIGURE OUT HOW TO DO THIS
+##                elif index == 1:  #if "Default" is selected, use default file in file_refs.py    
                 title_bling.append('Cosmic Infrared Background')
                 cib_excel = file_refs.CIB_ref  #name excel file to read from
                 cib = ExcelReader(cib_excel)
@@ -271,22 +283,49 @@ class atmodel(wx.Frame):
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
                 bling_squared += cal.bling_CMB(freqNoise, resol)  #calculate and add BLING(squared) of Cosmic Microwave Background to "bling_squared"
 
-#if "Galactic Emission" box or "Cumulative" is checked
+#if "Galactic Emission" or "Cumulative" box is checked
             if self.background_checkboxs[2].IsChecked() or self.background_checkboxs[6].IsChecked():
-                index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which ecliptic coordinates are selected 
-                if index == 0:  #if (g_long=0, g_lat=0) is selected
+                index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, 4, & 5 depending on file for selection 
+                if index == 0:  #if "Last Used" is selected
+                    title_bling.append('Galactic Emission')
+                    ######NEED TO FIGURE OUT HOW TO DO THIS
+                elif index == 1:  #if (g_long=0, g_lat=0) is selected, use the 1st default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=0)')
-                elif index == 1:  #if (g_long=0, g_lat=45) is selected
+                    ge = file_refs.Galatic_Emission_refs[0]  #index here(0) refers to file_refs.py not "self.galactic_direction_combo"
+                    
+                elif index == 2:  #if (g_long=0, g_lat=45) is selected, use the 2nd default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=45)')
-                elif index == 2:  #if (g_long=0, g_lat=90) is selected
+                    ge = file_refs.Galatic_Emission_refs[1]  #index here(1) refers to file_refs.py not "self.galactic_direction_combo"
+                elif index == 3:  #if (g_long=0, g_lat=90) is selected, use the 3rd default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=90)')
-                elif index == 3:  #if (g_long=0, g_lat=-90) is selected
+                    ge = file_refs.Galatic_Emission_refs[2]  #index here(2) refers to file_refs.py not "self.galactic_direction_combo"
+                elif index == 4:  #if (g_long=0, g_lat=-90) is selected, use the 4th default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=-90)')
-                ge = ExcelReader(file_refs.Galatic_Emission_refs[index])  #name excel file to read from
-                ge.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-                freqNoise = np.array(ge.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                    ge = file_refs.Galatic_Emission_refs[3]  #index here(3) refers to file_refs.py not "self.galactic_direction_combo"
+                elif index == 5:  #if "Choose New" is selected, open browser
+                    title_bling.append('Galactic Emission')
+                    # create window to let user know to pick the file
+                    message_dialog = wx.MessageDialog(self, message='Select file for Galactic Temperature')
+                    if message_dialog.ShowModal() == wx.ID_OK:
+                        message_dialog.Destroy()
+
+                    # open file browser
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
+                    if file_dialog.ShowModal() == wx.ID_OK:
+                        ge = file_dialog.GetPath()
+                    file_dialog.Destroy()
+
+                # save into "last used GE file.txt"
+                last_used = open("last used GE file.txt", "w")
+                last_used.write(str(ge))
+                last_used.close()
+
+                # perform calculations
+                GE = ExcelReader(ge)
+                GE.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(GE.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
-                temp = np.array(ge.read_from_col(8), dtype='float')  #create array of temperature(K) from 9th column of excel file, reading as floats
+                temp = np.array(GE.read_from_col(8), dtype='float')  #create array of temperature(K) from 9th column of excel file, reading as floats
                 bling_squared += cal.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Galactic Emission to "bling_squared"
 
 #if "Thermal Mirror Emission" or "Cumulative" box is checked 
