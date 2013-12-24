@@ -288,11 +288,11 @@ class atmodel(wx.Frame):
                 index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, 4, & 5 depending on file for selection 
                 if index == 0:  #if "Last Used" is selected
                     title_bling.append('Galactic Emission')
-                    ######NEED TO FIGURE OUT HOW TO DO THIS
+                    read_last_used = open("last used GE file.txt", "r") #read from "last used GE file.txt"
+                    ge = read_last_used.read()
                 elif index == 1:  #if (g_long=0, g_lat=0) is selected, use the 1st default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=0)')
                     ge = file_refs.Galatic_Emission_refs[0]  #index here(0) refers to file_refs.py not "self.galactic_direction_combo"
-                    
                 elif index == 2:  #if (g_long=0, g_lat=45) is selected, use the 2nd default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=45)')
                     ge = file_refs.Galatic_Emission_refs[1]  #index here(1) refers to file_refs.py not "self.galactic_direction_combo"
@@ -316,9 +316,9 @@ class atmodel(wx.Frame):
                     file_dialog.Destroy()
 
                 # save into "last used GE file.txt"
-                last_used = open("last used GE file.txt", "w")
-                last_used.write(str(ge))
-                last_used.close()
+                write_last_used = open("last used GE file.txt", "w")
+                write_last_used.write(str(ge))
+                write_last_used.close()
 
                 # perform calculations
                 GE = ExcelReader(ge)
