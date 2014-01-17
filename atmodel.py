@@ -58,10 +58,10 @@ class atmodel(wx.Frame):
         # Observation sites
         sites = ['13_7Km SOFIA', '30KmBalloon', '40KmBalloon', 'CCAT-0732g', 'CCAT-0978g', 'DomeA-01g', 'DomeA-014g', 'DomeC-015g',
                  'DomeC-024g', 'MaunaKea-1g', 'MaunaKea-15g', 'SantaBarbara-01g', 'SantaBarbara-30g', 'SouthPole-023g',
-                 'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Custom']
+                 'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Choose New', "Last Used"]
     
         # Source galaxies    
-        sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Custom']
+        sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Choose New', "Last Used"]
     
         # Sources of noise    
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission',
@@ -274,21 +274,44 @@ class atmodel(wx.Frame):
 
 #if "Cosmic Microwave Background" or "Cumulative" box is checked
             if self.background_checkboxs[1].IsChecked() or self.background_checkboxs[6].IsChecked():
-                title_bling.append('Cosmic Microwave Background')
-                cmb_excel = file_refs.CMB_ref  #name excel file to read from
-                cmb = ExcelReader(cmb_excel)
-                cmb.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-                print "Reading array from", cmb_excel
-                freqNoise = np.array(cmb.read_from_col(1), dtype="float")  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                title_bling.append('Cosmic Microwave Background')                
+                index = self.CMB_file_choice.GetCurrentSelection()  #creates "index"=0, 1, or 2 depending on file for selection               
+                if index == 0:  #if "Last Used" is selected
+                    read_last_used = open("last used CMB file.txt", "r")  #read from "last used GE file.txt"
+                    cmb = read_last_used.read()
+                elif index == 1:  #if "Default" is selected, use default file in file_refs.py
+                    cmb = file_refs.CMB_ref
+                elif index == 2:  #if "Choose New" is selected, open browser
+                     # create window to let user know to pick the file
+                    message_dialog = wx.MessageDialog(self, message='Select file for Cosmic Microwave Background')
+                    if message_dialog.ShowModal() == wx.ID_OK:
+                        message_dialog.Destroy()
+
+                    # open file browser
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
+                    if file_dialog.ShowModal() == wx.ID_OK:
+                        cmb = file_dialog.GetPath()
+                    file_dialog.Destroy()
+
+                # save into "last used CMB file.txt"
+                write_last_used = open("last used CMB file.txt", "w")
+                write_last_used.write(str(cmb))
+                write_last_used.close()
+                
+                # perform calculations
+                CMB = ExcelReader(cmb)
+                CMB.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                print "Reading array from", cmb
+                freqNoise = np.array(CMB.read_from_col(1), dtype="float")  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
                 bling_squared += cal.bling_CMB(freqNoise, resol)  #calculate and add BLING(squared) of Cosmic Microwave Background to "bling_squared"
 
 #if "Galactic Emission" or "Cumulative" box is checked
             if self.background_checkboxs[2].IsChecked() or self.background_checkboxs[6].IsChecked():
-                index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, 4, & 5 depending on file for selection 
+                index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, 4, or 5 depending on file for selection 
                 if index == 0:  #if "Last Used" is selected
                     title_bling.append('Galactic Emission')
-                    read_last_used = open("last used GE file.txt", "r") #read from "last used GE file.txt"
+                    read_last_used = open("last used GE file.txt", "r")  #read from "last used GE file.txt"
                     ge = read_last_used.read()
                 elif index == 1:  #if (g_long=0, g_lat=0) is selected, use the 1st default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=0)')
@@ -373,17 +396,21 @@ class atmodel(wx.Frame):
 
 #if "Zodiacial Emission" or "Cumulative" box is checked
             if self.background_checkboxs[5].IsChecked() or self.background_checkboxs[6].IsChecked():
-                index = self.zodiacal_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which ecliptic coordinates are selected
-                if index == 0:  #if (g_long=0,g_lat=0) is selected
+                index = self.zodiacal_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, or 4 depending on which ecliptic coordinates are selected
+                if index == 0:  #if "Last Used" is selected
+                    title_bling.append('Zodiacal Emission')
+                    read_last_used = open("last used ZE file.txt", "r")  #read from "last used ZE file.txt"
+                    ze = read_last_used.read()
+                if index == 1:  #if (g_long=0,g_lat=0) is selected, use the 1st default file in file_refs.py
                     title_bling.append('Zodiacal Emission(g_long=0,g_lat=0)')
-                    ze = ExcelReader(file_refs.ZODI_refs[0])  #name excel file to read from, depending on coordinates chosen
-                if index == 1:  #if (g_long=0,g_lat=45) is selected
+                    ze = file_refs.ZODI_refs[0]  #index here(0) refers to file_refs.py not "self.zodiacal_direction_combo"
+                if index == 2:  #if (g_long=0,g_lat=45) is selected, use the 2nd default file in file_refs.py
                     title_bling.append('Zodiacal Emission(g_long=0,g_lat=45)')
-                    ze = ExcelReader(file_refs.ZODI_refs[1])  #name excel file to read from, depending on coordinates chosen
-                if index == 2:  #if (g_long=0,g_lat=90) is selected
+                    ze = file_refs.ZODI_refs[1]  #index here(1) refers to file_refs.py not "self.zodiacal_direction_combo"
+                if index == 3:  #if (g_long=0,g_lat=90) is selected, use the 3rd default file in file_refs.py
                     title_bling.append('Zodiacal Emission(g_long=0,g_lat=90)')
-                    ze = ExcelReader(file_refs.ZODI_refs[2])  #name excel file to read from, depending on coordinates chosen
-                if index == 3:  #if "Custom" is selected
+                    ze = file_refs.ZODI_refs[2]  #index here(2) refers to file_refs.py not "self.zodiacal_direction_combo"
+                if index == 4:  #if "Choose New" is selected
                     title_bling.append('Zodiacal Emission')
                     # create window to let user know to pick the file
                     message_dialog = wx.MessageDialog(self, message='Select file for Zodiacal Temperature')
@@ -393,13 +420,20 @@ class atmodel(wx.Frame):
                     # open file browser
                     file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                     if file_dialog.ShowModal() == wx.ID_OK:
-                        self.zodi = file_dialog.GetPath()
-                        ze = ExcelReader(self.zodi)
+                        ze = file_dialog.GetPath()
                     file_dialog.Destroy()
-                ze.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-                freqNoise = np.array(ze.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                    
+                # save into "last used ZE file.txt"
+                write_last_used = open("last used ZE file.txt", "w")
+                write_last_used.write(str(ze))
+                write_last_used.close()
+
+                # perform calculations
+                ZE = ExcelReader(ze)
+                ZE.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(ZE.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
-                temp = np.array(ze.read_from_col(4), dtype='float')  #create array of temperature(K) from 5th column of excel file, reading as floats
+                temp = np.array(ZE.read_from_col(4), dtype='float')  #create array of temperature(K) from 5th column of excel file, reading as floats
                 bling_squared += cal.bling_sub(freqNoise, temp, resol)  #calculate and add BLING(squared) of Zodiacal Emission to "bling_squared"
             
             bling_TOT = (bling_squared) ** 0.5  #"bling_squared" is the sum of the squared bling of each background so "bling_TOT" is the radical of "bling_squared" since the result is the BLINGS added in quadrature
@@ -431,31 +465,77 @@ class atmodel(wx.Frame):
 
 #if "Cosmic Microwave Background" box is checked
             if self.background_checkboxs[1].IsChecked() or self.background_checkboxs[6].IsChecked():
-                title_temp.append('Cosmic Microwave Background')
-                cmb_excel = file_refs.CMB_ref  #name excel file to read from
-                cmb = ExcelReader(cmb_excel)
-                cmb.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-                print "Reading array from", cmb_excel
-                freqNoise = np.array(cmb.read_from_col(1), dtype="float")  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                if self.background_checkboxs[1].IsChecked() or self.background_checkboxs[6].IsChecked():
+                    title_temp.append('Cosmic Microwave Background')                
+                    index = self.CMB_file_choice.GetCurrentSelection()  #creates "index"=0, 1, or 2 depending on file for selection               
+                if index == 0:  #if "Last Used" is selected
+                    read_last_used = open("last used CMB file.txt", "r")  #read from "last used GE file.txt"
+                    cmb = read_last_used.read()
+                elif index == 1:  #if "Default" is selected, use default file in file_refs.py
+                    cmb = file_refs.CMB_ref
+                elif index == 2:  #if "Choose New" is selected, open browser
+                     # create window to let user know to pick the file
+                    message_dialog = wx.MessageDialog(self, message='Select file for Cosmic Microwave Background')
+                    if message_dialog.ShowModal() == wx.ID_OK:
+                        message_dialog.Destroy()
+
+                    # open file browser
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
+                    if file_dialog.ShowModal() == wx.ID_OK:
+                        cmb = file_dialog.GetPath()
+                    file_dialog.Destroy()
+
+                # save into "last used CMB file.txt"
+                write_last_used = open("last used CMB file.txt", "w")
+                write_last_used.write(str(cmb))
+                write_last_used.close()
+                
+                # perform calculations
+                CMB = ExcelReader(cmb)                
+                CMB.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                print "Reading array from", cmb
+                freqNoise = np.array(CMB.read_from_col(1), dtype="float")  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
                 temperature += cal.temp_CMB(freqNoise)  #calculate and add temperature of Cosmic Microwave Background to "temperature"
 
 #if "Galactic Emission" box is checked
             if self.background_checkboxs[2].IsChecked() or self.background_checkboxs[6].IsChecked():
-                index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, or 4 depending on which ecliptic coordinates are selected 
-                if index == 0:  #if (g_long=0, g_lat=0) is selected
-                    title_temp.append('Galactic Emission(g_long=0, g_lat=0)')
-                elif index == 1:  #if (g_long=0, g_lat=45) is selected
-                    title_temp.append('Galactic Emission(g_long=0, g_lat=45)')
-                elif index == 2:  #if (g_long=0, g_lat=90) is selected
-                    title_temp.append('Galactic Emission(g_long=0, g_lat=90)')
-                elif index == 3:  #if (g_long=0, g_lat=-90) is selected
-                    title_temp.append('Galactic Emission(g_long=0, g_lat=-90)')
-                ge = ExcelReader(file_refs.Galatic_Emission_refs[index])  #name excel file to read from
-                ge.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-                freqNoise = np.array(ge.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                index = self.galactic_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, 4, or 5 depending on file for selection 
+                if index == 0:  #if "Last Used" is selected
+                    title_bling.append('Galactic Emission')
+                    read_last_used = open("last used GE file.txt", "r")  #read from "last used GE file.txt"
+                    ge = read_last_used.read()
+                elif index == 1:  #if (g_long=0, g_lat=0) is selected, use the 1st default file in file_refs.py
+                    title_bling.append('Galactic Emission(g_long=0, g_lat=0)')
+                    ge = file_refs.Galatic_Emission_refs[0]  #index here(0) refers to file_refs.py not "self.galactic_direction_combo"
+                elif index == 2:  #if (g_long=0, g_lat=45) is selected, use the 2nd default file in file_refs.py
+                    title_bling.append('Galactic Emission(g_long=0, g_lat=45)')
+                    ge = file_refs.Galatic_Emission_refs[1]  #index here(1) refers to file_refs.py not "self.galactic_direction_combo"
+                elif index == 3:  #if (g_long=0, g_lat=90) is selected, use the 3rd default file in file_refs.py
+                    title_bling.append('Galactic Emission(g_long=0, g_lat=90)')
+                    ge = file_refs.Galatic_Emission_refs[2]  #index here(2) refers to file_refs.py not "self.galactic_direction_combo"
+                elif index == 4:  #if (g_long=0, g_lat=-90) is selected, use the 4th default file in file_refs.py
+                    title_bling.append('Galactic Emission(g_long=0, g_lat=-90)')
+                    ge = file_refs.Galatic_Emission_refs[3]  #index here(3) refers to file_refs.py not "self.galactic_direction_combo"
+                elif index == 5:  #if "Choose New" is selected, open browser
+                    title_bling.append('Galactic Emission')
+                    # create window to let user know to pick the file
+                    message_dialog = wx.MessageDialog(self, message='Select file for Galactic Temperature')
+                    if message_dialog.ShowModal() == wx.ID_OK:
+                        message_dialog.Destroy()
+
+                    # open file browser
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
+                    if file_dialog.ShowModal() == wx.ID_OK:
+                        ge = file_dialog.GetPath()
+                    file_dialog.Destroy()
+
+                # perform calculations
+                GE = ExcelReader(ge)
+                GE.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(GE.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
-                temp = np.array(ge.read_from_col(8), dtype='float')  #create array of temperature(K) from 9th column of excel file, reading as floats
+                temp = np.array(GE.read_from_col(8), dtype='float')  #create array of temperature(K) from 9th column of excel file, reading as floats
                 temperature += temp  #no calculations are needed to add temperature of Galactic Emission to "temperature"
 
 #if "Thermal Mirror Emission" box is checked 
@@ -480,7 +560,7 @@ class atmodel(wx.Frame):
 
 #if "Atmospheric Radiance" box is checked
             if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():
-                title_temp.append('Atmospheric Radiance') #title depends on name of site chosen
+                title_temp.append('Atmospheric Radiance')  #title depends on name of site chosen
                 if site == "Custom":  #find transmission file from custom site
                     # create window to let user know to pick the file
                     message_dialog = wx.MessageDialog(self, message='Select file for site radiance')
@@ -503,18 +583,44 @@ class atmodel(wx.Frame):
 
 #if "Zodiacial Emission" box is checked
             if self.background_checkboxs[5].IsChecked() or self.background_checkboxs[6].IsChecked():
-                index = self.zodiacal_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which ecliptic coordinates are selected
-                if index == 0:  #if (g_long=0,g_lat=0) is selected
+                index = self.zodiacal_direction_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, 3, or 4 depending on which ecliptic coordinates are selected
+                if index == 0:  #if "Last Used" is selected
+                    title_temp.append('Zodiacal Emission')
+                    read_last_used = open("last used ZE file.txt", "r")  #read from "last used ZE file.txt"
+                    ze = read_last_used.read()
+                if index == 1:  #if (g_long=0,g_lat=0) is selected, use the 1st default file in file_refs.py
                     title_temp.append('Zodiacal Emission(g_long=0,g_lat=0)')
-                if index == 1:  #if (g_long=0,g_lat=45) is selected
+                    ze = file_refs.ZODI_refs[0]  #index here(0) refers to file_refs.py not "self.zodiacal_direction_combo"
+                if index == 2:  #if (g_long=0,g_lat=45) is selected, use the 2nd default file in file_refs.py
                     title_temp.append('Zodiacal Emission(g_long=0,g_lat=45)')
-                if index == 2:  #if (g_long=0,g_lat=90) is selected
+                    ze = file_refs.ZODI_refs[1]  #index here(1) refers to file_refs.py not "self.zodiacal_direction_combo"
+                if index == 3:  #if (g_long=0,g_lat=90) is selected, use the 3rd default file in file_refs.py
                     title_temp.append('Zodiacal Emission(g_long=0,g_lat=90)')
-                ze = ExcelReader(file_refs.ZODI_refs[index])  #name excel file to read from, depending on site chosen
-                ze.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-                freqNoise = np.array(ze.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                    ze = file_refs.ZODI_refs[2]  #index here(2) refers to file_refs.py not "self.zodiacal_direction_combo"
+                if index == 4:  #if "Choose New" is selected
+                    title_temp.append('Zodiacal Emission')
+                    # create window to let user know to pick the file
+                    message_dialog = wx.MessageDialog(self, message='Select file for Zodiacal Temperature')
+                    if message_dialog.ShowModal() == wx.ID_OK:
+                        message_dialog.Destroy()
+
+                    # open file browser
+                    file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
+                    if file_dialog.ShowModal() == wx.ID_OK:
+                        ze = file_dialog.GetPath()
+                    file_dialog.Destroy()
+                    
+                # save into "last used ZE file.txt"
+                write_last_used = open("last used ZE file.txt", "w")
+                write_last_used.write(str(ze))
+                write_last_used.close()
+
+                # perform calculations
+                ZE = ExcelReader(ze)                
+                ZE.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(ZE.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
-                temp = np.array(ze.read_from_col(4), dtype='float')  #create array of temperature(K) from 5th column of excel file, reading as floats
+                temp = np.array(ZE.read_from_col(4), dtype='float')  #create array of temperature(K) from 5th column of excel file, reading as floats
                 temperature += temp  #no calculations are needed to add temperature of Zodiacal Emission to "temperature"
             
             end_time = time.time()  #stops clock for calculation time
@@ -529,7 +635,7 @@ class atmodel(wx.Frame):
         if self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
 # Calculate Source Intensity
             d = float(self.parameter_inputs[1].GetValue())  #only need mirror diameter input if "Total Signal" is checked
-            if source == "Custom":  #find file of custom source
+            if source == "Choose New":  #find file of custom source
                 # create window to let user know to pick the file
                 message_dialog = wx.MessageDialog(self, message='Select file for source')
                 if message_dialog.ShowModal() == wx.ID_OK:
@@ -539,14 +645,25 @@ class atmodel(wx.Frame):
                 file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                 if file_dialog.ShowModal() == wx.ID_OK:
                     self.source = file_dialog.GetPath()
-                    si = ExcelReader(self.source)
+                    si = self.source
                 file_dialog.Destroy()
-            else:  #if source not custom, find file
-                si = ExcelReader(file_refs.source_refs[source])  #find file of source galaxy
-            si.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-            freq = np.array(si.read_from_col(1), dtype='float')  #create list of frequency(Hz) from 2nd column of excel file
-            inte = np.array(si.read_from_col(5), dtype='float')  #create list of intensity(Jy) from 6th column of excel file, reading as floats
+            elif source == "Last Used":
+                read_last_used = open("last used SI file.txt", "r") #read from "last used SI file.txt"
+                si = read_last_used.read()
+            else:  #if source not custom, find file in file_refs.py
+                si = file_refs.source_refs[source]  #find file of source galaxy
+            
+            # perform calculations
+            SI = ExcelReader(si)
+            SI.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+            freq = np.array(SI.read_from_col(1), dtype='float')  #create list of frequency(Hz) from 2nd column of excel file
+            inte = np.array(SI.read_from_col(5), dtype='float')  #create list of intensity(Jy) from 6th column of excel file, reading as floats
             print "Reading from source. DONE"
+            
+            # save into "last used SI file.txt"
+            write_last_used = open("last used SI file.txt", "w")
+            write_last_used.write(str(si))
+            write_last_used.close()
             
 # Calculate Total Signal
             if site == "Custom":  #find transmission file from custom site
@@ -584,8 +701,8 @@ class atmodel(wx.Frame):
             pos = np.where(np.abs(np.diff(y)) >= .0015)[0] + 1  #jumps over .0015 THz(1.5 GHz) are not connected
             x = np.insert(x, pos, np.nan)  #replace values in "x" that correspond to nonpositives in "y" with "not a number"s
             y = np.insert(y, pos, np.nan)  #replace nonpositives in "y" with "not a number"s
-##            print("x is " + x)
-##            print("\ny is " + y)
+            #for reason yet to be determined, the preceding 3 lines don't work with "Integration Time" so that calculation has its own plotting function            
+            
             pylab.plot(x, y)
             pylab.xscale('log')
             pylab.yscale('log')
@@ -671,7 +788,18 @@ class atmodel(wx.Frame):
 
             # draw plot
             integration_time = cal.IT(bling_TOT, ratio, ts)  #returns array of integration time after signal and BLING are calculated
-            loglogplot(freq_THz, integration_time)  #plot of integration time is log(base 10)-scaled
+            print "Integration Time is " + str(integration_time)            
+            # don't use "loglogplot" function because it doesn't work with "Integration Time"
+            pylab.plot(freq_THz, integration_time)
+            pylab.xscale('log')
+            pylab.yscale('log')
+            pylab.xlim(freq_start, freq_end)  #define x-axis range by inputs
+            if self.dependent_limits_checkbox.IsChecked():  #if "Manually Input Range of Dependent Axis" box is checked, values must be input for following 2 boxes
+                start_magnitude = float(self.parameter_inputs[6].GetValue())  #get order of magnitude for y-axis minumum
+                dep_start = 10 ** start_magnitude  #turn order of magnitude into value of minimum
+                end_magnitude = float(self.parameter_inputs[7].GetValue())  #get order of magnitude for y-axis maximum
+                dep_end = 10 ** end_magnitude  #turn order of magnitude into value of maximum
+                pylab.ylim(dep_start, dep_end)            
             pylab.ylabel("Integration Time(sec)")
             pylab.xlabel("Frequency(THz)")
             title = "Integration time vs. Frequency at " + str(site) + " from " + str(source) + ".\nSpectral Resolution is " + str(resol) + " and frequency is from " + str(freq_start) + " to " + str(freq_end) + "THz.\nSignal to Noise ratio is " + str(ratio) + " and mirror diameter is " + str(d) + "m."
@@ -687,7 +815,10 @@ class atmodel(wx.Frame):
             xw.write_col('freq(Hz)', freq)
             xw.write_col('freq(THz)', freq_THz)
             xw.write_col('wavelength(um)', (3 * 10**8) / freq * 10**6)
+            xw.write_col('BLING(W*Hz^(-1/2))', bling_TOT)
+            xw.write_col('Signal(W)', ts)
             xw.write_col('Integration Time(s)', integration_time)
+
             
         # xw.save()
         print "Plotting. DONE"
