@@ -17,6 +17,7 @@ import time
 import pylab
 import const
 from excel import ExcelXWriter, ExcelReader
+import config
 
 class atmodel(wx.Frame):
     def __init__(self, parent , title):
@@ -69,7 +70,16 @@ class atmodel(wx.Frame):
         
     # Top_left -> Controls
         parameter_labels = [wx.StaticText(panel, label=parameters[i]) for i in range(12)]
-        self.parameter_inputs = [wx.TextCtrl(panel) for i in range(8)]
+        
+        self.input_SpecRes = wx.TextCtrl(panel, value=config.SpecRes_Default)
+        self.input_MirrorDiam = wx.TextCtrl(panel, value=config.MirrorDiam_Default)
+        self.input_MirrorTemp = wx.TextCtrl(panel, value=config.MirrorTemp_Default)
+        self.input_StartFreq = wx.TextCtrl(panel, value=config.StartFreq_Default)
+        self.input_StopFreq = wx.TextCtrl(panel, value=config.StopFreq_Default)
+        self.input_SigNoise = wx.TextCtrl(panel, value=config.SigNoise_Default)
+        self.input_DependMin = wx.TextCtrl(panel, value=config.DependMin_Default)
+        self.input_DependMax = wx.TextCtrl(panel, value=config.DependMax_Default)
+        
         self.parameter_site_combo = wx.ComboBox(panel, choices=sites, style=wx.CB_READONLY) 
         self.parameter_source_combo = wx.ComboBox(panel, choices=sources, style=wx.CB_READONLY)
 
@@ -83,17 +93,17 @@ class atmodel(wx.Frame):
         #each line represents a row in interface
         #parameters are referenced above in the list "parameters"
                             #left column: name of parameter     right column: text box/drop menu for user input
-        top_left_fgs.AddMany([(parameter_labels[1], 0, wx.EXPAND), (self.parameter_inputs[0], 0, wx.EXPAND),
-                              (parameter_labels[2], 0, wx.EXPAND), (self.parameter_inputs[1], 0, wx.EXPAND),
-                              (parameter_labels[3], 0, wx.EXPAND), (self.parameter_inputs[2], 0, wx.EXPAND),
+        top_left_fgs.AddMany([(parameter_labels[1], 0, wx.EXPAND), (self.input_SpecRes, 0, wx.EXPAND),
+                              (parameter_labels[2], 0, wx.EXPAND), (self.input_MirrorDiam, 0, wx.EXPAND),
+                              (parameter_labels[3], 0, wx.EXPAND), (self.input_MirrorTemp, 0, wx.EXPAND),
                               (parameter_labels[4], 0, wx.EXPAND), (self.parameter_site_combo, 0, wx.EXPAND),
                               (parameter_labels[5], 0, wx.EXPAND), (self.parameter_source_combo, 0, wx.EXPAND),
-                              (parameter_labels[7], 0, wx.EXPAND), (self.parameter_inputs[3], 0, wx.EXPAND),
-                              (parameter_labels[8], 0, wx.EXPAND), (self.parameter_inputs[4], 0, wx.EXPAND),
-                              (parameter_labels[9], 0, wx.EXPAND), (self.parameter_inputs[5], 0, wx.EXPAND),
+                              (parameter_labels[7], 0, wx.EXPAND), (self.input_StartFreq, 0, wx.EXPAND),
+                              (parameter_labels[8], 0, wx.EXPAND), (self.input_StopFreq, 0, wx.EXPAND),
+                              (parameter_labels[9], 0, wx.EXPAND), (self.input_SigNoise, 0, wx.EXPAND),
                               self.dependent_limits_checkbox, (wx.StaticText(panel, label='')),
-                              (parameter_labels[10], 0, wx.EXPAND), (self.parameter_inputs[6], 0, wx.EXPAND),
-                              (parameter_labels[11], 0, wx.EXPAND), (self.parameter_inputs[7], 0, wx.EXPAND)])
+                              (parameter_labels[10], 0, wx.EXPAND), (self.input_DependMin, 0, wx.EXPAND),
+                              (parameter_labels[11], 0, wx.EXPAND), (self.input_DependMax, 0, wx.EXPAND)])
                     
         top_left.Add(top_left_fgs, flag=wx.EXPAND)
 
