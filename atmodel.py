@@ -245,12 +245,12 @@ class atmodel(wx.Frame):
 # initialization -> Parse inputs
 
         #There must be inputs for resolution, starting frequency, and ending frequency
-        freq_start = float(self.parameter_inputs[3].GetValue())  #get starting frequency input as a float
-        freq_end = float(self.parameter_inputs[4].GetValue())  #get ending frequency input as a float
+        freq_start = float(self.input_StartFreq.GetValue())  #get starting frequency input as a float
+        freq_end = float(self.input_StopFreq.GetValue())  #get ending frequency input as a float
         #the other inputs are only required to have entries if they are needed in the calculation that is checked
 
         if self.generate_checkboxs[0].IsChecked() or self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only need resolution if any option other than "Total Temperature" is checked
-            resol = float(self.parameter_inputs[0].GetValue())  #get resolution input as a float
+            resol = float(self.input_SpecRes.GetValue())  #get resolution input as a float
 
         path = self.output_input.GetValue()  #get input as name of file to be written
         site = self.parameter_site_combo.GetValue()  #get name of chosen site
@@ -363,7 +363,7 @@ class atmodel(wx.Frame):
 
 #if "Thermal Mirror Emission" or "Cumulative" box is checked 
             if self.background_checkboxs[3].IsChecked() or self.background_checkboxs[6].IsChecked():
-                mirror_temp = float(self.parameter_inputs[2].GetValue())  #only need mirror temperature input if "Thermal Mirror Emission" is checked
+                mirror_temp = float(self.input_MirrorTemp.GetValue())  #only need mirror temperature input if "Thermal Mirror Emission" is checked
                 index = self.thermal_mirror_material_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which material is selected
                 if index == 0:  #if "Be" is selected
                     title_bling.append('Thermal Mirror Emission(Beryllium)')
@@ -550,7 +550,7 @@ class atmodel(wx.Frame):
 
 #if "Thermal Mirror Emission" box is checked 
             if self.background_checkboxs[3].IsChecked() or self.background_checkboxs[6].IsChecked():
-                mirror_temp = float(self.parameter_inputs[2].GetValue())  #only need mirror temperature input if "Thermal Mirror Emission" is checked
+                mirror_temp = float(self.input_MirrorTemp.GetValue())  #only need mirror temperature input if "Thermal Mirror Emission" is checked
                 index = self.thermal_mirror_material_combo.GetCurrentSelection()  #creates "index"=0, 1, 2, or 3 depending on which material is selected
                 if index == 0:  #if "Be" is selected
                     title_temp.append('Thermal Mirror Emission(Beryllium)')
@@ -644,7 +644,7 @@ class atmodel(wx.Frame):
 # Calculate Total Signal
         if self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
 # Calculate Source Intensity
-            d = float(self.parameter_inputs[1].GetValue())  #only need mirror diameter input if "Total Signal" is checked
+            d = float(self.input_MirrorDiam.GetValue())  #only need mirror diameter input if "Total Signal" is checked
             if source == "Choose New":  #find file of custom source
                 # create window to let user know to pick the file
                 message_dialog = wx.MessageDialog(self, message='Select file for source')
@@ -718,9 +718,9 @@ class atmodel(wx.Frame):
             pylab.yscale('log')
             pylab.xlim(freq_start, freq_end)  #define x-axis range by inputs
             if self.dependent_limits_checkbox.IsChecked():  #if "Manually Input Range of Dependent Axis" box is checked, values must be input for following 2 boxes
-                start_magnitude = float(self.parameter_inputs[6].GetValue())  #get order of magnitude for y-axis minumum
+                start_magnitude = float(self.input_DependMin.GetValue())  #get order of magnitude for y-axis minumum
                 dep_start = 10 ** start_magnitude  #turn order of magnitude into value of minimum
-                end_magnitude = float(self.parameter_inputs[7].GetValue())  #get order of magnitude for y-axis maximum
+                end_magnitude = float(self.input_DependMax.GetValue())  #get order of magnitude for y-axis maximum
                 dep_end = 10 ** end_magnitude  #turn order of magnitude into value of maximum
                 pylab.ylim(dep_start, dep_end)
 
@@ -794,7 +794,7 @@ class atmodel(wx.Frame):
 
 #if "Integration Time" is checked
         if self.generate_checkboxs[3].IsChecked():
-            ratio = float(self.parameter_inputs[5].GetValue())  #only need signal to noise ratio input if "Integration Time" is checked
+            ratio = float(self.input_SigNoise.GetValue())  #only need signal to noise ratio input if "Integration Time" is checked
 
             # draw plot
             integration_time = cal.IT(bling_TOT, ratio, ts)  #returns array of integration time after signal and BLING are calculated
@@ -805,9 +805,9 @@ class atmodel(wx.Frame):
             pylab.yscale('log')
             pylab.xlim(freq_start, freq_end)  #define x-axis range by inputs
             if self.dependent_limits_checkbox.IsChecked():  #if "Manually Input Range of Dependent Axis" box is checked, values must be input for following 2 boxes
-                start_magnitude = float(self.parameter_inputs[6].GetValue())  #get order of magnitude for y-axis minumum
+                start_magnitude = float(self.input_DependMin.GetValue())  #get order of magnitude for y-axis minumum
                 dep_start = 10 ** start_magnitude  #turn order of magnitude into value of minimum
-                end_magnitude = float(self.parameter_inputs[7].GetValue())  #get order of magnitude for y-axis maximum
+                end_magnitude = float(self.input_DependMax.GetValue())  #get order of magnitude for y-axis maximum
                 dep_end = 10 ** end_magnitude  #turn order of magnitude into value of maximum
                 pylab.ylim(dep_start, dep_end)            
             pylab.ylabel("Integration Time(sec)")
