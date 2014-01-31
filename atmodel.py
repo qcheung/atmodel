@@ -57,12 +57,12 @@ class atmodel(wx.Frame):
                       'Specify Dependent Minimum: 10 to the', 'Specify Dependent Maximum: 10 to the']
     
         # Observation sites
-        sites = ['13_7Km SOFIA', '30KmBalloon', '40KmBalloon', 'CCAT-0732g', 'CCAT-0978g', 'DomeA-01g', 'DomeA-014g', 'DomeC-015g',
+        sites = ["Last Used", '13_7Km SOFIA', '30KmBalloon', '40KmBalloon', 'CCAT-0732g', 'CCAT-0978g', 'DomeA-01g', 'DomeA-014g', 'DomeC-015g',
                  'DomeC-024g', 'MaunaKea-1g', 'MaunaKea-15g', 'SantaBarbara-01g', 'SantaBarbara-30g', 'SouthPole-023g',
-                 'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Choose New', "Last Used"]
+                 'SouthPole-032g', 'WhiteMountain-115g', 'WhiteMountain-175g', 'Choose New']
     
         # Source galaxies    
-        sources = ['NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Choose New', "Last Used"]
+        sources = ["Last Used", 'NGC958_z=1', 'ARP220_z=1', 'MRK231_z=1', 'Choose New']
     
         # Sources of noise    
         backgrounds = ['Cosmic Infrared Background', 'Cosmic Microwave Background', 'Galactic Emission', 'Thermal Mirror Emission',
@@ -151,24 +151,13 @@ class atmodel(wx.Frame):
         generate_label = wx.StaticText(panel, label='Generates:')
         generate_label.SetFont(font)  # Title
 
-        check_Noise = wx.CheckBox(panel, label="Total Noise")
-        check_Temp = wx.CheckBox(panel, label="Total Temperature")
-        check_Signal = wx.CheckBox(panel, label="Total Signal")
-        check_IntTime = wx.CheckBox(panel, label="Integration Time")
-        
-        # set default values
-        check_Noise.SetValue(config.Noise_Default)
-        check_Temp.SetValue(config.Temp_Default)
-        check_Signal.SetValue(config.Signal_Default)
-        check_IntTime.SetValue(config.IntTime_Default)
+        generates = ['Total Noise', 'Total Temperature', 'Total Signal', 'Integration time'] 
+        self.generate_checkboxs = [wx.CheckBox(panel, label=generates[i]) for i in range(len(generates))]
 
     # Bottom_left -> Fill up contents
         bottom_left.Add(generate_label, flag=wx.BOTTOM, border=10)
-        
-        bottom_left.Add(check_Noise, flag=wx.BOTTOM, border=2)
-        bottom_left.Add(check_Temp, flag=wx.BOTTOM, border=2)
-        bottom_left.Add(check_Signal, flag=wx.BOTTOM, border=2)
-        bottom_left.Add(check_IntTime, flag=wx.BOTTOM, border=2)
+        for i in range(len(generates)):
+            bottom_left.Add(self.generate_checkboxs[i], flag=wx.BOTTOM, border=3)
 
     # Bottom_right
         # Bottom_right -> Output -> Controls
@@ -260,7 +249,7 @@ class atmodel(wx.Frame):
         freq_end = float(self.input_StopFreq.GetValue())  #get ending frequency input as a float
         #the other inputs are only required to have entries if they are needed in the calculation that is checked
 
-        if self.check_Noise.IsChecked() or self.check_Signal.IsChecked() or self.check_IntTime.IsChecked():  #only need resolution if any option other than "Total Temperature" is checked
+        if self.generate_checkboxs[0].IsChecked() or self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only need resolution if any option other than "Total Temperature" is checked
             resol = float(self.input_SpecRes.GetValue())  #get resolution input as a float
 
         path = self.output_input.GetValue()  #get input as name of file to be written
@@ -269,7 +258,7 @@ class atmodel(wx.Frame):
 
 
 # Calculate BLING
-        if self.check_Noise.IsChecked() or self.check_IntTime.IsChecked():  #only do BLING calculations if "Total Noise" or "Integration Time" is checked
+        if self.generate_checkboxs[0].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only do BLING calculations if "Total Noise" or "Integration Time" is checked
             start_time = time.time()  #begins clock for calculation time   
             bling_squared = 0  #checking boxes for different backgrounds will add values to this "bling_squared" array
                 #the squares of BLINGs are added up since the final result is equal to BLINGs added in quadrature
@@ -467,7 +456,7 @@ class atmodel(wx.Frame):
 
 
 # Calculate Antenna Temperature
-        if self.check_Temp.IsChecked():
+        if self.generate_checkboxs[1].IsChecked():
             start_time = time.time()  #begins clock for calculation time   
             temperature = 0  #checking boxes for different backgrounds will add values to this "temperature" array
             title_temp = []  #append names of which backgrounds are checked to put in title
@@ -653,7 +642,7 @@ class atmodel(wx.Frame):
 
 
 # Calculate Total Signal
-        if self.check_Signal.IsChecked() or self.check_IntTime.IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
+        if self.generate_checkboxs[2].IsChecked() or self.generate_checkboxs[3].IsChecked():  #only do signal calculation if "Total Signal" or "Integration Time" is checked
 # Calculate Source Intensity
             d = float(self.input_MirrorDiam.GetValue())  #only need mirror diameter input if "Total Signal" is checked
             if source == "Choose New":  #find file of custom source
@@ -687,9 +676,9 @@ class atmodel(wx.Frame):
             write_last_used.close()
             
 # Calculate Total Signal
-            if site == "Custom":  #find transmission file from custom site
+            if site == "Choose New":  #find file of custom site
                 # create window to let user know to pick the file
-                message_dialog = wx.MessageDialog(self, message='Select file for site transmission')
+                message_dialog = wx.MessageDialog(self, message='Select file for site')
                 if message_dialog.ShowModal() == wx.ID_OK:
                     message_dialog.Destroy()
 
@@ -697,15 +686,26 @@ class atmodel(wx.Frame):
                 file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                 if file_dialog.ShowModal() == wx.ID_OK:
                     self.site_trans = file_dialog.GetPath()
-                    at = ExcelReader(self.site_trans)
+                    at = self.site_trans
                 file_dialog.Destroy()
-            else:  #if site not custom, find file
-                at = ExcelReader(file_refs.atm_tran_refs[site])
-            at.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-            
-            tau = np.array(at.read_from_col(4), dtype='float')  #create array of transmission from 5th column of excel file, reading as floats
+            elif site == "Last Used":
+                read_last_used = open("last used AT file.txt", "r") #read from "last used AT file.txt"
+                at = read_last_used.read()
+            else:  #if site not custom, find file in file_refs.py
+                at = file_refs.atm_tran_refs[site]  #find file of site transmission
+
+            # perform calculations    
+            AT = ExcelReader(at)
+            AT.set_freq_range_Hz(freq_start*10**12, freq_end*10**12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+            tau = np.array(AT.read_from_col(4), dtype='float')  #create array of transmission from 5th column of excel file, reading as floats
             print "Reading from Atmosphere Transmission. DONE"
 
+            # save into "last used AT file.txt"
+            write_last_used = open("last used AT file.txt", "w")
+            write_last_used.write(str(at))
+            write_last_used.close()
+
+            # final Signal calculations
             print "Calculating Total Signal.."
             start_time = time.time()  #begins clock for calculation time
             ts = cal.TS(freq, inte, tau, d, resol)  #returns array of total signal from inputs
@@ -737,7 +737,7 @@ class atmodel(wx.Frame):
 
 
 #if "Total Noise" is checked
-        if self.check_Noise.IsChecked():
+        if self.generate_checkboxs[0].IsChecked():
             # write file
             xw = ExcelXWriter(path)  #create xlsx file named after the input
             #each of the following adds a new column
@@ -761,7 +761,7 @@ class atmodel(wx.Frame):
 
 
 #if "Total Temperature" is checked
-        if self.check_Temp.IsChecked():
+        if self.generate_checkboxs[1].IsChecked():
             # write file
             xw = ExcelXWriter(path)  #create xlsx file named after the input
             #each of the following adds a new column
@@ -785,7 +785,7 @@ class atmodel(wx.Frame):
 
 
 #if "Total Signal" is checked
-        if self.check_Signal.IsChecked():
+        if self.generate_checkboxs[2].IsChecked():
             # draw plot
             loglogplot(freq_THz, ts)  #plot of signal is log(base 10)-scaled
             pylab.ylabel("Signal(W)")
@@ -804,7 +804,7 @@ class atmodel(wx.Frame):
 
 
 #if "Integration Time" is checked
-        if self.check_IntTime.IsChecked():
+        if self.generate_checkboxs[3].IsChecked():
             ratio = float(self.input_SigNoise.GetValue())  #only need signal to noise ratio input if "Integration Time" is checked
 
             # draw plot
