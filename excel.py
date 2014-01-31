@@ -1,4 +1,3 @@
-
 from xlrd import open_workbook
 from xlwt import Workbook
 from xlsxwriter.workbook import Workbook
@@ -22,31 +21,6 @@ class ExcelReader:
         return result
     
     def set_freq_range(self, freq_start, freq_end):
-        ####
-        ## Figure out the first and last rows with a frequency within the allowed range
-        ## (assumes frequencies are sorted in ascending order)
-        ####
-        #### BEGIN PSEUDOCODE ---->
-        ## Row_Start, Row_End := 0 -- what we're finding (this line isn't actually needed unless variables need to be declared)
-        ## Row = Row_Offset -- begin at Row_Offset which is number of rows we skip; so now we're at the first row we don't skip
-        ## Current_Value := Value (Row, 2) -- get the first value of the second column (2nd column contains frequencies)
-        ## -- keep looping until we find a frequency larger than the minimum
-        ## -- note: the (Current_Value != null) part checks to make sure we haven't reached the end of the data yet
-        ## while Current_Value != null && Current_Value < Minimum_Frequency do
-        ##    Row = Row + 1
-        ##    Current_Value := Value (Row, 2)
-        ## end
-        ## Row_Start := Row -- we're now at the first row that we want to use
-        ## -- keep looping until we find a frequency larger than the maximum
-        ## while Current_Value != null && Current_Value < Maximum_Frequency do
-        ##    Row = Row + 1
-        ##    Current_Value := Value (Row, 2)
-        ## end
-        ## -- the current row is the first row with a frequency larger than the maximum
-        ## -- the row with the largest frequency smaller than the maximum is therefore previous row
-        ## Row_End := Row - 1
-        #### <---- END PSEUDOCODE
-        ####
         ## Note: we can determine whether or not our allowed range of frequencies is completely
         ##       outside the range of data by checking Row_End < Row_Start;
         ##       if Row_End < Row_Start, that means we don't have any data in the file within our
@@ -69,11 +43,7 @@ class ExcelReader:
             Row = Row + 1
             Current_Value = self.sheet.cell(Row, 1).value
         self.row_end = Row - 1 #the row we want to end reading from is the last row the while loop iterated through which is one less than the "Row" it will give
-            
-##        self.row_start = int((freq_start - self.freq_offset)/self.freq_step_size) + self.row_offset
-##        self.row_end = int((freq_end - self.freq_offset) / self.freq_step_size)+ 1 + self.row_offset
-##        self.row_start = 1   #this is being used for testing purposes
-##        self.row_end = 11
+
         print("row start is " + str(self.row_start))
         print("row end is " + str(self.row_end))
 
