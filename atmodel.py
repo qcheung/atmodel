@@ -151,24 +151,24 @@ class atmodel(wx.Frame):
         generate_label = wx.StaticText(panel, label='Generates:')
         generate_label.SetFont(font)  # Title
 
-        check_Noise = wx.CheckBox(panel, label="Total Noise")
-        check_Temp = wx.CheckBox(panel, label="Total Temperature")
-        check_Signal = wx.CheckBox(panel, label="Total Signal")
-        check_IntTime = wx.CheckBox(panel, label="Integration Time")
+        self.check_Noise = wx.CheckBox(panel, label="Total Noise")
+        self.check_Temp = wx.CheckBox(panel, label="Total Temperature")
+        self.check_Signal = wx.CheckBox(panel, label="Total Signal")
+        self.check_IntTime = wx.CheckBox(panel, label="Integration Time")
         
         # set default values
-        check_Noise.SetValue(config.Noise_Default)
-        check_Temp.SetValue(config.Temp_Default)
-        check_Signal.SetValue(config.Signal_Default)
-        check_IntTime.SetValue(config.IntTime_Default)
+        self.check_Noise.SetValue(config.Noise_Default)
+        self.check_Temp.SetValue(config.Temp_Default)
+        self.check_Signal.SetValue(config.Signal_Default)
+        self.check_IntTime.SetValue(config.IntTime_Default)
 
     # Bottom_left -> Fill up contents
         bottom_left.Add(generate_label, flag=wx.BOTTOM, border=10)
         
-        bottom_left.Add(check_Noise, flag=wx.BOTTOM, border=2)
-        bottom_left.Add(check_Temp, flag=wx.BOTTOM, border=2)
-        bottom_left.Add(check_Signal, flag=wx.BOTTOM, border=2)
-        bottom_left.Add(check_IntTime, flag=wx.BOTTOM, border=2)
+        bottom_left.Add(self.check_Noise, flag=wx.BOTTOM, border=2)
+        bottom_left.Add(self.check_Temp, flag=wx.BOTTOM, border=2)
+        bottom_left.Add(self.check_Signal, flag=wx.BOTTOM, border=2)
+        bottom_left.Add(self.check_IntTime, flag=wx.BOTTOM, border=2)
 
     # Bottom_right
         # Bottom_right -> Output -> Controls
