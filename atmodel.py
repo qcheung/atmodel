@@ -279,7 +279,7 @@ class atmodel(wx.Frame):
             if self.background_checkboxs[0].IsChecked() or self.background_checkboxs[6].IsChecked():
 ##                index = self.CIB_file_choice.GetCurrentSelection()  #creates "index"=0, 1, & 2 depending on file for selection
 ##                if index == 0:  #if "Last Used" is selected
-##                    ######NEED TO FIGURE OUT HOW TO DO THIS
+##                    ######CONSIDERING FITTING FUNCTION
 ##                elif index == 1:  #if "Default" is selected, use default file in file_refs.py    
                 title_bling.append('Cosmic Infrared Background')
                 cib_excel = file_refs.CIB_ref  #name excel file to read from
@@ -299,9 +299,9 @@ class atmodel(wx.Frame):
                 index = self.CMB_file_choice.GetCurrentSelection()  #creates "index"=0, 1, or 2 depending on file for selection               
                 if index == 0:  #if "Last Used" is selected
                     read_last_used = open("last used CMB file.txt", "r")  #read from "last used GE file.txt"
-                    cmb = read_last_used.read()
+                    cmb_file = read_last_used.read()
                 elif index == 1:  #if "Default" is selected, use default file in file_refs.py
-                    cmb = file_refs.CMB_ref
+                    cmb_file = file_refs.CMB_ref
                 elif index == 2:  #if "Choose New" is selected, open browser
                      # create window to let user know to pick the file
                     message_dialog = wx.MessageDialog(self, message='Select file for Cosmic Microwave Background')
@@ -311,16 +311,16 @@ class atmodel(wx.Frame):
                     # open file browser
                     file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                     if file_dialog.ShowModal() == wx.ID_OK:
-                        cmb = file_dialog.GetPath()
+                        cmb_file = file_dialog.GetPath()
                     file_dialog.Destroy()
 
                 # save into "last used CMB file.txt"
                 write_last_used = open("last used CMB file.txt", "w")
-                write_last_used.write(str(cmb))
+                write_last_used.write(str(cmb_file))
                 write_last_used.close()
                 
                 # perform calculations
-                CMB = ExcelReader(cmb)
+                CMB = ExcelReader(cmb_file)
                 CMB.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
                 print "Reading array from", cmb
                 freqNoise = np.array(CMB.read_from_col(1), dtype="float")  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
@@ -333,19 +333,19 @@ class atmodel(wx.Frame):
                 if index == 0:  #if "Last Used" is selected
                     title_bling.append('Galactic Emission')
                     read_last_used = open("last used GE file.txt", "r")  #read from "last used GE file.txt"
-                    ge = read_last_used.read()
+                    ge_file = read_last_used.read()
                 elif index == 1:  #if (g_long=0, g_lat=0) is selected, use the 1st default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=0)')
-                    ge = file_refs.Galatic_Emission_refs[0]  #index here(0) refers to file_refs.py not "self.galactic_direction_combo"
+                    ge_file = file_refs.Galatic_Emission_refs[0]  #index here(0) refers to file_refs.py not "self.galactic_direction_combo"
                 elif index == 2:  #if (g_long=0, g_lat=45) is selected, use the 2nd default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=45)')
-                    ge = file_refs.Galatic_Emission_refs[1]  #index here(1) refers to file_refs.py not "self.galactic_direction_combo"
+                    ge_file = file_refs.Galatic_Emission_refs[1]  #index here(1) refers to file_refs.py not "self.galactic_direction_combo"
                 elif index == 3:  #if (g_long=0, g_lat=90) is selected, use the 3rd default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=90)')
-                    ge = file_refs.Galatic_Emission_refs[2]  #index here(2) refers to file_refs.py not "self.galactic_direction_combo"
+                    ge_file = file_refs.Galatic_Emission_refs[2]  #index here(2) refers to file_refs.py not "self.galactic_direction_combo"
                 elif index == 4:  #if (g_long=0, g_lat=-90) is selected, use the 4th default file in file_refs.py
                     title_bling.append('Galactic Emission(g_long=0, g_lat=-90)')
-                    ge = file_refs.Galatic_Emission_refs[3]  #index here(3) refers to file_refs.py not "self.galactic_direction_combo"
+                    ge_file = file_refs.Galatic_Emission_refs[3]  #index here(3) refers to file_refs.py not "self.galactic_direction_combo"
                 elif index == 5:  #if "Choose New" is selected, open browser
                     title_bling.append('Galactic Emission')
                     # create window to let user know to pick the file
@@ -356,16 +356,16 @@ class atmodel(wx.Frame):
                     # open file browser
                     file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                     if file_dialog.ShowModal() == wx.ID_OK:
-                        ge = file_dialog.GetPath()
+                        ge_file = file_dialog.GetPath()
                     file_dialog.Destroy()
 
                 # save into "last used GE file.txt"
                 write_last_used = open("last used GE file.txt", "w")
-                write_last_used.write(str(ge))
+                write_last_used.write(str(ge_file))
                 write_last_used.close()
 
                 # perform calculations
-                GE = ExcelReader(ge)
+                GE = ExcelReader(ge_file)
                 GE.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
                 freqNoise = np.array(GE.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
@@ -394,8 +394,8 @@ class atmodel(wx.Frame):
 
 #if "Atmospheric Radiance" or "Cumulative" box is checked
             if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():
-                title_bling.append('Atmospheric Radiance') #title depends on name of site chosen
-                if site == "Choose New":  #find transmission file from custom site
+                title_bling.append('Atmospheric Radiance')
+                if site == "Choose New":  #if "Choose New" is selected, open browser
                     # create window to let user know to pick the file
                     message_dialog = wx.MessageDialog(self, message='Select file for site radiance')
                     if message_dialog.ShowModal() == wx.ID_OK:
@@ -404,18 +404,26 @@ class atmodel(wx.Frame):
                     # open file browser
                     file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                     if file_dialog.ShowModal() == wx.ID_OK:
-                        self.site_rad = file_dialog.GetPath()
-                        ar = self.site_rad
+                        ar_file = file_dialog.GetPath()
                     file_dialog.Destroy()
+                elif site == "Last Used":  #if "Last Used" is selected
+                    read_last_used = open("last used AR file.txt", "r")  #read from "last used AR file.txt"
+                    ar_file = read_last_used.read()
                 else:  #if default file is selected, find file
-                    ar = file_refs.atm_rad_refs[site]  #name excel file to read from, depending on site chosen
+                    ar_file = file_refs.atm_rad_refs[site]  #name excel file to read from, depending on site chosen
+                    title_bling.append('[' + str(site) + ']')  #if site is chosen from list of known sites, can include name in plot title
 
-                    #still need "last used" here
-                site_rad = ExcelReader(ar)
-                site_rad.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-                freqNoise = np.array(site_rad.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                # save into "last used AR file.txt"
+                write_last_used = open("last used AR file.txt", "w")
+                write_last_used.write(str(ar_file))
+                write_last_used.close()
+
+                # perform calculations
+                AR = ExcelReader(ar_file)
+                AR.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(AR.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
-                rad = np.array(site_rad.read_from_col(4), dtype='float')  #create array of radiance(W/cm^2/st/cm^-1) from 5th column of excel file, reading as floats
+                rad = np.array(AR.read_from_col(4), dtype='float')  #create array of radiance(W/cm^2/st/cm^-1) from 5th column of excel file, reading as floats
                 bling_squared += cal.bling_AR(freqNoise, rad, resol)  #calculate and add BLING(squared) of Atmospheric Radiance to "bling_squared"
 
 #if "Zodiacial Emission" or "Cumulative" box is checked
