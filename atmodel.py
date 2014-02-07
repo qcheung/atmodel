@@ -395,7 +395,7 @@ class atmodel(wx.Frame):
 #if "Atmospheric Radiance" or "Cumulative" box is checked
             if self.background_checkboxs[4].IsChecked() or self.background_checkboxs[6].IsChecked():
                 title_bling.append('Atmospheric Radiance') #title depends on name of site chosen
-                if site == "Custom":  #find transmission file from custom site
+                if site == "Choose New":  #find transmission file from custom site
                     # create window to let user know to pick the file
                     message_dialog = wx.MessageDialog(self, message='Select file for site radiance')
                     if message_dialog.ShowModal() == wx.ID_OK:
@@ -405,14 +405,17 @@ class atmodel(wx.Frame):
                     file_dialog = wx.FileDialog(self, style=wx.FD_OPEN)
                     if file_dialog.ShowModal() == wx.ID_OK:
                         self.site_rad = file_dialog.GetPath()
-                        ar = ExcelReader(self.site_rad)
+                        ar = self.site_rad
                     file_dialog.Destroy()
-                else:  #if site not custom, find file
-                    ar = ExcelReader(file_refs.atm_rad_refs[site])  #name excel file to read from, depending on site chosen
-                ar.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
-                freqNoise = np.array(ar.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
+                else:  #if default file is selected, find file
+                    ar = file_refs.atm_rad_refs[site]  #name excel file to read from, depending on site chosen
+
+                    #still need "last used" here
+                site_rad = ExcelReader(ar)
+                site_rad.set_freq_range_Hz(freq_start * 1e12, freq_end * 1e12)  #set where in excel file to start/stop reading by converting input from THz to Hz
+                freqNoise = np.array(site_rad.read_from_col(1), dtype='float')  #create array of frequency(Hz) from 2nd column of excel file, reading as floats
                 freqNoise_THz = freqNoise * 10 ** (-12)  #create array that converts "freqNoise" into THz
-                rad = np.array(ar.read_from_col(4), dtype='float')  #create array of radiance(W/cm^2/st/cm^-1) from 5th column of excel file, reading as floats
+                rad = np.array(site_rad.read_from_col(4), dtype='float')  #create array of radiance(W/cm^2/st/cm^-1) from 5th column of excel file, reading as floats
                 bling_squared += cal.bling_AR(freqNoise, rad, resol)  #calculate and add BLING(squared) of Atmospheric Radiance to "bling_squared"
 
 #if "Zodiacial Emission" or "Cumulative" box is checked
